@@ -13,7 +13,11 @@ jiti("./src/lib/env.server.ts")
 jiti("./src/lib/env.client.ts")
 
 /** @type {import('next').NextConfig} */
-let nextConfig = {}
+let nextConfig = {
+  experimental: {
+    serverComponentsExternalPackages: ["@node-rs/argon2"],
+  },
+}
 
 nextConfig = withBundleAnalyzer(nextConfig)
 

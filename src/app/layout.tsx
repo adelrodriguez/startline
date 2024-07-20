@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import "@/styles/tailwind.css"
-import { Analytics } from "@vercel/analytics/react"
 import { cn, fonts } from "@/utils/ui"
+import { Analytics } from "@vercel/analytics/react"
 
 export const metadata: Metadata = {
   title: "Create Next App",

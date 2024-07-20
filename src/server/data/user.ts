@@ -1,0 +1,59 @@
+"server-only"
+
+import {
+  type User,
+  type UserValues,
+  insertUser,
+  selectUser,
+  upsertUser,
+} from "@/server/db"
+
+export async function findUserByEmail(email: User["email"]) {
+  const user = await selectUser({ email })
+
+  return user ?? null
+}
+
+export async function findUserByGoogleId(googleId: string) {
+  const user = await selectUser({ googleId })
+
+  return user ?? null
+}
+
+export async function findUserById(userId: User["id"]) {
+  const user = await selectUser(userId)
+
+  return user ?? null
+}
+
+export async function createUser(values: Omit<UserValues, "id" | "role">) {
+  const user = await insertUser({ ...values, role: "user" })
+
+  return user
+}
+
+export async function createAdmin(values: Omit<UserValues, "id" | "role">) {
+  const user = await insertUser({ ...values, role: "admin" })
+
+  return user
+}
+
+export async function createUserWithGoogle(
+  values: Pick<UserValues, "email" | "googleId" | "emailVerifiedAt">,
+) {
+  const user = await upsertUser({
+    googleId: values.googleId,
+    email: values.email,
+    emailVerifiedAt: values.emailVerifiedAt,
+  })
+
+  return user
+}
+
+export function checkIsAdmin(user: User) {
+  return user.role === "admin"
+}
+
+export function checkIsUser(user: User) {
+  return user.role === "user"
+}

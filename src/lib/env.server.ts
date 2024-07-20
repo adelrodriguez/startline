@@ -8,6 +8,10 @@ export default createEnv({
   server: {
     BASE_URL: z.string().url(),
 
+    // Google
+    GOOGLE_CLIENT_ID: z.string(),
+    GOOGLE_CLIENT_SECRET: z.string(),
+
     // Node
     NODE_ENV: z
       .enum(["development", "test", "production"])
