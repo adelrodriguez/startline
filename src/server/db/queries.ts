@@ -15,7 +15,11 @@ type OmitUserId<T> = Omit<T, "userId">
 
 // User
 export function selectUser(
-  query: User["id"] | { email: string } | { googleId: string },
+  query:
+    | User["id"]
+    | { email: string }
+    | { googleId: string }
+    | { githubId: string },
 ) {
   return db.query.user.findFirst({
     where: (model, { eq }) => {
@@ -29,6 +33,10 @@ export function selectUser(
 
       if ("googleId" in query) {
         return eq(model.googleId, query.googleId)
+      }
+
+      if ("githubId" in query) {
+        return eq(model.githubId, query.githubId)
       }
 
       return undefined

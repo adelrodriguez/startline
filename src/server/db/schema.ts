@@ -22,6 +22,7 @@ export const user = createTable("user", {
 
   // Accounts
   googleId: text("google_id").unique(),
+  githubId: text("github_id").unique(),
 })
 export type User = typeof user.$inferSelect
 export type UserValues = typeof user.$inferInsert

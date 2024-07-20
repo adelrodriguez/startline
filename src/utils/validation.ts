@@ -23,3 +23,10 @@ export const GoogleUserSchema = z.object({
   email_verified: z.boolean(),
   picture: z.string().optional(),
 })
+
+export const GitHubUserSchema = z.object({
+  id: z.coerce.string().min(1),
+  email: z.string().email(),
+  avatar_url: z.string().optional(),
+  name: z.string().optional(),
+})

@@ -20,6 +20,12 @@ export async function findUserByGoogleId(googleId: string) {
   return user ?? null
 }
 
+export async function findUserByGitHubId(githubId: string) {
+  const user = await selectUser({ githubId })
+
+  return user ?? null
+}
+
 export async function findUserById(userId: User["id"]) {
   const user = await selectUser(userId)
 
@@ -45,6 +51,17 @@ export async function createUserWithGoogle(
     googleId: values.googleId,
     email: values.email,
     emailVerifiedAt: values.emailVerifiedAt,
+  })
+
+  return user
+}
+
+export async function createUserWithGitHub(
+  values: Pick<UserValues, "email" | "githubId">,
+) {
+  const user = await upsertUser({
+    githubId: values.githubId,
+    email: values.email,
   })
 
   return user

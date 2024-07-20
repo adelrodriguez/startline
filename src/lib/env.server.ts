@@ -8,6 +8,10 @@ export default createEnv({
   server: {
     BASE_URL: z.string().url(),
 
+    // GitHub
+    GITHUB_CLIENT_ID: z.string(),
+    GITHUB_CLIENT_SECRET: z.string(),
+
     // Google
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),

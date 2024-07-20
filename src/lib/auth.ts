@@ -7,7 +7,7 @@ import db, { type User, type SessionValues } from "@/server/db"
 import { session, user } from "@/server/db"
 import { buildUrl } from "@/utils/url"
 import { DrizzleSQLiteAdapter } from "@lucia-auth/adapter-drizzle"
-import { Google } from "arctic"
+import { GitHub, Google } from "arctic"
 import { Lucia } from "lucia"
 import type { User as AuthUser, Session } from "lucia"
 import { cookies } from "next/headers"
@@ -109,3 +109,5 @@ export const google = new Google(
   env.GOOGLE_CLIENT_SECRET,
   buildUrl("/api/sign-in/google/callback"),
 )
+
+export const github = new GitHub(env.GITHUB_CLIENT_ID, env.GITHUB_CLIENT_SECRET)
