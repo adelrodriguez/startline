@@ -2,6 +2,7 @@
 
 import { invalidateSession, setSession, validateRequest } from "@/lib/auth"
 import { AUTHORIZED_URL, UNAUTHORIZED_URL } from "@/lib/consts"
+import rateLimit from "@/lib/rate-limit"
 import {
   createPassword,
   createUser,
@@ -22,6 +23,16 @@ export async function signUp(prevState: unknown, formData: FormData) {
     return submission.reply()
   }
 
+  const ipAddress = getIpAddress()
+
+  const success = await rateLimit.unknown.limit(ipAddress)
+
+  if (!success) {
+    return submission.reply({
+      formErrors: ["Too many requests"],
+    })
+  }
+
   const existingUser = await findUserByEmail(submission.value.email)
 
   if (existingUser) {
@@ -36,8 +47,6 @@ export async function signUp(prevState: unknown, formData: FormData) {
 
   await createPassword(newUser.id, submission.value.password)
 
-  const ipAddress = getIpAddress()
-
   await setSession(newUser.id, { ipAddress })
 
   redirect(AUTHORIZED_URL)
@@ -50,6 +59,16 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
 
   if (submission.status !== "success") {
     return submission.reply()
+  }
+
+  const ipAddress = getIpAddress()
+
+  const success = await rateLimit.unknown.limit(ipAddress)
+
+  if (!success) {
+    return submission.reply({
+      formErrors: ["Too many requests"],
+    })
   }
 
   const existingUser = await findUserByEmail(submission.value.email)
@@ -70,8 +89,6 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
       formErrors: ["Incorrect email or password"],
     })
   }
-
-  const ipAddress = getIpAddress()
 
   await setSession(existingUser.id, { ipAddress })
 

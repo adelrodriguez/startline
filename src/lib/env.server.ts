@@ -29,6 +29,10 @@ export default createEnv({
     // Turso
     TURSO_DATABASE_URL: z.string(),
     TURSO_AUTH_TOKEN: z.string(),
+
+    // Upstash
+    UPSTASH_REDIS_REST_URL: z.string(),
+    UPSTASH_REDIS_REST_TOKEN: z.string(),
   },
   experimental__runtimeEnv: process.env,
   /**
