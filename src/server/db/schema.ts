@@ -1,4 +1,4 @@
-import { USER_ROLES, UserRoles } from "@/lib/consts"
+import { USER_ROLES, WEBHOOK_PROVIDERS } from "@/lib/consts"
 import { relations, sql } from "drizzle-orm"
 import { integer, sqliteTableCreator, text } from "drizzle-orm/sqlite-core"
 
@@ -15,7 +15,7 @@ export const user = createTable("user", {
     sql`(unixepoch())`,
   ),
 
-  role: text("role", { enum: USER_ROLES }).notNull().default(UserRoles.USER),
+  role: text("role", { enum: USER_ROLES }).notNull().default("user"),
 
   email: text("email").notNull().unique(),
   emailVerifiedAt: integer("email_verified_at", { mode: "timestamp" }),
@@ -59,3 +59,18 @@ export const session = createTable("session", {
 })
 export type Session = typeof session.$inferSelect
 export type SessionValues = typeof session.$inferInsert
+
+export const webhookEvent = createTable("webhook_event", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  createdAt: integer("created_at", { mode: "timestamp" }).default(
+    sql`(unixepoch())`,
+  ),
+  processedAt: integer("processed_at", { mode: "timestamp" }),
+
+  event: text("event").notNull(),
+  externalId: text("external_id").notNull(),
+  payload: text("payload"),
+  provider: text("provider", { enum: WEBHOOK_PROVIDERS }).notNull(),
+})
+export type WebhookEvent = typeof webhookEvent.$inferSelect
+export type WebhookEventValues = typeof webhookEvent.$inferInsert

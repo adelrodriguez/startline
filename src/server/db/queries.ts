@@ -6,8 +6,11 @@ import {
   type PasswordValues,
   type User,
   type UserValues,
+  type WebhookEvent,
+  type WebhookEventValues,
   password,
   user,
+  webhookEvent,
 } from "./schema"
 
 type OmitId<T> = Omit<T, "id">
@@ -86,6 +89,41 @@ export function insertPassword(
   return db
     .insert(password)
     .values({ ...values, userId })
+    .returning()
+    .get()
+}
+
+// Webhook Event
+export function selectWebhookEvent(
+  query: WebhookEvent["id"] | { externalId: string },
+) {
+  return db.query.webhookEvent.findFirst({
+    where: (model, { eq }) => {
+      if (typeof query === "number") {
+        return eq(model.id, query)
+      }
+
+      if ("externalId" in query) {
+        return eq(model.externalId, query.externalId)
+      }
+
+      return undefined
+    },
+  })
+}
+
+export function insertWebhookEvent(values: OmitId<WebhookEventValues>) {
+  return db.insert(webhookEvent).values(values).returning().get()
+}
+
+export function updateWebhookEvent(
+  webhookEventId: WebhookEvent["id"],
+  values: Partial<OmitId<WebhookEventValues>>,
+) {
+  return db
+    .update(webhookEvent)
+    .set(values)
+    .where(eq(webhookEvent.id, webhookEventId))
     .returning()
     .get()
 }

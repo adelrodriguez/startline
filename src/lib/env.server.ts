@@ -26,6 +26,10 @@ export default createEnv({
     SENTRY_ORG: z.string(),
     SENTRY_PROJECT: z.string(),
 
+    // Stripe
+    STRIPE_SECRET_KEY: z.string(),
+    STRIPE_WEBHOOK_SECRET: z.string(),
+
     // Turso
     TURSO_DATABASE_URL: z.string(),
     TURSO_AUTH_TOKEN: z.string(),
