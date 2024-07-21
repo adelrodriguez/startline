@@ -12,6 +12,7 @@ import {
   user,
   webhookEvent,
 } from "./schema"
+import { QueryError } from "@/utils/error"
 
 type OmitId<T> = Omit<T, "id">
 type OmitUserId<T> = Omit<T, "userId">
@@ -42,7 +43,7 @@ export function selectUser(
         return eq(model.githubId, query.githubId)
       }
 
-      return undefined
+      throw new QueryError("selectUser")
     },
   })
 }
@@ -107,7 +108,7 @@ export function selectWebhookEvent(
         return eq(model.externalId, query.externalId)
       }
 
-      return undefined
+      throw new QueryError("selectWebhookEvent")
     },
   })
 }
