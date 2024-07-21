@@ -1,17 +1,30 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
+    // Base options
     "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    // Strictness
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    // Module resolution
     "module": "esnext",
     "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+    "noEmit": true,
+
+    // DOM
+    "lib": ["dom", "dom.iterable", "esnext"],
     "jsx": "preserve",
     "incremental": true,
+
     "plugins": [
       {
         "name": "next"
