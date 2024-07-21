@@ -1,3 +1,5 @@
+"server-only"
+
 import env from "@/lib/env.server"
 import { remember } from "@epic-web/remember"
 import { Redis } from "@upstash/redis"
