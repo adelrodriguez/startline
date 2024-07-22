@@ -10,5 +10,8 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 [] Set up admin panel
 [] Set up example
 [] Beautify logs
+[] Update script (pulls changes from template)
 [] Set up basic UI
 [] Write a README
+[] Modularize certain features (jobs queue, Stripe webhooks, etc.)
+[] Set up testing (mostly for unit tests of utils and such)
