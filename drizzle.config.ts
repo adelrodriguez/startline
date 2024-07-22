@@ -6,8 +6,8 @@ export default {
   out: "./migrations",
   driver: "turso",
   dbCredentials: {
-    url: env.TURSO_DATABASE_URL,
-    authToken: env.TURSO_AUTH_TOKEN,
+    url: env.DATABASE_URL,
+    authToken: env.DATABASE_AUTH_TOKEN,
   },
   dialect: "sqlite",
 } satisfies Config

@@ -31,8 +31,8 @@ export default createEnv({
     STRIPE_WEBHOOK_SECRET: z.string(),
 
     // Turso
-    TURSO_DATABASE_URL: z.string(),
-    TURSO_AUTH_TOKEN: z.string(),
+    DATABASE_URL: z.string(),
+    DATABASE_AUTH_TOKEN: z.string(),
 
     // Upstash
     UPSTASH_REDIS_REST_URL: z.string(),

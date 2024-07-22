@@ -7,8 +7,8 @@ import { createClient } from "@libsql/client"
 import { drizzle } from "drizzle-orm/libsql"
 
 const turso = createClient({
-  url: env.TURSO_DATABASE_URL,
-  authToken: env.TURSO_AUTH_TOKEN,
+  url: env.DATABASE_URL,
+  authToken: env.DATABASE_AUTH_TOKEN,
 })
 
 const db = remember("db", () => drizzle(turso, { schema }))
