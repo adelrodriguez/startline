@@ -1,7 +1,7 @@
 "use server"
 
 import { invalidateSession, setSession, validateRequest } from "@/lib/auth"
-import { AUTHORIZED_URL, UNAUTHORIZED_URL } from "@/lib/consts"
+import { AUTHORIZED_URL, FALLBACK_IP, UNAUTHORIZED_URL } from "@/lib/consts"
 import rateLimit from "@/lib/rate-limit"
 import {
   createPassword,
@@ -14,7 +14,7 @@ import { SignInSchema, SignUpSchema } from "@/utils/validation"
 import { parseWithZod } from "@conform-to/zod"
 import { redirect } from "next/navigation"
 
-export async function signUp(prevState: unknown, formData: FormData) {
+export async function signUp(_: unknown, formData: FormData) {
   const submission = parseWithZod(formData, {
     schema: SignUpSchema,
   })
@@ -23,7 +23,7 @@ export async function signUp(prevState: unknown, formData: FormData) {
     return submission.reply()
   }
 
-  const ipAddress = getIpAddress()
+  const ipAddress = getIpAddress() ?? FALLBACK_IP
 
   const success = await rateLimit.unknown.limit(ipAddress)
 
@@ -61,7 +61,7 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
     return submission.reply()
   }
 
-  const ipAddress = getIpAddress()
+  const ipAddress = getIpAddress() ?? FALLBACK_IP
 
   const success = await rateLimit.unknown.limit(ipAddress)
 
