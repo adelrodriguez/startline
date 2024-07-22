@@ -21,6 +21,9 @@ export default createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
 
+    // Resend
+    RESEND_API_KEY: z.string(),
+
     // Sentry
     SENTRY_DSN: z.string(),
     SENTRY_ORG: z.string(),
