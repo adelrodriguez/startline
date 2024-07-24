@@ -32,16 +32,19 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 # TODO
 
-- [ ] Set up emails
-- [ ] Set up magic link
-- [ ] Set up password reset
-- [ ] Set up analytics
+- [x] Set up emails
+- [x] Set up sign-in with code
+- [ ] Set up verification email code
+- [ ] Set up password reset tokens
+- [ ] Set up file uploads
 - [ ] Set up jobs queue
+- [ ] Set up analytics
 - [ ] Set up admin panel
+- [ ] Set up testing (mostly for unit tests of utils and such)
+- [ ] Create setup script using Pulumi
 - [ ] Set up example
 - [ ] Beautify logs
 - [ ] Update script (pulls changes from template)
 - [ ] Set up basic UI
 - [ ] Write a README
 - [ ] Modularize certain features (jobs queue, Stripe webhooks, etc.)
-- [ ] Set up testing (mostly for unit tests of utils and such)
