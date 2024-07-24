@@ -46,5 +46,6 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 - [ ] Beautify logs
 - [ ] Update script (pulls changes from template)
 - [ ] Set up basic UI
+- [ ] Setup i18n
 - [ ] Write a README
 - [ ] Modularize certain features (jobs queue, Stripe webhooks, etc.)
