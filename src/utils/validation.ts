@@ -11,9 +11,17 @@ export const SignUpSchema = z
     path: ["confirmPassword"],
   })
 
-export const SignInSchema = z.object({
+export const SignInWithPasswordSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
+})
+
+export const SignInWithCodeSchema = z.object({
+  email: z.string().email(),
+})
+
+export const CheckSignInCodeSchema = z.object({
+  code: z.string().length(6),
 })
 
 export const GoogleUserSchema = z.object({

@@ -3,16 +3,28 @@
 import { invalidateSession, setSession, validateRequest } from "@/lib/auth"
 import { AUTHORIZED_URL, FALLBACK_IP, UNAUTHORIZED_URL } from "@/lib/consts"
 import rateLimit from "@/lib/rate-limit"
+import { isProduction } from "@/lib/vars"
 import {
   createPassword,
   createUser,
+  createUserFromCode,
   findUserByEmail,
+  sendSignInCode,
   verifyPassword,
+  verifySignInCode,
 } from "@/server/data"
 import { getIpAddress } from "@/utils/headers"
-import { SignInSchema, SignUpSchema } from "@/utils/validation"
+import {
+  CheckSignInCodeSchema,
+  SignInWithPasswordSchema,
+  SignUpSchema,
+  SignInWithCodeSchema,
+} from "@/utils/validation"
 import { parseWithZod } from "@conform-to/zod"
+import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+
+const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
 export async function signUp(_: unknown, formData: FormData) {
   const submission = parseWithZod(formData, {
@@ -25,7 +37,7 @@ export async function signUp(_: unknown, formData: FormData) {
 
   const ipAddress = getIpAddress() ?? FALLBACK_IP
 
-  const success = await rateLimit.unknown.limit(ipAddress)
+  const { success } = await rateLimit.unknown.limit(ipAddress)
 
   if (!success) {
     return submission.reply({
@@ -54,7 +66,7 @@ export async function signUp(_: unknown, formData: FormData) {
 
 export async function signInWithPassword(_: unknown, formData: FormData) {
   const submission = parseWithZod(formData, {
-    schema: SignInSchema,
+    schema: SignInWithPasswordSchema,
   })
 
   if (submission.status !== "success") {
@@ -63,7 +75,7 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
 
   const ipAddress = getIpAddress() ?? FALLBACK_IP
 
-  const success = await rateLimit.unknown.limit(ipAddress)
+  const { success } = await rateLimit.unknown.limit(ipAddress)
 
   if (!success) {
     return submission.reply({
@@ -91,6 +103,79 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
   }
 
   await setSession(existingUser.id, { ipAddress })
+
+  redirect(AUTHORIZED_URL)
+}
+
+export async function signInWithCode(_: unknown, formData: FormData) {
+  const submission = parseWithZod(formData, {
+    schema: SignInWithCodeSchema,
+  })
+
+  if (submission.status !== "success") {
+    return submission.reply()
+  }
+
+  const { success } = await rateLimit.unknown.limit(submission.value.email)
+
+  if (!success) {
+    return submission.reply({
+      formErrors: ["Too many requests"],
+    })
+  }
+
+  await sendSignInCode(submission.value.email)
+
+  cookies().set(VERIFICATION_EMAIL_COOKIE_NAME, submission.value.email, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "strict",
+    maxAge: 60 * 10, // Ten minutes
+    path: "/sign-in/code",
+  })
+
+  redirect("/sign-in/code")
+}
+
+export async function checkSignInCode(_: unknown, formData: FormData) {
+  const email = cookies().get(VERIFICATION_EMAIL_COOKIE_NAME)?.value ?? null
+
+  if (!email) {
+    return redirect(UNAUTHORIZED_URL)
+  }
+
+  const submission = parseWithZod(formData, {
+    schema: CheckSignInCodeSchema,
+  })
+
+  if (submission.status !== "success") {
+    return submission.reply()
+  }
+
+  const ipAddress = getIpAddress() ?? FALLBACK_IP
+
+  const { success } = await rateLimit.unknown.limit(ipAddress)
+
+  if (!success) {
+    return submission.reply({
+      formErrors: ["Too many requests"],
+    })
+  }
+
+  const isValidCode = await verifySignInCode(email, submission.value.code)
+
+  if (!isValidCode) {
+    return submission.reply({
+      formErrors: ["Invalid code"],
+    })
+  }
+
+  cookies().delete(VERIFICATION_EMAIL_COOKIE_NAME)
+
+  // If the user already exists, we just update their emailVerifiedAt
+  const user = await createUserFromCode({ email })
+
+  await setSession(user.id, { ipAddress })
 
   redirect(AUTHORIZED_URL)
 }

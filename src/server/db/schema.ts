@@ -43,6 +43,17 @@ export const password = createTable("password", {
 export type Password = typeof password.$inferSelect
 export type PasswordValues = typeof password.$inferInsert
 
+export const signInCode = createTable("sign_in_code", {
+  createdAt: integer("created_at", { mode: "timestamp" }).default(
+    sql`(unixepoch())`,
+  ),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  email: text("email").notNull().unique(),
+  hash: text("hash").notNull(),
+})
+export type SignInCode = typeof signInCode.$inferSelect
+export type SignInCodeValues = typeof signInCode.$inferInsert
+
 export const session = createTable("session", {
   id: text("id").primaryKey(),
   createdAt: integer("created_at", { mode: "timestamp" }).default(

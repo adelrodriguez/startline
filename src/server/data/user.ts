@@ -44,7 +44,17 @@ export async function createAdmin(values: Omit<UserValues, "id" | "role">) {
   return user
 }
 
-export async function createUserWithGoogle(
+export async function createUserFromCode(values: Pick<UserValues, "email">) {
+  const user = await upsertUser({
+    ...values,
+    role: "user",
+    emailVerifiedAt: new Date(),
+  })
+
+  return user
+}
+
+export async function createUserFromGoogle(
   values: Pick<UserValues, "email" | "googleId" | "emailVerifiedAt">,
 ) {
   const user = await upsertUser({
@@ -56,7 +66,7 @@ export async function createUserWithGoogle(
   return user
 }
 
-export async function createUserWithGitHub(
+export async function createUserFromGitHub(
   values: Pick<UserValues, "email" | "githubId">,
 ) {
   const user = await upsertUser({

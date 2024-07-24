@@ -1,8 +1,10 @@
+export const APPLICATION_NAME = "Startline"
 export const FALLBACK_IP = "127.0.0.1"
 
 // Auth
 export const AUTHORIZED_URL = "/my"
 export const UNAUTHORIZED_URL = "/sign-in"
+export const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
 // User
 export const USER_ROLES = ["admin", "user"] as const

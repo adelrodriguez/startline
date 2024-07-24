@@ -1,6 +1,6 @@
 import { github, setSession } from "@/lib/auth"
 import { AUTHORIZED_URL } from "@/lib/consts"
-import { createUserWithGitHub, findUserByGitHubId } from "@/server/data"
+import { createUserFromGitHub, findUserByGitHubId } from "@/server/data"
 import { GitHubUserSchema } from "@/utils/validation"
 import { OAuth2RequestError } from "arctic"
 import { StatusCodes } from "http-status-codes"
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       })
     }
 
-    const user = await createUserWithGitHub({
+    const user = await createUserFromGitHub({
       githubId: githubUser.id,
       email: githubUser.email,
     })
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
     })
   } catch (e) {
-    console.log(e)
+    console.error(e)
     // The specific error message depends on the provider
     if (e instanceof OAuth2RequestError) {
       // Invalid code

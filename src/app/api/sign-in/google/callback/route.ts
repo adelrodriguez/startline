@@ -1,6 +1,6 @@
 import { google, setSession } from "@/lib/auth"
 import { AUTHORIZED_URL } from "@/lib/consts"
-import { createUserWithGoogle, findUserByGoogleId } from "@/server/data"
+import { createUserFromGoogle, findUserByGoogleId } from "@/server/data"
 import { GoogleUserSchema } from "@/utils/validation"
 import { OAuth2RequestError } from "arctic"
 import { StatusCodes } from "http-status-codes"
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       })
     }
 
-    const user = await createUserWithGoogle({
+    const user = await createUserFromGoogle({
       googleId: googleUser.sub,
       email: googleUser.email,
       emailVerifiedAt: googleUser.email_verified ? new Date() : null,
@@ -78,6 +78,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
     })
   } catch (e) {
+    console.error(e)
     // The specific error message depends on the provider
     if (e instanceof OAuth2RequestError) {
       // Invalid code

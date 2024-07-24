@@ -1,14 +1,17 @@
 "server-only"
 
-import { eq } from "drizzle-orm"
+import { eq, type SQL } from "drizzle-orm"
 import db from "./client"
 import {
   type PasswordValues,
+  type SignInCode,
+  type SignInCodeValues,
   type User,
   type UserValues,
   type WebhookEvent,
   type WebhookEventValues,
   password,
+  signInCode,
   user,
   webhookEvent,
 } from "./schema"
@@ -58,7 +61,7 @@ export function updateUser(
 ) {
   return db
     .update(user)
-    .set(values)
+    .set({ ...values, updatedAt: new Date() })
     .where(eq(user.id, userId))
     .returning()
     .get()
@@ -70,7 +73,7 @@ export function upsertUser(values: OmitId<UserValues>) {
     .values(values)
     .onConflictDoUpdate({
       target: user.email,
-      set: values,
+      set: { ...values, updatedAt: new Date() },
     })
     .returning()
     .get()
@@ -92,6 +95,34 @@ export function insertPassword(
     .values({ ...values, userId })
     .returning()
     .get()
+}
+
+// Sign In Code
+export function selectSignInCode(query: { email: SignInCode["email"] }) {
+  return db.query.signInCode.findFirst({
+    where: (model, { eq, and, gte }) =>
+      and(eq(model.email, query.email), gte(model.expiresAt, new Date())),
+  })
+}
+
+export function insertSignInCode(values: OmitId<SignInCodeValues>) {
+  return db.insert(signInCode).values(values).returning().get()
+}
+
+export function deleteSignInCode(
+  query: { hash: SignInCode["hash"] } | { email: SignInCode["email"] },
+) {
+  let condition: SQL
+
+  if ("hash" in query) {
+    condition = eq(signInCode.hash, query.hash)
+  } else if ("email" in query) {
+    condition = eq(signInCode.email, query.email)
+  } else {
+    throw new QueryError("deleteSignInCode")
+  }
+
+  return db.delete(signInCode).where(condition)
 }
 
 // Webhook Event

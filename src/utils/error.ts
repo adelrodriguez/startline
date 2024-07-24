@@ -35,6 +35,13 @@ export class QueryError extends Error {
   }
 }
 
+export class SendEmailError extends Error {
+  constructor(name: string, message: string, email: string) {
+    super(`Error sending email to ${email}. ${name}: ${message}`)
+    this.name = "SendEmailError"
+  }
+}
+
 export class InternalError extends Error {}
 
 export class StripeError extends Error {}
