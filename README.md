@@ -38,6 +38,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 - [ ] Set up password reset tokens
 - [ ] Set up file uploads
 - [ ] Set up jobs queue
+- [ ] Set up CRON jobs (for deleting expired codes and tokens)
 - [ ] Set up analytics
 - [ ] Set up admin panel
 - [ ] Set up testing (mostly for unit tests of utils and such)
