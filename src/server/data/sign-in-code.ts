@@ -13,12 +13,12 @@ export async function sendSignInCode(email: string) {
   // Delete old codes
   await deleteSignInCode({ email })
 
-  const code = await generateRandomString(6, alphabet("0-9"))
+  const code = await generateRandomString(6, alphabet("0-9", "A-Z"))
 
   await insertSignInCode({
     email,
     hash: await hash(code),
-    expiresAt: addMinutes(new Date(), 10),
+    expiresAt: addMinutes(new Date(), 15),
   })
 
   await sendEmail(email, "Sign in code", SignInCodeEmail({ code }))
