@@ -12,6 +12,7 @@ import {
   sendSignInCode,
   verifyPassword,
   verifySignInCode,
+  verifyEmailVerificationCode,
 } from "@/server/data"
 import { getIpAddress } from "@/utils/headers"
 import {
@@ -19,12 +20,11 @@ import {
   SignInWithPasswordSchema,
   SignUpSchema,
   SignInWithCodeSchema,
-  CheckVerifyEmailCodeSchema,
+  CheckEmailVerificationCodeSchema,
 } from "@/utils/validation"
 import { parseWithZod } from "@conform-to/zod"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import { verifyVerifyEmailCode } from "../data/verify-email-code"
 
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
@@ -182,7 +182,10 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
   redirect(AUTHORIZED_URL)
 }
 
-export async function checkVerifyEmailCode(_: unknown, formData: FormData) {
+export async function checkEmailVerificationCode(
+  _: unknown,
+  formData: FormData,
+) {
   const { user } = await validateRequest()
 
   if (!user) {
@@ -190,7 +193,7 @@ export async function checkVerifyEmailCode(_: unknown, formData: FormData) {
   }
 
   const submission = parseWithZod(formData, {
-    schema: CheckVerifyEmailCodeSchema,
+    schema: CheckEmailVerificationCodeSchema,
   })
 
   if (submission.status !== "success") {
@@ -205,7 +208,7 @@ export async function checkVerifyEmailCode(_: unknown, formData: FormData) {
     })
   }
 
-  const isValidCode = await verifyVerifyEmailCode(
+  const isValidCode = await verifyEmailVerificationCode(
     user.id,
     submission.value.code,
   )

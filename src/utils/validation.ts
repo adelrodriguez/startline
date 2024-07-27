@@ -24,7 +24,7 @@ export const CheckSignInCodeSchema = z.object({
   code: z.string().length(6),
 })
 
-export const CheckVerifyEmailCodeSchema = z.object({
+export const CheckEmailVerificationCodeSchema = z.object({
   code: z.string().length(6),
 })
 

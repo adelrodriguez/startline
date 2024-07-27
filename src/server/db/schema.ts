@@ -56,7 +56,7 @@ export const signInCode = createTable("sign_in_code", {
 export type SignInCode = typeof signInCode.$inferSelect
 export type SignInCodeValues = typeof signInCode.$inferInsert
 
-export const verifyEmailCode = createTable("verify_email_code", {
+export const emailVerificationCode = createTable("email_verification_code", {
   createdAt: integer("created_at", { mode: "timestamp" }).default(
     sql`(unixepoch())`,
   ),
@@ -69,8 +69,9 @@ export const verifyEmailCode = createTable("verify_email_code", {
 
   hash: text("hash").notNull(),
 })
-export type VerifyEmailCode = typeof verifyEmailCode.$inferSelect
-export type VerifyEmailCodeValues = typeof verifyEmailCode.$inferInsert
+export type EmailVerificationCode = typeof emailVerificationCode.$inferSelect
+export type EmailVerificationCodeValues =
+  typeof emailVerificationCode.$inferInsert
 
 export const session = createTable("session", {
   id: text("id").primaryKey(),

@@ -8,14 +8,14 @@ import {
   type SignInCodeValues,
   type User,
   type UserValues,
-  type VerifyEmailCode,
-  type VerifyEmailCodeValues,
+  type EmailVerificationCode,
+  type EmailVerificationCodeValues,
   type WebhookEvent,
   type WebhookEventValues,
   password,
   signInCode,
   user,
-  verifyEmailCode,
+  emailVerificationCode,
   webhookEvent,
 } from "./schema"
 import { QueryError } from "@/utils/error"
@@ -127,38 +127,40 @@ export function deleteSignInCode(
   return db.delete(signInCode).where(condition)
 }
 
-// Verify Email Code
-export function selectVerifyEmailCode(query: { userId: User["id"] }) {
+// Email Verification Code
+export function selectEmailVerificationCode(query: { userId: User["id"] }) {
   let condition: SQL
 
   if ("userId" in query) {
-    condition = eq(verifyEmailCode.userId, query.userId)
+    condition = eq(emailVerificationCode.userId, query.userId)
   }
 
-  return db.query.verifyEmailCode.findFirst({
+  return db.query.emailVerificationCode.findFirst({
     where: (model, { eq, and, gte }) =>
       and(eq(model.userId, query.userId), gte(model.expiresAt, new Date())),
   })
 }
 
-export function insertVerifyEmailCode(values: OmitId<VerifyEmailCodeValues>) {
-  return db.insert(verifyEmailCode).values(values).returning().get()
+export function insertEmailVerificationCode(
+  values: OmitId<EmailVerificationCodeValues>,
+) {
+  return db.insert(emailVerificationCode).values(values).returning().get()
 }
 
-export function deleteVerifyEmailCode(
-  query: { hash: VerifyEmailCode["hash"] } | { userId: User["id"] },
+export function deleteEmailVerificationCode(
+  query: { hash: EmailVerificationCode["hash"] } | { userId: User["id"] },
 ) {
   let condition: SQL
 
   if ("hash" in query) {
-    condition = eq(verifyEmailCode.hash, query.hash)
+    condition = eq(emailVerificationCode.hash, query.hash)
   } else if ("userId" in query) {
-    condition = eq(verifyEmailCode.userId, query.userId)
+    condition = eq(emailVerificationCode.userId, query.userId)
   } else {
-    throw new QueryError("deleteVerifyEmailCode")
+    throw new QueryError("deleteEmailVerificationCode")
   }
 
-  return db.delete(verifyEmailCode).where(condition)
+  return db.delete(emailVerificationCode).where(condition)
 }
 
 // Webhook Event

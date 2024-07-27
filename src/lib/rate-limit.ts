@@ -10,6 +10,7 @@ const rateLimit = {
     analytics: true,
     ephemeralCache,
     prefix: "ratelimit:user",
+    enableProtection: true,
   }),
   unknown: new Ratelimit({
     redis,
@@ -17,6 +18,7 @@ const rateLimit = {
     analytics: true,
     ephemeralCache,
     prefix: "ratelimit:unknown",
+    enableProtection: true,
   }),
 }
 

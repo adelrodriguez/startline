@@ -1,6 +1,6 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-# Features
+## Features
 
 1. Next.js: React framework for building web applications
 2. React: JavaScript library for building user interfaces
@@ -30,11 +30,11 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 26. Hot module replacement: For fast refresh during development
 27. TypeScript checking: Script for type checking without emitting files
 
-# TODO
+## TODO
 
 - [x] Set up emails
 - [x] Set up sign-in with code
-- [ ] Set up verification email code
+- [x] Set up verification email code
 - [ ] Set up password reset tokens
 - [ ] Set up file uploads
 - [ ] Set up jobs queue

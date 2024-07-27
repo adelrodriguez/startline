@@ -1,2 +1,2 @@
 export { default as SignInCodeEmail } from "./SignInCode"
-export { default as VerifyEmailCodeEmail } from "./VerifyEmailCode"
+export { default as EmailVerificationCodeEmail } from "./EmailVerificationCode"

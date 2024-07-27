@@ -3,12 +3,12 @@
 import {
   type User,
   type UserValues,
-  deleteVerifyEmailCode,
+  deleteEmailVerificationCode,
   insertUser,
   selectUser,
   upsertUser,
 } from "@/server/db"
-import { sendVerifyEmailCode } from "./verify-email-code"
+import { sendEmailVerificationCode } from "./email-verification-code"
 
 export async function findUserByEmail(email: User["email"]) {
   const user = await selectUser({ email })
@@ -37,7 +37,7 @@ export async function findUserById(userId: User["id"]) {
 export async function createUser(values: Omit<UserValues, "id" | "role">) {
   const user = await insertUser({ ...values, role: "user" })
 
-  await sendVerifyEmailCode(user)
+  await sendEmailVerificationCode(user)
 
   return user
 }
@@ -55,7 +55,7 @@ export async function createUserFromCode(values: Pick<UserValues, "email">) {
     emailVerifiedAt: new Date(),
   })
 
-  await deleteVerifyEmailCode({ userId: user.id })
+  await deleteEmailVerificationCode({ userId: user.id })
 
   return user
 }
@@ -69,7 +69,7 @@ export async function createUserFromGoogle(
     emailVerifiedAt: values.emailVerifiedAt,
   })
 
-  await deleteVerifyEmailCode({ userId: user.id })
+  await deleteEmailVerificationCode({ userId: user.id })
 
   return user
 }
@@ -83,7 +83,7 @@ export async function createUserFromGitHub(
     emailVerifiedAt: new Date(),
   })
 
-  await deleteVerifyEmailCode({ userId: user.id })
+  await deleteEmailVerificationCode({ userId: user.id })
 
   return user
 }
