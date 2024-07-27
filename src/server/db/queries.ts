@@ -129,12 +129,6 @@ export function deleteSignInCode(
 
 // Email Verification Code
 export function selectEmailVerificationCode(query: { userId: User["id"] }) {
-  let condition: SQL
-
-  if ("userId" in query) {
-    condition = eq(emailVerificationCode.userId, query.userId)
-  }
-
   return db.query.emailVerificationCode.findFirst({
     where: (model, { eq, and, gte }) =>
       and(eq(model.userId, query.userId), gte(model.expiresAt, new Date())),
