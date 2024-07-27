@@ -2,6 +2,8 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Features
 
+AI-generated list (will fix):
+
 1. Next.js: React framework for building web applications
 2. React: JavaScript library for building user interfaces
 3. TypeScript: Typed superset of JavaScript for improved developer experience
