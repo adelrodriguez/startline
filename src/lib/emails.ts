@@ -1,3 +1,5 @@
+"server-only"
+
 import resend from "@/services/resend"
 import type { ReactNode } from "react"
 import env from "@/lib/env.server"

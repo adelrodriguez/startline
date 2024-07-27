@@ -1,3 +1,5 @@
+"server-only"
+
 import { alphabet, generateRandomString } from "oslo/crypto"
 import {
   batch,
