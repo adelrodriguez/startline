@@ -1,10 +1,10 @@
 "server-only"
 
-import { type User, insertPassword, selectPassword } from "@/server/db"
+import { type User, selectPassword, upsertPassword } from "@/server/db"
 import { hash, verify } from "@node-rs/argon2"
 
 export async function createPassword(userId: User["id"], password: string) {
-  return await insertPassword(userId, { hash: await hash(password) })
+  return await upsertPassword(userId, { hash: await hash(password) })
 }
 
 export async function findPassword(userId: User["id"]) {

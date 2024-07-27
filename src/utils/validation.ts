@@ -28,6 +28,21 @@ export const CheckEmailVerificationCodeSchema = z.object({
   code: z.string().length(6),
 })
 
+export const RequestPasswordResetSchema = z.object({
+  email: z.string().email(),
+})
+
+export const NewPasswordSchema = z
+  .object({
+    token: z.string().min(1),
+    password: z.string().min(8),
+    confirmPassword: z.string().min(8),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  })
+
 export const GoogleUserSchema = z.object({
   sub: z.string().min(1),
   name: z.string().min(1),

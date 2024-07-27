@@ -4,6 +4,7 @@ export const FALLBACK_IP = "127.0.0.1"
 // Auth
 export const AUTHORIZED_URL = "/my"
 export const UNAUTHORIZED_URL = "/sign-in"
+export const RESET_PASSWORD_URL = "/sign-in/reset-password"
 export const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
 // User

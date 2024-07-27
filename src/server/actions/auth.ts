@@ -1,7 +1,17 @@
 "use server"
 
-import { invalidateSession, setSession, validateRequest } from "@/lib/auth"
-import { AUTHORIZED_URL, FALLBACK_IP, UNAUTHORIZED_URL } from "@/lib/consts"
+import {
+  invalidateAllSessions,
+  invalidateSession,
+  setSession,
+  validateRequest,
+} from "@/lib/auth"
+import {
+  AUTHORIZED_URL,
+  FALLBACK_IP,
+  RESET_PASSWORD_URL,
+  UNAUTHORIZED_URL,
+} from "@/lib/consts"
 import rateLimit from "@/lib/rate-limit"
 import { isProduction } from "@/lib/vars"
 import {
@@ -13,7 +23,11 @@ import {
   verifyPassword,
   verifySignInCode,
   verifyEmailVerificationCode,
+  sendPasswordResetToken,
+  findPasswordResetToken,
+  markPasswordResetTokenAsUsed,
 } from "@/server/data"
+import { PasswordResetError } from "@/utils/error"
 import { getIpAddress } from "@/utils/headers"
 import {
   CheckSignInCodeSchema,
@@ -21,10 +35,12 @@ import {
   SignUpSchema,
   SignInWithCodeSchema,
   CheckEmailVerificationCodeSchema,
+  RequestPasswordResetSchema,
+  NewPasswordSchema,
 } from "@/utils/validation"
 import { parseWithZod } from "@conform-to/zod"
 import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
+import { redirect, RedirectType } from "next/navigation"
 
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
@@ -220,6 +236,72 @@ export async function checkEmailVerificationCode(
   }
 
   await redirect(AUTHORIZED_URL)
+}
+
+export async function requestPasswordReset(_: unknown, formData: FormData) {
+  const submission = parseWithZod(formData, {
+    schema: RequestPasswordResetSchema,
+  })
+
+  if (submission.status !== "success") {
+    return submission.reply()
+  }
+
+  const ipAddress = getIpAddress() ?? FALLBACK_IP
+
+  const { success } = await rateLimit.unknown.limit(ipAddress)
+
+  if (!success) {
+    return submission.reply({
+      formErrors: ["Too many requests"],
+    })
+  }
+
+  const existingUser = await findUserByEmail(submission.value.email)
+
+  if (existingUser) {
+    await sendPasswordResetToken(existingUser)
+  }
+
+  redirect(`${RESET_PASSWORD_URL}/confirm?to=${submission.value.email}`)
+}
+
+export async function resetPassword(_: unknown, formData: FormData) {
+  const submission = parseWithZod(formData, {
+    schema: NewPasswordSchema,
+  })
+
+  if (submission.status !== "success") {
+    return submission.reply()
+  }
+
+  const ipAddress = getIpAddress() ?? FALLBACK_IP
+
+  const { success } = await rateLimit.unknown.limit(ipAddress)
+
+  if (!success) {
+    return submission.reply({
+      formErrors: ["Too many requests"],
+    })
+  }
+
+  const passwordResetToken = await findPasswordResetToken(
+    submission.value.token,
+  )
+
+  if (!passwordResetToken) {
+    throw new PasswordResetError("Your token has expired or is invalid")
+  }
+
+  // Log the user out of all sessions
+  await invalidateAllSessions(passwordResetToken.userId)
+
+  await createPassword(passwordResetToken.userId, submission.value.password)
+  await markPasswordResetTokenAsUsed(passwordResetToken)
+
+  await setSession(passwordResetToken.userId, { ipAddress })
+
+  redirect(AUTHORIZED_URL, RedirectType.replace)
 }
 
 export async function signOut() {

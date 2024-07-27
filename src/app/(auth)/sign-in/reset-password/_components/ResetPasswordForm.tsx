@@ -1,18 +1,17 @@
 "use client"
 
-import { signInWithPassword } from "@/server/actions"
-import { SignInWithPasswordSchema } from "@/utils/validation"
+import { requestPasswordReset } from "@/server/actions"
+import { RequestPasswordResetSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
-import Link from "next/link"
 import { useFormState } from "react-dom"
 
-export default function SignInForm() {
-  const [lastResult, action] = useFormState(signInWithPassword, undefined)
+export default function ResetPasswordForm() {
+  const [lastResult, action] = useFormState(requestPasswordReset, undefined)
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: SignInWithPasswordSchema })
+      return parseWithZod(formData, { schema: RequestPasswordResetSchema })
     },
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
@@ -33,30 +32,6 @@ export default function SignInForm() {
             autoComplete="email"
             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 focus:ring-inset sm:text-sm sm:leading-6"
           />
-        </div>
-      </div>
-
-      <div>
-        <label
-          htmlFor={fields.password.id}
-          className="block font-medium text-gray-900 text-sm leading-6"
-        >
-          Password
-        </label>
-        <div className="mt-2">
-          <input
-            {...getInputProps(fields.password, { type: "password" })}
-            autoComplete="current-password"
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 focus:ring-inset sm:text-sm sm:leading-6"
-          />
-        </div>
-        <div className="mt-1 text-sm leading-6">
-          <Link
-            href="/sign-in/reset-password"
-            className="font-semibold text-indigo-600 hover:text-indigo-500"
-          >
-            Forgot password?
-          </Link>
         </div>
       </div>
 

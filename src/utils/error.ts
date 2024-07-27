@@ -42,6 +42,8 @@ export class SendEmailError extends Error {
   }
 }
 
+export class PasswordResetError extends Error {}
+
 export class InternalError extends Error {}
 
 export class StripeError extends Error {}

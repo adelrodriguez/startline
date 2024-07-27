@@ -66,6 +66,10 @@ export async function invalidateSession(session: Session) {
   )
 }
 
+export async function invalidateAllSessions(userId: AuthUser["id"]) {
+  await lucia.invalidateUserSessions(userId)
+}
+
 export const validateRequest = cache(
   async (): Promise<
     { user: AuthUser; session: Session } | { user: null; session: null }

@@ -38,7 +38,8 @@ export const password = createTable("password", {
   hash: text("hash").notNull(),
   userId: integer("user_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" })
+    .unique(),
 })
 export type Password = typeof password.$inferSelect
 export type PasswordValues = typeof password.$inferInsert
@@ -72,6 +73,22 @@ export const emailVerificationCode = createTable("email_verification_code", {
 export type EmailVerificationCode = typeof emailVerificationCode.$inferSelect
 export type EmailVerificationCodeValues =
   typeof emailVerificationCode.$inferInsert
+
+export const passwordResetToken = createTable("password_reset_token", {
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .default(sql`(unixepoch())`)
+    .notNull(),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+
+  userId: integer("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" })
+    .unique(),
+
+  hash: text("token").notNull(),
+})
+export type PasswordResetToken = typeof passwordResetToken.$inferSelect
+export type PasswordResetTokenValues = typeof passwordResetToken.$inferInsert
 
 export const session = createTable("session", {
   id: text("id").primaryKey(),

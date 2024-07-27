@@ -35,7 +35,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 - [x] Set up emails
 - [x] Set up sign-in with code
 - [x] Set up verification email code
-- [ ] Set up password reset tokens
+- [x] Set up password reset tokens
 - [ ] Set up file uploads
 - [ ] Set up jobs queue
 - [ ] Set up CRON jobs (for deleting expired codes and tokens)
@@ -47,6 +47,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 - [ ] Beautify logs
 - [ ] Update script (pulls changes from template)
 - [ ] Set up basic UI
+- [ ] Set up middleware (prevent referrer leakage from password reset, i18n, etc.)
 - [ ] Setup i18n
 - [ ] Write a README
 - [ ] Modularize certain features (jobs queue, Stripe webhooks, etc.)

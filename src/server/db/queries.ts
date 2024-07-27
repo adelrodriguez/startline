@@ -17,6 +17,9 @@ import {
   user,
   emailVerificationCode,
   webhookEvent,
+  type PasswordResetToken,
+  type PasswordResetTokenValues,
+  passwordResetToken,
 } from "./schema"
 import { QueryError } from "@/utils/error"
 
@@ -88,13 +91,17 @@ export function selectPassword(userId: User["id"]) {
   })
 }
 
-export function insertPassword(
+export function upsertPassword(
   userId: User["id"],
   values: OmitUserId<PasswordValues>,
 ) {
   return db
     .insert(password)
     .values({ ...values, userId })
+    .onConflictDoUpdate({
+      target: password.userId,
+      set: values,
+    })
     .returning()
     .get()
 }
@@ -155,6 +162,38 @@ export function deleteEmailVerificationCode(
   }
 
   return db.delete(emailVerificationCode).where(condition)
+}
+
+// Password Reset Token
+export function selectPasswordResetToken(query: {
+  hash: PasswordResetToken["hash"]
+}) {
+  return db.query.passwordResetToken.findFirst({
+    where: (model, { eq, and, gte }) =>
+      and(eq(model.hash, query.hash), gte(model.expiresAt, new Date())),
+  })
+}
+
+export function insertPasswordResetToken(
+  values: OmitId<PasswordResetTokenValues>,
+) {
+  return db.insert(passwordResetToken).values(values).returning().get()
+}
+
+export function deletePasswordResetToken(
+  query: { hash: PasswordResetToken["hash"] } | { userId: User["id"] },
+) {
+  let condition: SQL
+
+  if ("hash" in query) {
+    condition = eq(passwordResetToken.hash, query.hash)
+  } else if ("userId" in query) {
+    condition = eq(passwordResetToken.userId, query.userId)
+  } else {
+    throw new QueryError("deletePasswordResetToken")
+  }
+
+  return db.delete(passwordResetToken).where(condition)
 }
 
 // Webhook Event
