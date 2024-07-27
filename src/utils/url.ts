@@ -1,8 +1,8 @@
 import { AUTHORIZED_URL } from "@/lib/consts"
 import env from "@/lib/env.server"
 
-export function buildUrl(
-  pathname: string,
+export function buildUrl<T extends string>(
+  pathname: T,
   options?: { query?: Record<string, string | number>; decoded?: boolean },
 ): string {
   const url = new URL(pathname, env.BASE_URL)
