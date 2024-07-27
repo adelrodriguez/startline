@@ -4,10 +4,10 @@ import {
   insertSignInCode,
   selectSignInCode,
 } from "@/server/db"
-import { hash, verify } from "@node-rs/argon2"
 import { SignInCodeEmail } from "@/components/emails"
 import { sendEmail } from "@/lib/emails"
 import { createDate, TimeSpan } from "oslo"
+import { hash, verify } from "@/utils/hash"
 
 export async function sendSignInCode(email: string) {
   // Delete old codes

@@ -7,10 +7,10 @@ import {
   updateUser,
   type User,
 } from "@/server/db"
-import { hash, verify } from "@node-rs/argon2"
 import { EmailVerificationCodeEmail } from "@/components/emails"
 import { sendEmail } from "@/lib/emails"
 import { createDate, TimeSpan } from "oslo"
+import { hash, verify } from "@/utils/hash"
 
 export async function sendEmailVerificationCode(user: User) {
   // Delete old codes
