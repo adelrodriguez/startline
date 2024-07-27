@@ -24,6 +24,10 @@ export const CheckSignInCodeSchema = z.object({
   code: z.string().length(6),
 })
 
+export const CheckVerifyEmailCodeSchema = z.object({
+  code: z.string().length(6),
+})
+
 export const GoogleUserSchema = z.object({
   sub: z.string().min(1),
   name: z.string().min(1),

@@ -3,10 +3,12 @@
 import {
   type User,
   type UserValues,
+  deleteVerifyEmailCode,
   insertUser,
   selectUser,
   upsertUser,
 } from "@/server/db"
+import { sendVerifyEmailCode } from "./verify-email-code"
 
 export async function findUserByEmail(email: User["email"]) {
   const user = await selectUser({ email })
@@ -35,6 +37,8 @@ export async function findUserById(userId: User["id"]) {
 export async function createUser(values: Omit<UserValues, "id" | "role">) {
   const user = await insertUser({ ...values, role: "user" })
 
+  await sendVerifyEmailCode(user)
+
   return user
 }
 
@@ -50,6 +54,8 @@ export async function createUserFromCode(values: Pick<UserValues, "email">) {
     role: "user",
     emailVerifiedAt: new Date(),
   })
+
+  await deleteVerifyEmailCode({ userId: user.id })
 
   return user
 }

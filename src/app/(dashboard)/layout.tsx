@@ -1,17 +1,22 @@
-import { validateRequest } from "@/lib/auth"
-import { UNAUTHORIZED_URL } from "@/lib/consts"
-import { redirect } from "next/navigation"
+import { signOut } from "@/server/actions"
+import { getCurrentUser } from "@/server/loader"
 
 export default async function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const { user } = await validateRequest()
+  const user = await getCurrentUser()
 
-  if (!user) {
-    return redirect(UNAUTHORIZED_URL)
-  }
-
-  return <main>{children}</main>
+  return (
+    <main>
+      <div className="flex justify-between">
+        You are signed in as {user.email}
+        <form action={signOut}>
+          <button type="submit">Sign Out</button>
+        </form>
+      </div>
+      {children}
+    </main>
+  )
 }

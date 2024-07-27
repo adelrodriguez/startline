@@ -8,11 +8,14 @@ import {
   type SignInCodeValues,
   type User,
   type UserValues,
+  type VerifyEmailCode,
+  type VerifyEmailCodeValues,
   type WebhookEvent,
   type WebhookEventValues,
   password,
   signInCode,
   user,
+  verifyEmailCode,
   webhookEvent,
 } from "./schema"
 import { QueryError } from "@/utils/error"
@@ -64,7 +67,6 @@ export function updateUser(
     .set({ ...values, updatedAt: new Date() })
     .where(eq(user.id, userId))
     .returning()
-    .get()
 }
 
 export function upsertUser(values: OmitId<UserValues>) {
@@ -123,6 +125,40 @@ export function deleteSignInCode(
   }
 
   return db.delete(signInCode).where(condition)
+}
+
+// Verify Email Code
+export function selectVerifyEmailCode(query: { userId: User["id"] }) {
+  let condition: SQL
+
+  if ("userId" in query) {
+    condition = eq(verifyEmailCode.userId, query.userId)
+  }
+
+  return db.query.verifyEmailCode.findFirst({
+    where: (model, { eq, and, gte }) =>
+      and(eq(model.userId, query.userId), gte(model.expiresAt, new Date())),
+  })
+}
+
+export function insertVerifyEmailCode(values: OmitId<VerifyEmailCodeValues>) {
+  return db.insert(verifyEmailCode).values(values).returning().get()
+}
+
+export function deleteVerifyEmailCode(
+  query: { hash: VerifyEmailCode["hash"] } | { userId: User["id"] },
+) {
+  let condition: SQL
+
+  if ("hash" in query) {
+    condition = eq(verifyEmailCode.hash, query.hash)
+  } else if ("userId" in query) {
+    condition = eq(verifyEmailCode.userId, query.userId)
+  } else {
+    throw new QueryError("deleteVerifyEmailCode")
+  }
+
+  return db.delete(verifyEmailCode).where(condition)
 }
 
 // Webhook Event

@@ -19,10 +19,12 @@ import {
   SignInWithPasswordSchema,
   SignUpSchema,
   SignInWithCodeSchema,
+  CheckVerifyEmailCodeSchema,
 } from "@/utils/validation"
 import { parseWithZod } from "@conform-to/zod"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+import { verifyVerifyEmailCode } from "../data/verify-email-code"
 
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
@@ -178,6 +180,43 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
   await setSession(user.id, { ipAddress })
 
   redirect(AUTHORIZED_URL)
+}
+
+export async function checkVerifyEmailCode(_: unknown, formData: FormData) {
+  const { user } = await validateRequest()
+
+  if (!user) {
+    return redirect(UNAUTHORIZED_URL)
+  }
+
+  const submission = parseWithZod(formData, {
+    schema: CheckVerifyEmailCodeSchema,
+  })
+
+  if (submission.status !== "success") {
+    return submission.reply()
+  }
+
+  const { success } = await rateLimit.user.limit(user.email)
+
+  if (!success) {
+    return submission.reply({
+      formErrors: ["Too many requests"],
+    })
+  }
+
+  const isValidCode = await verifyVerifyEmailCode(
+    user.id,
+    submission.value.code,
+  )
+
+  if (!isValidCode) {
+    return submission.reply({
+      formErrors: ["Invalid code"],
+    })
+  }
+
+  await redirect(AUTHORIZED_URL)
 }
 
 export async function signOut() {

@@ -48,11 +48,29 @@ export const signInCode = createTable("sign_in_code", {
     sql`(unixepoch())`,
   ),
   expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+
   email: text("email").notNull().unique(),
+
   hash: text("hash").notNull(),
 })
 export type SignInCode = typeof signInCode.$inferSelect
 export type SignInCodeValues = typeof signInCode.$inferInsert
+
+export const verifyEmailCode = createTable("verify_email_code", {
+  createdAt: integer("created_at", { mode: "timestamp" }).default(
+    sql`(unixepoch())`,
+  ),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+
+  userId: integer("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" })
+    .unique(),
+
+  hash: text("hash").notNull(),
+})
+export type VerifyEmailCode = typeof verifyEmailCode.$inferSelect
+export type VerifyEmailCodeValues = typeof verifyEmailCode.$inferInsert
 
 export const session = createTable("session", {
   id: text("id").primaryKey(),
