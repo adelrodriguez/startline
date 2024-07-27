@@ -69,6 +69,8 @@ export async function createUserFromGoogle(
     emailVerifiedAt: values.emailVerifiedAt,
   })
 
+  await deleteVerifyEmailCode({ userId: user.id })
+
   return user
 }
 
@@ -78,7 +80,10 @@ export async function createUserFromGitHub(
   const user = await upsertUser({
     githubId: values.githubId,
     email: values.email,
+    emailVerifiedAt: new Date(),
   })
+
+  await deleteVerifyEmailCode({ userId: user.id })
 
   return user
 }
