@@ -8,12 +8,12 @@ const createTable = sqliteTableCreator((name) => name)
 
 export const user = createTable("user", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(
-    sql`(unixepoch())`,
-  ),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).default(
-    sql`(unixepoch())`,
-  ),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .default(sql`(unixepoch())`)
+    .notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .default(sql`(unixepoch())`)
+    .notNull(),
 
   role: text("role", { enum: USER_ROLES }).notNull().default("user"),
 
@@ -45,9 +45,9 @@ export type Password = typeof password.$inferSelect
 export type PasswordValues = typeof password.$inferInsert
 
 export const signInCode = createTable("sign_in_code", {
-  createdAt: integer("created_at", { mode: "timestamp" }).default(
-    sql`(unixepoch())`,
-  ),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .default(sql`(unixepoch())`)
+    .notNull(),
   expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
 
   email: text("email").notNull().unique(),
@@ -58,9 +58,9 @@ export type SignInCode = typeof signInCode.$inferSelect
 export type SignInCodeValues = typeof signInCode.$inferInsert
 
 export const emailVerificationCode = createTable("email_verification_code", {
-  createdAt: integer("created_at", { mode: "timestamp" }).default(
-    sql`(unixepoch())`,
-  ),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .default(sql`(unixepoch())`)
+    .notNull(),
   expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
 
   userId: integer("user_id")
@@ -92,9 +92,9 @@ export type PasswordResetTokenValues = typeof passwordResetToken.$inferInsert
 
 export const session = createTable("session", {
   id: text("id").primaryKey(),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(
-    sql`(unixepoch())`,
-  ),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .default(sql`(unixepoch())`)
+    .notNull(),
   expiresAt: integer("expires_at").notNull(),
 
   userId: integer("user_id")
@@ -109,9 +109,9 @@ export type SessionValues = typeof session.$inferInsert
 
 export const webhookEvent = createTable("webhook_event", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(
-    sql`(unixepoch())`,
-  ),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .default(sql`(unixepoch())`)
+    .notNull(),
   processedAt: integer("processed_at", { mode: "timestamp" }),
 
   event: text("event").notNull(),
