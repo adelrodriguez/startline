@@ -4,10 +4,10 @@ import {
   insertSignInCode,
   selectSignInCode,
 } from "@/server/db"
-import { addMinutes } from "date-fns"
 import { hash, verify } from "@node-rs/argon2"
 import { SignInCodeEmail } from "@/components/emails"
 import { sendEmail } from "@/lib/emails"
+import { createDate, TimeSpan } from "oslo"
 
 export async function sendSignInCode(email: string) {
   // Delete old codes
@@ -18,7 +18,7 @@ export async function sendSignInCode(email: string) {
   await insertSignInCode({
     email,
     hash: await hash(code),
-    expiresAt: addMinutes(new Date(), 15),
+    expiresAt: createDate(new TimeSpan(15, "m")),
   })
 
   await sendEmail(email, "Sign in code", SignInCodeEmail({ code }))

@@ -7,10 +7,10 @@ import {
   updateUser,
   type User,
 } from "@/server/db"
-import { addHours } from "date-fns"
 import { hash, verify } from "@node-rs/argon2"
 import { EmailVerificationCodeEmail } from "@/components/emails"
 import { sendEmail } from "@/lib/emails"
+import { createDate, TimeSpan } from "oslo"
 
 export async function sendEmailVerificationCode(user: User) {
   // Delete old codes
@@ -21,7 +21,7 @@ export async function sendEmailVerificationCode(user: User) {
   await insertEmailVerificationCode({
     userId: user.id,
     hash: await hash(code),
-    expiresAt: addHours(new Date(), 24),
+    expiresAt: createDate(new TimeSpan(24, "h")),
   })
 
   await sendEmail(
