@@ -38,9 +38,9 @@ AI-generated list (will fix):
 - [x] Set up sign-in with code
 - [x] Set up verification email code
 - [x] Set up password reset tokens
-- [ ] Set up file uploads
 - [ ] Set up jobs queue
 - [ ] Set up CRON jobs (for deleting expired codes and tokens)
+- [ ] Set up file uploads
 - [ ] Set up analytics
 - [ ] Set up admin panel
 - [ ] Set up testing (mostly for unit tests of utils and such)
