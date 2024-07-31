@@ -1,4 +1,5 @@
-export const APPLICATION_NAME = "Startline"
+export const APP_ID = "startline"
+
 export const FALLBACK_IP = "127.0.0.1"
 
 export const MOCK_RESEND_EMAIL = "mock-resend-email"

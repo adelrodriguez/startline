@@ -46,4 +46,6 @@ export class PasswordResetError extends Error {}
 
 export class InternalError extends Error {}
 
+// Service errors
 export class StripeError extends Error {}
+export class InngestError extends Error {}

@@ -18,6 +18,10 @@ export default createEnv({
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
 
+    // Inngest
+    INNGEST_SIGNING_KEY: z.string(),
+    INNGEST_SIGNING_KEY_FALLBACK: z.string().optional(),
+
     // Node
     NODE_ENV: z
       .enum(["development", "test", "production"])
