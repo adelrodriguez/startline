@@ -3,6 +3,7 @@
 import { vercel } from "@t3-oss/env-core/presets"
 import { createEnv } from "@t3-oss/env-nextjs"
 import { z } from "zod"
+import { MOCK_RESEND_EMAIL } from "./consts"
 
 export default createEnv({
   server: {
@@ -23,7 +24,7 @@ export default createEnv({
       .default("development"),
 
     // Resend
-    RESEND_API_KEY: z.string(),
+    RESEND_API_KEY: z.string().default(MOCK_RESEND_EMAIL),
 
     // Sentry
     SENTRY_DSN: z.string(),
