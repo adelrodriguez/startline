@@ -1,6 +1,6 @@
 import Link from "next/link"
-import SignInWithPasswordForm from "./_components/SignInWithPasswordForm"
 import SignInWithCodeForm from "./_components/SignInWithCodeForm"
+import SignInWithPasswordForm from "./_components/SignInWithPasswordForm"
 
 export default function Page() {
   return (

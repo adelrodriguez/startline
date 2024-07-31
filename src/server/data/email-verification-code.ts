@@ -1,18 +1,18 @@
 "server-only"
 
-import { alphabet, generateRandomString } from "oslo/crypto"
+import { EmailVerificationCodeEmail } from "@/components/emails"
+import { sendEmail } from "@/lib/emails"
 import {
+  type User,
   batch,
   deleteEmailVerificationCode,
   insertEmailVerificationCode,
   selectEmailVerificationCode,
   updateUser,
-  type User,
 } from "@/server/db"
-import { EmailVerificationCodeEmail } from "@/components/emails"
-import { sendEmail } from "@/lib/emails"
-import { createDate, TimeSpan } from "oslo"
 import { hash, verify } from "@/utils/hash"
+import { TimeSpan, createDate } from "oslo"
+import { alphabet, generateRandomString } from "oslo/crypto"
 
 export async function sendEmailVerificationCode(user: User) {
   // Delete old codes

@@ -3,16 +3,16 @@
 import { PasswordResetTokenEmail } from "@/components/emails"
 import { sendEmail } from "@/lib/emails"
 import {
+  type PasswordResetToken,
+  type User,
   batch,
   deletePasswordResetToken,
   insertPasswordResetToken,
   selectPasswordResetToken,
   updateUser,
-  type PasswordResetToken,
-  type User,
 } from "@/server/db"
 import { hash } from "@/utils/hash"
-import { generateIdFromEntropySize, TimeSpan } from "lucia"
+import { TimeSpan, generateIdFromEntropySize } from "lucia"
 import { createDate } from "oslo"
 
 export async function findPasswordResetToken(token: string) {

@@ -1,27 +1,27 @@
 "server-only"
 
-import { eq, type SQL } from "drizzle-orm"
+import { QueryError } from "@/utils/error"
+import { type SQL, eq } from "drizzle-orm"
 import db from "./client"
 import {
+  type EmailVerificationCode,
+  type EmailVerificationCodeValues,
+  type PasswordResetToken,
+  type PasswordResetTokenValues,
   type PasswordValues,
   type SignInCode,
   type SignInCodeValues,
   type User,
   type UserValues,
-  type EmailVerificationCode,
-  type EmailVerificationCodeValues,
   type WebhookEvent,
   type WebhookEventValues,
+  emailVerificationCode,
   password,
+  passwordResetToken,
   signInCode,
   user,
-  emailVerificationCode,
   webhookEvent,
-  type PasswordResetToken,
-  type PasswordResetTokenValues,
-  passwordResetToken,
 } from "./schema"
-import { QueryError } from "@/utils/error"
 
 type OmitId<T> = Omit<T, "id">
 type OmitUserId<T> = Omit<T, "userId">

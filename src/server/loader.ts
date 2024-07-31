@@ -1,9 +1,9 @@
 import { validateRequest } from "@/lib/auth"
 import { UNAUTHORIZED_URL } from "@/lib/consts"
-import { redirect } from "next/navigation"
-import { findUserById } from "./data"
 import { throwUnless } from "@/utils/assert"
+import { redirect } from "next/navigation"
 import { cache } from "react"
+import { findUserById } from "./data"
 
 export const getCurrentUser = cache(async () => {
   const { user: authUser } = await validateRequest()

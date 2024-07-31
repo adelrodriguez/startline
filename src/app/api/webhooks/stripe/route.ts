@@ -1,14 +1,14 @@
-import stripe from "@/services/stripe"
-import { StatusCodes } from "http-status-codes"
-import { NextResponse, type NextRequest } from "next/server"
 import env from "@/lib/env.server"
 import {
   createWebhookEvent,
   findWebhookEventByExternalId,
   markWebhookEventAsProcessed,
 } from "@/server/data"
-import type Stripe from "stripe"
+import stripe from "@/services/stripe"
 import { StripeError } from "@/utils/error"
+import { StatusCodes } from "http-status-codes"
+import { type NextRequest, NextResponse } from "next/server"
+import type Stripe from "stripe"
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const signature = req.headers.get("stripe-signature")

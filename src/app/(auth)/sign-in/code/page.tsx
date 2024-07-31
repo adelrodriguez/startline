@@ -1,6 +1,6 @@
 import { cookies } from "next/headers"
-import CheckSignInCodeForm from "./_components/CheckSignInCodeForm"
 import { redirect } from "next/navigation"
+import CheckSignInCodeForm from "./_components/CheckSignInCodeForm"
 
 export default function Page() {
   const email = cookies().get("verification-email")?.value ?? null
