@@ -1,4 +1,4 @@
-import { APPLICATION_NAME } from "@/lib/consts"
+import { APP_NAME } from "@/lib/consts"
 import {
   Body,
   Head,
@@ -14,7 +14,7 @@ export default function SignInCodeEmail({ code }: { code: string }) {
   return (
     <Html>
       <Head />
-      <Preview>Here's your sign in code for {APPLICATION_NAME}</Preview>
+      <Preview>Here's your sign in code for {APP_NAME}</Preview>
       <Tailwind>
         <Fragment>
           <Body className="mx-auto my-auto bg-white font-sans">

@@ -1,4 +1,4 @@
-import { APPLICATION_NAME, RESET_PASSWORD_URL } from "@/lib/consts"
+import { APP_NAME, RESET_PASSWORD_URL } from "@/lib/consts"
 import { buildUrl } from "@/utils/url"
 import {
   Body,
@@ -15,7 +15,7 @@ export default function PasswordResetTokenEmail({ token }: { token: string }) {
   return (
     <Html>
       <Head />
-      <Preview>Verify your email for {APPLICATION_NAME}</Preview>
+      <Preview>Verify your email for {APP_NAME}</Preview>
       <Tailwind>
         <Fragment>
           <Body className="mx-auto my-auto bg-white font-sans">

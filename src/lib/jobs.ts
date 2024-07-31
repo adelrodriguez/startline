@@ -1,10 +1,10 @@
 "server-only"
 
-import inngest from "@/services/inngest"
-import type { GetEvents } from "inngest"
 import { validateRequest } from "@/lib/auth"
-import { getTime } from "date-fns"
+import inngest from "@/services/inngest"
 import { InngestError } from "@/utils/error"
+import { getTime } from "date-fns"
+import type { GetEvents } from "inngest"
 
 type Events = GetEvents<typeof inngest>
 

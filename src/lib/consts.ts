@@ -1,3 +1,4 @@
+export const APP_NAME = "Startline"
 export const APP_ID = "startline"
 
 export const FALLBACK_IP = "127.0.0.1"
