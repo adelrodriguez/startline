@@ -1,11 +1,11 @@
-import redis from "@/server/cache"
 import { Ratelimit } from "@upstash/ratelimit"
+import { Redis } from "@upstash/redis"
 
 const ephemeralCache = new Map<string, number>()
 
 const rateLimit = {
   user: new Ratelimit({
-    redis,
+    redis: Redis.fromEnv(),
     limiter: Ratelimit.slidingWindow(100, "10 s"),
     analytics: true,
     ephemeralCache,
@@ -13,7 +13,7 @@ const rateLimit = {
     enableProtection: true,
   }),
   unknown: new Ratelimit({
-    redis,
+    redis: Redis.fromEnv(),
     limiter: Ratelimit.slidingWindow(10, "10 s"),
     analytics: true,
     ephemeralCache,
