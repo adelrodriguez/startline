@@ -1,6 +1,6 @@
 "server-only"
 
-import { vercel } from "@t3-oss/env-core/presets"
+import { uploadthing, vercel } from "@t3-oss/env-core/presets"
 import { createEnv } from "@t3-oss/env-nextjs"
 import { z } from "zod"
 import { MOCK_RESEND_EMAIL } from "./consts"
@@ -58,5 +58,5 @@ export default createEnv({
    * `SOME_VAR=''` will throw an error.
    */
   emptyStringAsUndefined: true,
-  extends: [vercel()],
+  extends: [vercel(), uploadthing()],
 })
