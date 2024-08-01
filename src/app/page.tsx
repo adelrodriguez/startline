@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-export default function Home() {
+export default function Page() {
   return (
     <main className="flex flex-col justify-center gap-4">
       <h1>This is your project's home page</h1>

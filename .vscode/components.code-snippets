@@ -8,5 +8,10 @@
     "prefix": "/client-component",
     "body": ["\"use client\"", "", "export default function Component() {", "  return null", "}"],
     "description": "Client component"
+  },
+  "server-only": {
+    "prefix": "/server-only",
+    "body": ["\"server-only\""],
+    "description": "Server-only directive"
   }
 }
