@@ -40,16 +40,15 @@ AI-generated list (will fix):
 - [x] Set up password reset tokens
 - [x] Set up jobs queue
 - [x] Set up CRON jobs (for deleting expired codes and tokens)
-- [ ] Set up file uploads
+- [x] Set up file uploads
 - [ ] Set up analytics
-- [ ] Set up admin panel
 - [ ] Set up testing (mostly for unit tests of utils and such)
-- [ ] Create setup script using Pulumi
-- [ ] Set up example
-- [ ] Beautify logs
-- [ ] Update script (pulls changes from template)
-- [ ] Set up basic UI
 - [ ] Set up middleware (prevent referrer leakage from password reset, i18n, etc.)
+- [ ] Beautify logs
 - [ ] Setup i18n
+- [ ] Update script (pulls changes from template)
+- [ ] Create setup script
+- [ ] Set up example
+- [ ] Set up basic UI
 - [ ] Write a README
 - [ ] Modularize certain features (jobs queue, Stripe webhooks, etc.)
