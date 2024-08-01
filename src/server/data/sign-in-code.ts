@@ -4,6 +4,7 @@ import { SignInCodeEmail } from "@/components/emails"
 import { sendEmail } from "@/lib/emails"
 import {
   deleteSignInCode,
+  deleteSignInCodes,
   insertSignInCode,
   selectSignInCode,
 } from "@/server/db"
@@ -39,4 +40,10 @@ export async function verifySignInCode(email: string, code: string) {
   await deleteSignInCode({ email })
 
   return true
+}
+
+export async function cleanExpiredSignInCodes() {
+  const result = await deleteSignInCodes({ expiresAt: new Date() })
+
+  return result.rowsAffected
 }

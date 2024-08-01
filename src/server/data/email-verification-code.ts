@@ -6,6 +6,7 @@ import {
   type User,
   batch,
   deleteEmailVerificationCode,
+  deleteEmailVerificationCodes,
   insertEmailVerificationCode,
   selectEmailVerificationCode,
   updateUser,
@@ -51,4 +52,10 @@ export async function verifyEmailVerificationCode(
   ])
 
   return true
+}
+
+export async function cleanExpiredEmailVerificationCodes() {
+  const result = await deleteEmailVerificationCodes({ expiresAt: new Date() })
+
+  return result.rowsAffected
 }

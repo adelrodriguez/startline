@@ -1,13 +1,34 @@
+import {
+  cleanExpiredEmailVerificationCodes,
+  cleanExpiredPasswordResetTokens,
+  cleanExpiredSignInCodes,
+} from "@/server/data"
 import inngest from "./client"
 
-export const helloWorld = inngest.createFunction(
-  { id: "hello-world" },
-  { event: "demo/hello-world" },
-  async ({ event, step }) => {
-    await step.sleep("wait-five-seconds", "5s")
+export const cleanExpiredCodes = inngest.createFunction(
+  {
+    id: "clean-expired-codes",
+  },
+  { cron: "0 0 * * *" },
+  async ({ step }) => {
+    const signInCodesDeleted = await step.run(
+      "clean-sign-in-codes",
+      cleanExpiredSignInCodes,
+    )
+    console.log(`Deleted ${signInCodesDeleted} sign-in codes`)
 
-    console.log("Hello, World!")
+    const emailVerificationCodesDeleted = await step.run(
+      "clean-email-verification-codes",
+      cleanExpiredEmailVerificationCodes,
+    )
+    console.log(
+      `Deleted ${emailVerificationCodesDeleted} email verification codes`,
+    )
 
-    return { event, body: "Hello, World!" }
+    const passwordResetTokensDeleted = await step.run(
+      "clean-password-reset-tokens",
+      cleanExpiredPasswordResetTokens,
+    )
+    console.log(`Deleted ${passwordResetTokensDeleted} password reset tokens`)
   },
 )

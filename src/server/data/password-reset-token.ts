@@ -7,6 +7,7 @@ import {
   type User,
   batch,
   deletePasswordResetToken,
+  deletePasswordResetTokens,
   insertPasswordResetToken,
   selectPasswordResetToken,
   updateUser,
@@ -48,4 +49,10 @@ export async function markPasswordResetTokenAsUsed(token: PasswordResetToken) {
     // verified, we can mark the user as verified.
     updateUser(token.userId, { emailVerifiedAt: new Date() }),
   ])
+}
+
+export async function cleanExpiredPasswordResetTokens() {
+  const result = await deletePasswordResetTokens({ expiresAt: new Date() })
+
+  return result.rowsAffected
 }

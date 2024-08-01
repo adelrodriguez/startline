@@ -1,7 +1,7 @@
 "server-only"
 
 import { QueryError } from "@/utils/error"
-import { type SQL, eq } from "drizzle-orm"
+import { type SQL, eq, lt } from "drizzle-orm"
 import db from "./client"
 import {
   type EmailVerificationCode,
@@ -119,7 +119,10 @@ export function insertSignInCode(values: OmitId<SignInCodeValues>) {
 }
 
 export function deleteSignInCode(
-  query: { hash: SignInCode["hash"] } | { email: SignInCode["email"] },
+  query:
+    | { hash: SignInCode["hash"] }
+    | { email: SignInCode["email"] }
+    | { expiresAt: SignInCode["expiresAt"] },
 ) {
   let condition: SQL
 
@@ -132,6 +135,10 @@ export function deleteSignInCode(
   }
 
   return db.delete(signInCode).where(condition)
+}
+
+export function deleteSignInCodes(query: { expiresAt: Date }) {
+  return db.delete(signInCode).where(lt(signInCode.expiresAt, query.expiresAt))
 }
 
 // Email Verification Code
@@ -164,6 +171,12 @@ export function deleteEmailVerificationCode(
   return db.delete(emailVerificationCode).where(condition)
 }
 
+export function deleteEmailVerificationCodes(query: { expiresAt: Date }) {
+  return db
+    .delete(emailVerificationCode)
+    .where(lt(emailVerificationCode.expiresAt, query.expiresAt))
+}
+
 // Password Reset Token
 export function selectPasswordResetToken(query: {
   hash: PasswordResetToken["hash"]
@@ -194,6 +207,12 @@ export function deletePasswordResetToken(
   }
 
   return db.delete(passwordResetToken).where(condition)
+}
+
+export function deletePasswordResetTokens(query: { expiresAt: Date }) {
+  return db
+    .delete(passwordResetToken)
+    .where(lt(passwordResetToken.expiresAt, query.expiresAt))
 }
 
 // Webhook Event
