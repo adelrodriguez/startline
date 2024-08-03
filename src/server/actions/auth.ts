@@ -12,7 +12,7 @@ import {
   RESET_PASSWORD_URL,
   UNAUTHORIZED_URL,
 } from "@/lib/consts"
-import rateLimit from "@/lib/rate-limit"
+import rateLimiter from "@/lib/rate-limit"
 import { isProduction } from "@/lib/vars"
 import {
   createPassword,
@@ -55,9 +55,9 @@ export async function signUp(_: unknown, formData: FormData) {
 
   const ipAddress = getIpAddress() ?? FALLBACK_IP
 
-  const { success } = await rateLimit.unknown.limit(ipAddress)
+  const limit = await rateLimiter.unknown.limit(ipAddress)
 
-  if (!success) {
+  if (!limit.success) {
     return submission.reply({
       formErrors: ["Too many requests"],
     })
@@ -93,9 +93,9 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
 
   const ipAddress = getIpAddress() ?? FALLBACK_IP
 
-  const { success } = await rateLimit.unknown.limit(ipAddress)
+  const limit = await rateLimiter.unknown.limit(ipAddress)
 
-  if (!success) {
+  if (!limit.success) {
     return submission.reply({
       formErrors: ["Too many requests"],
     })
@@ -134,9 +134,9 @@ export async function signInWithCode(_: unknown, formData: FormData) {
     return submission.reply()
   }
 
-  const { success } = await rateLimit.unknown.limit(submission.value.email)
+  const limit = await rateLimiter.unknown.limit(submission.value.email)
 
-  if (!success) {
+  if (!limit.success) {
     return submission.reply({
       formErrors: ["Too many requests"],
     })
@@ -172,9 +172,9 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
 
   const ipAddress = getIpAddress() ?? FALLBACK_IP
 
-  const { success } = await rateLimit.unknown.limit(ipAddress)
+  const limit = await rateLimiter.unknown.limit(ipAddress)
 
-  if (!success) {
+  if (!limit.success) {
     return submission.reply({
       formErrors: ["Too many requests"],
     })
@@ -216,9 +216,9 @@ export async function checkEmailVerificationCode(
     return submission.reply()
   }
 
-  const { success } = await rateLimit.user.limit(user.email)
+  const limit = await rateLimiter.user.limit(user.email)
 
-  if (!success) {
+  if (!limit.success) {
     return submission.reply({
       formErrors: ["Too many requests"],
     })
@@ -249,9 +249,9 @@ export async function requestPasswordReset(_: unknown, formData: FormData) {
 
   const ipAddress = getIpAddress() ?? FALLBACK_IP
 
-  const { success } = await rateLimit.unknown.limit(ipAddress)
+  const limit = await rateLimiter.unknown.limit(ipAddress)
 
-  if (!success) {
+  if (!limit.success) {
     return submission.reply({
       formErrors: ["Too many requests"],
     })
@@ -277,9 +277,9 @@ export async function resetPassword(_: unknown, formData: FormData) {
 
   const ipAddress = getIpAddress() ?? FALLBACK_IP
 
-  const { success } = await rateLimit.unknown.limit(ipAddress)
+  const limit = await rateLimiter.unknown.limit(ipAddress)
 
-  if (!success) {
+  if (!limit.success) {
     return submission.reply({
       formErrors: ["Too many requests"],
     })
