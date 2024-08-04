@@ -36,7 +36,7 @@ import {
   RequestPasswordResetSchema,
   SignInWithCodeSchema,
   SignInWithPasswordSchema,
-  SignUpSchema,
+  createSignUpSchema,
 } from "@/utils/validation"
 import { parseWithZod } from "@conform-to/zod"
 import { cookies } from "next/headers"
@@ -45,30 +45,28 @@ import { RedirectType, redirect } from "next/navigation"
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
 export async function signUp(_: unknown, formData: FormData) {
-  const submission = parseWithZod(formData, {
-    schema: SignUpSchema,
-  })
-
-  if (submission.status !== "success") {
-    return submission.reply()
-  }
-
   const ipAddress = getIpAddress() ?? FALLBACK_IP
 
   const limit = await rateLimiter.unknown.limit(ipAddress)
 
   if (!limit.success) {
-    return submission.reply({
-      formErrors: ["Too many requests"],
-    })
+    throw new Error("Too many requests")
   }
 
-  const existingUser = await findUserByEmail(submission.value.email)
+  const submission = await parseWithZod(formData, {
+    schema: (intent) =>
+      createSignUpSchema(intent, {
+        async checkIsEmailUnique(email) {
+          const existingUser = await findUserByEmail(email)
 
-  if (existingUser) {
-    return submission.reply({
-      formErrors: ["There's already an account with this email"],
-    })
+          return existingUser === null
+        },
+      }),
+    async: true,
+  })
+
+  if (submission.status !== "success") {
+    return submission.reply()
   }
 
   const newUser = await createUser({

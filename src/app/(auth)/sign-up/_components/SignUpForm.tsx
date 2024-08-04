@@ -1,7 +1,7 @@
 "use client"
 
 import { signUp } from "@/server/actions"
-import { SignUpSchema } from "@/utils/validation"
+import { createSignUpSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { useFormState } from "react-dom"
@@ -12,7 +12,9 @@ export default function SignUpForm() {
     lastResult,
 
     onValidate: ({ formData }) =>
-      parseWithZod(formData, { schema: SignUpSchema }),
+      parseWithZod(formData, {
+        schema: (intent) => createSignUpSchema(intent),
+      }),
 
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
