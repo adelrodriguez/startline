@@ -30,12 +30,12 @@ import {
 import { PasswordResetError } from "@/utils/error"
 import { getIpAddress } from "@/utils/headers"
 import {
-  CheckEmailVerificationCodeSchema,
-  CheckSignInCodeSchema,
-  NewPasswordSchema,
   RequestPasswordResetSchema,
-  SignInWithCodeSchema,
-  SignInWithPasswordSchema,
+  createCheckEmailVerificationCodeSchema,
+  createCheckInWithCodeSchema,
+  createNewPasswordSchema,
+  createSignInWithCodeSchema,
+  createSignInWithPasswordSchema,
   createSignUpSchema,
 } from "@/utils/validation"
 import { parseWithZod } from "@conform-to/zod"
@@ -82,7 +82,7 @@ export async function signUp(_: unknown, formData: FormData) {
 
 export async function signInWithPassword(_: unknown, formData: FormData) {
   const submission = parseWithZod(formData, {
-    schema: SignInWithPasswordSchema,
+    schema: createSignInWithPasswordSchema(),
   })
 
   if (submission.status !== "success") {
@@ -125,7 +125,7 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
 
 export async function signInWithCode(_: unknown, formData: FormData) {
   const submission = parseWithZod(formData, {
-    schema: SignInWithCodeSchema,
+    schema: createSignInWithCodeSchema(),
   })
 
   if (submission.status !== "success") {
@@ -161,7 +161,7 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
   }
 
   const submission = parseWithZod(formData, {
-    schema: CheckSignInCodeSchema,
+    schema: createCheckInWithCodeSchema(),
   })
 
   if (submission.status !== "success") {
@@ -207,7 +207,7 @@ export async function checkEmailVerificationCode(
   }
 
   const submission = parseWithZod(formData, {
-    schema: CheckEmailVerificationCodeSchema,
+    schema: createCheckEmailVerificationCodeSchema(),
   })
 
   if (submission.status !== "success") {
@@ -266,7 +266,7 @@ export async function requestPasswordReset(_: unknown, formData: FormData) {
 
 export async function resetPassword(_: unknown, formData: FormData) {
   const submission = parseWithZod(formData, {
-    schema: NewPasswordSchema,
+    schema: createNewPasswordSchema(),
   })
 
   if (submission.status !== "success") {

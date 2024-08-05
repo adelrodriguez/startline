@@ -8,11 +8,12 @@ export const GoogleUserSchema = z.object({
   email: z.string().email(),
   email_verified: z.boolean(),
   picture: z.string().url().optional(),
+  locale: z.string().optional(),
 })
 
 export const GitHubUserSchema = z.object({
   id: z.coerce.string().min(1),
   email: z.string().email(),
-  avatar_url: z.string().url().optional(),
+  avatar_url: z.string().optional(),
   name: z.string().optional(),
 })

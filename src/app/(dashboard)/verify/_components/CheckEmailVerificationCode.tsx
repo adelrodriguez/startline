@@ -1,7 +1,7 @@
 "use client"
 
 import { checkEmailVerificationCode } from "@/server/actions"
-import { CheckEmailVerificationCodeSchema } from "@/utils/validation"
+import { createCheckEmailVerificationCodeSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { useFormState } from "react-dom"
@@ -15,7 +15,7 @@ export default function CheckEmailVerificationCodeForm() {
     lastResult,
     onValidate({ formData }) {
       return parseWithZod(formData, {
-        schema: CheckEmailVerificationCodeSchema,
+        schema: createCheckEmailVerificationCodeSchema(),
       })
     },
     shouldValidate: "onBlur",

@@ -1,7 +1,7 @@
 "use client"
 
 import { checkSignInCode } from "@/server/actions"
-import { CheckSignInCodeSchema } from "@/utils/validation"
+import { createCheckInWithCodeSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { useFormState } from "react-dom"
@@ -11,7 +11,7 @@ export default function CheckSignInCodeForm() {
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: CheckSignInCodeSchema })
+      return parseWithZod(formData, { schema: createCheckInWithCodeSchema() })
     },
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",

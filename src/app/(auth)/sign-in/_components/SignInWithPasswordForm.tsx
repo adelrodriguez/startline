@@ -1,7 +1,7 @@
 "use client"
 
 import { signInWithPassword } from "@/server/actions"
-import { SignInWithPasswordSchema } from "@/utils/validation"
+import { createSignInWithPasswordSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import Link from "next/link"
@@ -12,7 +12,9 @@ export default function SignInForm() {
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: SignInWithPasswordSchema })
+      return parseWithZod(formData, {
+        schema: createSignInWithPasswordSchema(),
+      })
     },
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",

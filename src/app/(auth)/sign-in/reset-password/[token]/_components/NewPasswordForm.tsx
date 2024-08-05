@@ -1,7 +1,7 @@
 "use client"
 
 import { resetPassword } from "@/server/actions"
-import { NewPasswordSchema } from "@/utils/validation"
+import { createNewPasswordSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { useFormState } from "react-dom"
@@ -12,7 +12,7 @@ export default function NewPasswordForm({ token }: { token: string }) {
     lastResult,
     defaultValue: { token },
     onValidate: ({ formData }) =>
-      parseWithZod(formData, { schema: NewPasswordSchema }),
+      parseWithZod(formData, { schema: createNewPasswordSchema() }),
 
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",

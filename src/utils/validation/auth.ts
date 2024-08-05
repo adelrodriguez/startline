@@ -28,7 +28,7 @@ export function createSignUpSchema(
             // indicating that the validation is skipped
             if (!isValidatingEmail) {
               ctx.addIssue({
-                code: "custom",
+                code: z.ZodIssueCode.custom,
                 message: conformZodMessage.VALIDATION_SKIPPED,
               })
 
@@ -37,7 +37,7 @@ export function createSignUpSchema(
 
             if (typeof options?.checkIsEmailUnique !== "function") {
               ctx.addIssue({
-                code: "custom",
+                code: z.ZodIssueCode.custom,
                 message: conformZodMessage.VALIDATION_UNDEFINED,
                 fatal: true,
               })
@@ -49,7 +49,7 @@ export function createSignUpSchema(
               if (isEmailUnique) return
 
               ctx.addIssue({
-                code: "custom",
+                code: z.ZodIssueCode.custom,
                 message: "Email is already used",
               })
             })
@@ -64,45 +64,50 @@ export function createSignUpSchema(
     })
 }
 
-export const SignUpSchema = z
-  .object({
+export function createSignInWithPasswordSchema() {
+  return z.object({
     email: z.string().email(),
     password: PasswordSchema,
-    confirmPassword: PasswordSchema,
   })
-  .refine(matchPasswords, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
+}
+
+export function createSignInWithCodeSchema() {
+  return z.object({
+    email: z.string().email(),
   })
+}
 
-export const SignInWithPasswordSchema = z.object({
-  email: z.string().email(),
-  password: PasswordSchema,
-})
+export function createCheckInWithCodeSchema() {
+  return z.object({
+    code: z.string().length(6),
+  })
+}
 
-export const SignInWithCodeSchema = z.object({
-  email: z.string().email(),
-})
+export function createCheckEmailVerificationCodeSchema() {
+  return z.object({
+    code: z.string().length(6),
+  })
+}
 
-export const CheckSignInCodeSchema = z.object({
-  code: z.string().length(6),
-})
+export function createRequestPasswordResetSchema() {
+  return z.object({
+    email: z.string().email(),
+  })
+}
 
-export const CheckEmailVerificationCodeSchema = z.object({
-  code: z.string().length(6),
-})
+export function createNewPasswordSchema() {
+  return z
+    .object({
+      token: z.string().min(1),
+      password: PasswordSchema,
+      confirmPassword: PasswordSchema,
+    })
+    .refine(matchPasswords, {
+      message: "Passwords don't match",
+      path: ["confirmPassword"],
+    })
+}
 
 export const RequestPasswordResetSchema = z.object({
   email: z.string().email(),
 })
-
-export const NewPasswordSchema = z
-  .object({
-    token: z.string().min(1),
-    password: PasswordSchema,
-    confirmPassword: PasswordSchema,
-  })
-  .refine(matchPasswords, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  })
