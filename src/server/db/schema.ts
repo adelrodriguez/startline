@@ -1,5 +1,10 @@
 import { relations, sql } from "drizzle-orm"
-import { integer, sqliteTableCreator, text } from "drizzle-orm/sqlite-core"
+import {
+  integer,
+  primaryKey,
+  sqliteTableCreator,
+  text,
+} from "drizzle-orm/sqlite-core"
 
 const CURRENT_TIMESTAMP = sql`(unixepoch())`
 
@@ -36,7 +41,76 @@ export const userRelations = relations(user, ({ many, one }) => ({
     fields: [user.id],
     references: [password.userId],
   }),
+  organizationMemberships: many(organizationMembership),
 }))
+
+export const organization = createTable("organization", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .default(CURRENT_TIMESTAMP)
+    .notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .default(CURRENT_TIMESTAMP)
+    .notNull(),
+
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+})
+export type Organization = typeof organization.$inferSelect
+export type OrganizationValues = typeof organization.$inferInsert
+
+export const organizationRelations = relations(organization, ({ many }) => ({
+  members: many(organizationMembership),
+}))
+
+export const organizationMembership = createTable(
+  "organization_membership",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .default(CURRENT_TIMESTAMP)
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .default(CURRENT_TIMESTAMP)
+      .notNull(),
+
+    userId: integer("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+    organizationId: integer("organization_id")
+      .notNull()
+      .references(() => organization.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    role: text("role", { enum: ["owner", "admin", "member"] })
+      .notNull()
+      .default("member"),
+  },
+  (table) => ({
+    pk: primaryKey({
+      name: "pk_organization_membership",
+      columns: [table.userId, table.organizationId],
+    }),
+  }),
+)
+export type OrganizationMembership = typeof organizationMembership.$inferSelect
+export type OrganizationMembershipValues =
+  typeof organizationMembership.$inferInsert
+
+export const organizationMembershipRelations = relations(
+  organizationMembership,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [organizationMembership.userId],
+      references: [user.id],
+    }),
+    organization: one(organization, {
+      fields: [organizationMembership.organizationId],
+      references: [organization.id],
+    }),
+  }),
+)
 
 export const password = createTable("password", {
   hash: text("hash").notNull(),
