@@ -2,10 +2,12 @@ import { fileURLToPath } from "node:url"
 import bundleAnalyzer from "@next/bundle-analyzer"
 import { withSentryConfig } from "@sentry/nextjs"
 import createJiti from "jiti"
+import createNextIntlPlugin from "next-intl/plugin"
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 })
+const withNextIntl = createNextIntlPlugin("./src/lib/i18n.ts")
 
 const jiti = createJiti(fileURLToPath(import.meta.url))
 
@@ -40,7 +42,7 @@ let nextConfig = {
 }
 
 nextConfig = withBundleAnalyzer(nextConfig)
-
+nextConfig = withNextIntl(nextConfig)
 nextConfig = withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options

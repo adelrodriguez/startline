@@ -5,6 +5,7 @@ import type { Metadata } from "next"
 
 import "@/styles/tailwind.css"
 import "@uploadthing/react/styles.css"
+import type { Locale } from "@/lib/consts"
 
 export const metadata: Metadata = {
   title: "Startline",
@@ -13,9 +14,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+  params: { locale },
+}: Readonly<{ children: React.ReactNode; params: { locale: Locale } }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang={locale} className="h-full">
       <Providers>
         <body className={cn("h-full", fonts.body.className)}>{children}</body>
 
