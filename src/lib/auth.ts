@@ -1,9 +1,8 @@
 "server-only"
 
-import type { UserRole } from "@/lib/consts"
 import env from "@/lib/env.server"
 import { isProduction } from "@/lib/vars"
-import db, { type User, type SessionValues } from "@/server/db"
+import db, { type User, type SessionValues, type UserRole } from "@/server/db"
 import { session, user } from "@/server/db"
 import { buildUrl } from "@/utils/url"
 import { DrizzleSQLiteAdapter } from "@lucia-auth/adapter-drizzle"
