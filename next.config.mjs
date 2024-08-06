@@ -37,6 +37,15 @@ let nextConfig = {
     ]
   },
 
+  async headers() {
+    return [
+      {
+        source: "/reset-password/:token",
+        headers: [{ key: "referrer-policy", value: "strict-origin" }],
+      },
+    ]
+  },
+
   // This is required to support PostHog trailing slash API requests
   skipTrailingSlashRedirect: true,
 }

@@ -44,7 +44,7 @@ AI-generated list (will fix):
 - [x] Set up analytics
 - [x] Set up testing (mostly for unit tests of utils and such)
 - [x] Setup i18n
-- [ ] Set up middleware (prevent referrer leakage from password reset, i18n, etc.)
+- [x] Set up middleware (prevent referrer leakage from password reset, i18n, etc.)
 - [ ] Beautify logs
 - [ ] Update script (pulls changes from template)
 - [ ] Create setup script
