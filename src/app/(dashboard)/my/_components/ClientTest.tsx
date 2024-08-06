@@ -1,8 +1,11 @@
 "use client"
 
 import { UploadButton, UploadDropzone } from "@/components/upload"
+import { usePostHog } from "posthog-js/react"
 
 export default function Component() {
+  const posthog = usePostHog()
+
   return (
     <>
       <UploadButton
@@ -18,6 +21,17 @@ export default function Component() {
         }}
       />
       <UploadDropzone endpoint="imageUploader" />
+      <button
+        onClick={() => {
+          console.log("clicking test event")
+          posthog.capture("test event", {
+            property: "value",
+          })
+        }}
+        type="button"
+      >
+        Capture
+      </button>
     </>
   )
 }

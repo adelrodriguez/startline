@@ -1,7 +1,7 @@
-import { withSentryConfig } from "@sentry/nextjs"
-import createJiti from "jiti"
 import { fileURLToPath } from "node:url"
 import bundleAnalyzer from "@next/bundle-analyzer"
+import { withSentryConfig } from "@sentry/nextjs"
+import createJiti from "jiti"
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -17,6 +17,26 @@ let nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["@node-rs/argon2"],
   },
+
+  async rewrites() {
+    return [
+      {
+        source: "/ingest/static/:path*",
+        destination: "https://us-assets.i.posthog.com/static/:path*",
+      },
+      {
+        source: "/ingest/:path*",
+        destination: "https://us.i.posthog.com/:path*",
+      },
+      {
+        source: "/ingest/decide",
+        destination: "https://us.i.posthog.com/decide",
+      },
+    ]
+  },
+
+  // This is required to support PostHog trailing slash API requests
+  skipTrailingSlashRedirect: true,
 }
 
 nextConfig = withBundleAnalyzer(nextConfig)
