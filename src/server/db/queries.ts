@@ -5,16 +5,10 @@ import { type SQL, eq, lt } from "drizzle-orm"
 import db from "./client"
 import {
   type EmailVerificationCode,
-  type EmailVerificationCodeValues,
   type PasswordResetToken,
-  type PasswordResetTokenValues,
-  type PasswordValues,
   type SignInCode,
-  type SignInCodeValues,
   type User,
-  type UserValues,
   type WebhookEvent,
-  type WebhookEventValues,
   emailVerificationCode,
   password,
   passwordResetToken,
@@ -57,13 +51,13 @@ export function selectUser(
   })
 }
 
-export function insertUser(values: OmitId<UserValues>) {
+export function insertUser(values: OmitId<typeof user.$inferInsert>) {
   return db.insert(user).values(values).returning().get()
 }
 
 export function updateUser(
   userId: User["id"],
-  values: Partial<OmitId<UserValues>>,
+  values: Partial<OmitId<typeof user.$inferInsert>>,
 ) {
   return db
     .update(user)
@@ -72,7 +66,7 @@ export function updateUser(
     .returning()
 }
 
-export function upsertUser(values: OmitId<UserValues>) {
+export function upsertUser(values: OmitId<typeof user.$inferInsert>) {
   return db
     .insert(user)
     .values(values)
@@ -93,7 +87,7 @@ export function selectPassword(userId: User["id"]) {
 
 export function upsertPassword(
   userId: User["id"],
-  values: OmitUserId<PasswordValues>,
+  values: OmitUserId<typeof password.$inferInsert>,
 ) {
   return db
     .insert(password)
@@ -114,7 +108,9 @@ export function selectSignInCode(query: { email: SignInCode["email"] }) {
   })
 }
 
-export function insertSignInCode(values: OmitId<SignInCodeValues>) {
+export function insertSignInCode(
+  values: OmitId<typeof signInCode.$inferInsert>,
+) {
   return db.insert(signInCode).values(values).returning().get()
 }
 
@@ -150,7 +146,7 @@ export function selectEmailVerificationCode(query: { userId: User["id"] }) {
 }
 
 export function insertEmailVerificationCode(
-  values: OmitId<EmailVerificationCodeValues>,
+  values: OmitId<typeof emailVerificationCode.$inferInsert>,
 ) {
   return db.insert(emailVerificationCode).values(values).returning().get()
 }
@@ -188,7 +184,7 @@ export function selectPasswordResetToken(query: {
 }
 
 export function insertPasswordResetToken(
-  values: OmitId<PasswordResetTokenValues>,
+  values: OmitId<typeof passwordResetToken.$inferInsert>,
 ) {
   return db.insert(passwordResetToken).values(values).returning().get()
 }
@@ -234,13 +230,15 @@ export function selectWebhookEvent(
   })
 }
 
-export function insertWebhookEvent(values: OmitId<WebhookEventValues>) {
+export function insertWebhookEvent(
+  values: OmitId<typeof webhookEvent.$inferInsert>,
+) {
   return db.insert(webhookEvent).values(values).returning().get()
 }
 
 export function updateWebhookEvent(
   webhookEventId: WebhookEvent["id"],
-  values: Partial<OmitId<WebhookEventValues>>,
+  values: Partial<OmitId<typeof webhookEvent.$inferInsert>>,
 ) {
   return db
     .update(webhookEvent)

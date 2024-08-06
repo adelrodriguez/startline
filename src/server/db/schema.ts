@@ -33,7 +33,6 @@ export const user = createTable("user", {
   githubId: text("github_id").unique(),
 })
 export type User = typeof user.$inferSelect
-export type UserValues = typeof user.$inferInsert
 export type UserRole = User["role"]
 
 export const userRelations = relations(user, ({ many, one }) => ({
@@ -57,10 +56,9 @@ export const organization = createTable("organization", {
   slug: text("slug").notNull().unique(),
 })
 export type Organization = typeof organization.$inferSelect
-export type OrganizationValues = typeof organization.$inferInsert
 
 export const organizationRelations = relations(organization, ({ many }) => ({
-  members: many(organizationMembership),
+  memberships: many(organizationMembership),
 }))
 
 export const organizationMembership = createTable(
@@ -95,8 +93,6 @@ export const organizationMembership = createTable(
   }),
 )
 export type OrganizationMembership = typeof organizationMembership.$inferSelect
-export type OrganizationMembershipValues =
-  typeof organizationMembership.$inferInsert
 
 export const organizationMembershipRelations = relations(
   organizationMembership,
@@ -120,7 +116,6 @@ export const password = createTable("password", {
     .unique(),
 })
 export type Password = typeof password.$inferSelect
-export type PasswordValues = typeof password.$inferInsert
 
 export const signInCode = createTable("sign_in_code", {
   createdAt: integer("created_at", { mode: "timestamp" })
@@ -133,7 +128,6 @@ export const signInCode = createTable("sign_in_code", {
   hash: text("hash").notNull(),
 })
 export type SignInCode = typeof signInCode.$inferSelect
-export type SignInCodeValues = typeof signInCode.$inferInsert
 
 export const emailVerificationCode = createTable("email_verification_code", {
   createdAt: integer("created_at", { mode: "timestamp" })
@@ -149,8 +143,6 @@ export const emailVerificationCode = createTable("email_verification_code", {
   hash: text("hash").notNull(),
 })
 export type EmailVerificationCode = typeof emailVerificationCode.$inferSelect
-export type EmailVerificationCodeValues =
-  typeof emailVerificationCode.$inferInsert
 
 export const passwordResetToken = createTable("password_reset_token", {
   createdAt: integer("created_at", { mode: "timestamp" })
@@ -166,7 +158,6 @@ export const passwordResetToken = createTable("password_reset_token", {
   hash: text("token").notNull(),
 })
 export type PasswordResetToken = typeof passwordResetToken.$inferSelect
-export type PasswordResetTokenValues = typeof passwordResetToken.$inferInsert
 
 export const session = createTable("session", {
   id: text("id").primaryKey(),
@@ -183,7 +174,6 @@ export const session = createTable("session", {
   ipAddress: text("ip_address"),
 })
 export type Session = typeof session.$inferSelect
-export type SessionValues = typeof session.$inferInsert
 
 export const webhookEvent = createTable("webhook_event", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -198,5 +188,4 @@ export const webhookEvent = createTable("webhook_event", {
   provider: text("provider", { enum: ["stripe"] }).notNull(),
 })
 export type WebhookEvent = typeof webhookEvent.$inferSelect
-export type WebhookEventValues = typeof webhookEvent.$inferInsert
 export type WebhookProvider = WebhookEvent["provider"]

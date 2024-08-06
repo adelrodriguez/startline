@@ -2,7 +2,7 @@
 
 import env from "@/lib/env.server"
 import { isProduction } from "@/lib/vars"
-import db, { type User, type SessionValues, type UserRole } from "@/server/db"
+import db, { type User, type UserRole } from "@/server/db"
 import { session, user } from "@/server/db"
 import { buildUrl } from "@/utils/url"
 import { DrizzleSQLiteAdapter } from "@lucia-auth/adapter-drizzle"
@@ -41,7 +41,7 @@ declare module "lucia" {
 
 export async function setSession(
   userId: User["id"],
-  { ipAddress }: Pick<SessionValues, "ipAddress"> = {},
+  { ipAddress }: Pick<typeof session.$inferInsert, "ipAddress"> = {},
 ) {
   const session = await lucia.createSession(userId, { ipAddress })
   const sessionCookie = await lucia.createSessionCookie(session.id)

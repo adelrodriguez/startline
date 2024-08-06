@@ -2,11 +2,11 @@
 
 import {
   type User,
-  type UserValues,
   deleteEmailVerificationCode,
   insertUser,
   selectUser,
   upsertUser,
+  type user,
 } from "@/server/db"
 import { sendEmailVerificationCode } from "./email-verification-code"
 
@@ -34,7 +34,9 @@ export async function findUserById(userId: User["id"]) {
   return user ?? null
 }
 
-export async function createUser(values: Omit<UserValues, "id" | "role">) {
+export async function createUser(
+  values: Omit<typeof user.$inferInsert, "id" | "role">,
+) {
   const user = await insertUser({ ...values, role: "user" })
 
   await sendEmailVerificationCode(user)
@@ -42,13 +44,17 @@ export async function createUser(values: Omit<UserValues, "id" | "role">) {
   return user
 }
 
-export async function createAdmin(values: Omit<UserValues, "id" | "role">) {
+export async function createAdmin(
+  values: Omit<typeof user.$inferInsert, "id" | "role">,
+) {
   const user = await insertUser({ ...values, role: "admin" })
 
   return user
 }
 
-export async function createUserFromCode(values: Pick<UserValues, "email">) {
+export async function createUserFromCode(
+  values: Pick<typeof user.$inferInsert, "email">,
+) {
   const user = await upsertUser({
     ...values,
     role: "user",
@@ -61,7 +67,10 @@ export async function createUserFromCode(values: Pick<UserValues, "email">) {
 }
 
 export async function createUserFromGoogle(
-  values: Pick<UserValues, "email" | "googleId" | "emailVerifiedAt">,
+  values: Pick<
+    typeof user.$inferInsert,
+    "email" | "googleId" | "emailVerifiedAt"
+  >,
 ) {
   const user = await upsertUser({
     googleId: values.googleId,
@@ -75,7 +84,7 @@ export async function createUserFromGoogle(
 }
 
 export async function createUserFromGitHub(
-  values: Pick<UserValues, "email" | "githubId">,
+  values: Pick<typeof user.$inferInsert, "email" | "githubId">,
 ) {
   const user = await upsertUser({
     githubId: values.githubId,

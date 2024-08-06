@@ -2,10 +2,10 @@
 
 import {
   type WebhookEvent,
-  type WebhookEventValues,
   insertWebhookEvent,
   selectWebhookEvent,
   updateWebhookEvent,
+  type webhookEvent,
 } from "@/server/db"
 
 export async function findWebhookEventByExternalId(
@@ -17,7 +17,9 @@ export async function findWebhookEventByExternalId(
 }
 
 export async function createWebhookEvent(
-  values: Omit<WebhookEventValues, "id" | "payload"> & { payload: unknown },
+  values: Omit<typeof webhookEvent.$inferInsert, "id" | "payload"> & {
+    payload: unknown
+  },
 ) {
   const webhookEvent = await insertWebhookEvent({
     ...values,
