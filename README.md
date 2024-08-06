@@ -42,7 +42,7 @@ AI-generated list (will fix):
 - [x] Set up CRON jobs (for deleting expired codes and tokens)
 - [x] Set up file uploads
 - [x] Set up analytics
-- [ ] Set up testing (mostly for unit tests of utils and such)
+- [x] Set up testing (mostly for unit tests of utils and such)
 - [ ] Set up middleware (prevent referrer leakage from password reset, i18n, etc.)
 - [ ] Beautify logs
 - [ ] Setup i18n
