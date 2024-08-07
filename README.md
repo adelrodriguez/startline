@@ -46,8 +46,7 @@ AI-generated list (will fix):
 - [x] Setup i18n
 - [x] Set up middleware (prevent referrer leakage from password reset, i18n, etc.)
 - [x] Beautify logs
+- [ ] Set up basic UI
 - [ ] Update script (pulls changes from template)
 - [ ] Create setup script
-- [ ] Set up example
-- [ ] Set up basic UI
 - [ ] Write a README
