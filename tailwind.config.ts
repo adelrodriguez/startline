@@ -1,6 +1,8 @@
 import type { Config } from "tailwindcss"
+import { fontFamily } from "tailwindcss/defaultTheme"
+import { withUt } from "uploadthing/tw"
 
-export default {
+const config = {
   darkMode: ["class"],
   content: ["./src/**/*.{ts,tsx}"],
   prefix: "",
@@ -48,6 +50,9 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      fontFamily: {
+        sans: ["var(--font-sans)", ...fontFamily.sans],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -76,3 +81,5 @@ export default {
   },
   plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
 } satisfies Config
+
+export default withUt(config)
