@@ -1,9 +1,11 @@
 "use client"
 
+import { Form, FormItem, FormSubmit, Input, Label } from "@/components/ui"
 import { requestPasswordReset } from "@/server/actions"
 import { RequestPasswordResetSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
+import { Loader2 } from "lucide-react"
 import { useFormState } from "react-dom"
 
 export default function ResetPasswordForm() {
@@ -18,31 +20,27 @@ export default function ResetPasswordForm() {
   })
 
   return (
-    <form {...getFormProps(form)} action={action} className="space-y-6">
-      <div>
-        <label
-          htmlFor={fields.email.id}
-          className="block font-medium text-gray-900 text-sm leading-6"
-        >
-          Email address
-        </label>
-        <div className="mt-2">
-          <input
-            {...getInputProps(fields.email, { type: "email" })}
-            autoComplete="email"
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 focus:ring-inset sm:text-sm sm:leading-6"
-          />
-        </div>
-      </div>
+    <Form {...getFormProps(form)} action={action}>
+      <FormItem>
+        <Label htmlFor={fields.email.id}>Email address</Label>
 
-      <div>
-        <button
-          type="submit"
-          className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 font-semibold text-sm text-white leading-6 shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-600 focus-visible:outline-offset-2"
-        >
-          Sign in
-        </button>
-      </div>
-    </form>
+        <Input
+          {...getInputProps(fields.email, { type: "email" })}
+          autoComplete="email"
+        />
+      </FormItem>
+
+      <FormSubmit
+        className="w-full"
+        renderLoading={
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Sending...
+          </>
+        }
+      >
+        Send
+      </FormSubmit>
+    </Form>
   )
 }

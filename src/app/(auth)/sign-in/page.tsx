@@ -1,25 +1,31 @@
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Separator,
+} from "@/components/ui"
 import Link from "next/link"
 import SignInWithCodeForm from "./_components/SignInWithCodeForm"
 import SignInWithPasswordForm from "./_components/SignInWithPasswordForm"
 
 export default function Page() {
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center font-bold text-2xl text-gray-900 leading-9 tracking-tight">
-          Sign in to your account
-        </h2>
-      </div>
-
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-        <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
+    <div className="flex min-h-screen items-center justify-center px-6 py-12 sm:px-8">
+      <Card className="w-full sm:mx-auto sm:max-w-[480px]">
+        <CardHeader>
+          <CardTitle className="text-center">Sign in to your account</CardTitle>
+        </CardHeader>
+        <CardContent>
           <SignInWithCodeForm />
-          <div className="relative mt-10">
+
+          <div className="relative my-10">
             <div
               aria-hidden="true"
               className="absolute inset-0 flex items-center"
             >
-              <div className="w-full border-gray-200 border-t" />
+              <Separator decorative />
             </div>
             <div className="relative flex justify-center font-medium text-sm leading-6">
               <span className="bg-white px-6 text-gray-900">
@@ -30,40 +36,36 @@ export default function Page() {
 
           <SignInWithPasswordForm />
 
-          <div>
-            <div className="relative mt-10">
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 flex items-center"
-              >
-                <div className="w-full border-gray-200 border-t" />
-              </div>
-              <div className="relative flex justify-center font-medium text-sm leading-6">
-                <span className="bg-white px-6 text-gray-900">
-                  Or continue with
-                </span>
-              </div>
+          <div className="relative my-10">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 flex items-center"
+            >
+              <Separator decorative />
             </div>
-
-            <div className="mt-6 flex flex-col justify-center gap-4 sm:flex-row">
-              <Link
-                href="/api/sign-in/google"
-                className="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 font-semibold text-gray-900 text-sm shadow-sm ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:ring-transparent"
-              >
-                <GoogleIcon />
-                <span className="font-semibold text-sm leading-6">Google</span>
-              </Link>
-              <Link
-                href="/api/sign-in/github"
-                className="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 font-semibold text-gray-900 text-sm shadow-sm ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:ring-transparent"
-              >
-                <GitHubIcon />
-                <span className="font-semibold text-sm leading-6">GitHub</span>
-              </Link>
+            <div className="relative flex justify-center font-medium text-sm leading-6">
+              <span className="bg-white px-6 text-gray-900">
+                Or continue with
+              </span>
             </div>
           </div>
-        </div>
-      </div>
+
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/api/sign-in/google" className="flex gap-3">
+                <GoogleIcon />
+                Google
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/api/sign-in/github" className="flex gap-3">
+                <GitHubIcon />
+                GitHub
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

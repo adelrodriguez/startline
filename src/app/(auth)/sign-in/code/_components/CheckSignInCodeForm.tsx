@@ -1,9 +1,20 @@
 "use client"
 
+import {
+  Form,
+  FormItem,
+  FormMessage,
+  FormSubmit,
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui"
 import { checkSignInCode } from "@/server/actions"
 import { createCheckInWithCodeSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
 import { useFormState } from "react-dom"
 
 export default function CheckSignInCodeForm() {
@@ -18,8 +29,32 @@ export default function CheckSignInCodeForm() {
   })
 
   return (
-    <form {...getFormProps(form)} action={action} className="space-y-6">
-      <div>
+    <Form {...getFormProps(form)} action={action}>
+      <FormItem className="flex flex-col items-center">
+        <InputOTP
+          maxLength={6}
+          pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+          {...getInputProps(fields.code, { type: "text" })}
+        >
+          <InputOTPGroup>
+            <InputOTPSlot index={0} />
+            <InputOTPSlot index={1} />
+            <InputOTPSlot index={2} />
+          </InputOTPGroup>
+          <InputOTPSeparator />
+          <InputOTPGroup>
+            <InputOTPSlot index={3} />
+            <InputOTPSlot index={4} />
+            <InputOTPSlot index={5} />
+          </InputOTPGroup>
+        </InputOTP>
+
+        <FormMessage id={fields.code.errorId}>{fields.code.errors}</FormMessage>
+      </FormItem>
+      <FormSubmit className="w-full" renderLoading={<>Sending...</>}>
+        Verify
+      </FormSubmit>
+      {/* <div>
         <label
           htmlFor={fields.code.id}
           className="block font-medium text-gray-900 text-sm leading-6"
@@ -42,7 +77,7 @@ export default function CheckSignInCodeForm() {
         >
           Verify
         </button>
-      </div>
-    </form>
+      </div> */}
+    </Form>
   )
 }
