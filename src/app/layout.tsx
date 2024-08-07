@@ -1,11 +1,12 @@
 import { Providers } from "@/components/providers"
-import { cn, fonts } from "@/utils/ui"
+import type { Locale } from "@/lib/consts"
+import { fonts } from "@/utils/fonts"
+import { cn } from "@/utils/ui"
 import { Analytics } from "@vercel/analytics/react"
 import type { Metadata } from "next"
 
 import "@/styles/tailwind.css"
 import "@uploadthing/react/styles.css"
-import type { Locale } from "@/lib/consts"
 
 export const metadata: Metadata = {
   title: "Startline",
