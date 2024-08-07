@@ -18,6 +18,7 @@ jiti("./src/lib/env.client.ts")
 let nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["@node-rs/argon2"],
+    typedRoutes: true,
   },
 
   async rewrites() {
