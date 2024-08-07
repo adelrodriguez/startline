@@ -186,7 +186,7 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
     })
   }
 
-  cookies().delete(VERIFICATION_EMAIL_COOKIE_NAME)
+  cookies().set(VERIFICATION_EMAIL_COOKIE_NAME, "")
 
   // If the user already exists, we just update their emailVerifiedAt
   const user = await createUserFromCode({ email })

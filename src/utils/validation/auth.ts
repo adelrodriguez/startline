@@ -3,6 +3,10 @@ import { conformZodMessage } from "@conform-to/zod"
 import { z } from "zod"
 
 const PasswordSchema = z.string().min(8)
+const CodeSchema = z
+  .string()
+  .length(6)
+  .transform((code) => code.toUpperCase())
 
 const matchPasswords = (data: { password: string; confirmPassword: string }) =>
   data.password === data.confirmPassword
@@ -79,13 +83,13 @@ export function createSignInWithCodeSchema() {
 
 export function createCheckInWithCodeSchema() {
   return z.object({
-    code: z.string().length(6),
+    code: CodeSchema,
   })
 }
 
 export function createCheckEmailVerificationCodeSchema() {
   return z.object({
-    code: z.string().length(6),
+    code: CodeSchema,
   })
 }
 
