@@ -32,6 +32,14 @@ AI-generated list (will fix):
 26. Hot module replacement: For fast refresh during development
 27. TypeScript checking: Script for type checking without emitting files
 
+## Setup
+
+TODO. Finish the setup script.
+
+## Updates
+
+TODO. Talk about the action: https://github.com/marketplace/actions/actions-template-sync
+
 ## TODO
 
 - [x] Set up emails

@@ -20,7 +20,7 @@
     "db:studio": "drizzle-kit studio",
     "deps:check": "taze -l",
     "deps:update": "taze -lw",
-    "dev:email": "bun scripts/setup-dev-email.ts && email dev --dir src/components/emails --port 3001",
+    "dev:email": "bun template:setup-email && email dev --dir src/components/emails --port 3001",
     "dev": "next dev",
     "docker:down": "docker-compose down",
     "docker:up": "docker-compose up -d",
@@ -30,7 +30,8 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "template:setup": "bun scripts/setup.ts",
-    "template:update": "bun scripts/update.ts",
+    "template:setup-email": "bun scripts/setup-dev-email.ts",
+    "template:sync": "bun scripts/sync.ts",
     "ui:add": "shadcn-ui add",
     "ui:diff": "shadcn-ui diff",
     "ui:init": "shadcn-ui init"
