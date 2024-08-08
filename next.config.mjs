@@ -54,7 +54,6 @@ let nextConfig = {
 
 nextConfig = withBundleAnalyzer(nextConfig)
 nextConfig = withNextIntl(nextConfig)
-nextConfig = withPlausibleProxy(nextConfig)
 nextConfig = withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
@@ -89,5 +88,6 @@ nextConfig = withSentryConfig(nextConfig, {
   // https://vercel.com/docs/cron-jobs
   automaticVercelMonitors: true,
 })
+nextConfig = withPlausibleProxy()(nextConfig)
 
 export default nextConfig
