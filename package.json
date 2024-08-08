@@ -67,6 +67,7 @@
     "lucide-react": "0.424.0",
     "next": "14.2.5",
     "next-intl": "3.17.2",
+    "next-plausible": "^3.12.1",
     "oslo": "1.2.1",
     "posthog-js": "1.154.3",
     "posthog-node": "4.0.1",

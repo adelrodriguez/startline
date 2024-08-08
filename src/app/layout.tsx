@@ -1,5 +1,6 @@
-import { Providers } from "@/components/providers"
+import Providers from "@/components/providers"
 import type { Locale } from "@/lib/consts"
+import env from "@/lib/env.client"
 import { fileRouter } from "@/services/uploadthing"
 import { fonts } from "@/utils/fonts"
 import { cn } from "@/utils/ui"
@@ -9,6 +10,7 @@ import type { Metadata } from "next"
 import { extractRouterConfig } from "uploadthing/server"
 
 import "@/styles/tailwind.css"
+import PlausibleProvider from "next-plausible"
 
 export const metadata: Metadata = {
   title: "Startline",
@@ -21,6 +23,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode; params: { locale: Locale } }>) {
   return (
     <html lang={locale} className="h-full">
+      <head>
+        <PlausibleProvider domain={env.NEXT_PUBLIC_DOMAIN} />
+      </head>
       <Providers>
         <NextSSRPlugin routerConfig={extractRouterConfig(fileRouter)} />
         <body

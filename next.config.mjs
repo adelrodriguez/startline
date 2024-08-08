@@ -3,6 +3,7 @@ import bundleAnalyzer from "@next/bundle-analyzer"
 import { withSentryConfig } from "@sentry/nextjs"
 import createJiti from "jiti"
 import createNextIntlPlugin from "next-intl/plugin"
+import { withPlausibleProxy } from "next-plausible"
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -53,6 +54,7 @@ let nextConfig = {
 
 nextConfig = withBundleAnalyzer(nextConfig)
 nextConfig = withNextIntl(nextConfig)
+nextConfig = withPlausibleProxy(nextConfig)
 nextConfig = withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
