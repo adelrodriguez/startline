@@ -1,3 +1,3 @@
 import { $ } from "bun"
 
-await $`echo "TODO: setup script"`
+await $`git remote add template git@github.com:adelrodriguez/startline.git`
