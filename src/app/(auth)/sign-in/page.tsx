@@ -7,8 +7,8 @@ import {
   Separator,
 } from "@/components/ui"
 import Link from "next/link"
-import SignInWithCodeForm from "./_components/SignInWithCodeForm"
-import SignInWithPasswordForm from "./_components/SignInWithPasswordForm"
+import SignInWithCodeForm from "./_components/sign-in-with-code-form"
+import SignInWithPasswordForm from "./_components/sign-in-with-password-form"
 
 export default function Page() {
   return (

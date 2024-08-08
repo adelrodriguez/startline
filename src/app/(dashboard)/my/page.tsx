@@ -1,5 +1,5 @@
 import { AdminOnly, UserOnly } from "@/components/auth"
-import ClientTest from "./_components/ClientTest"
+import ClientTest from "./_components/client-test"
 
 export default async function Page() {
   return (

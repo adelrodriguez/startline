@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui"
-import NewPasswordForm from "./_components/NewPasswordForm"
+import NewPasswordForm from "./_components/new-password-form"
 
 export default function Page({
   params: { token },

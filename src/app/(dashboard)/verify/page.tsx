@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@/server/loader"
 import { redirect } from "next/navigation"
-import CheckEmailVerificationCodeForm from "./_components/CheckEmailVerificationCode"
+import CheckEmailVerificationCodeForm from "./_components/check-email-verification-code-form"
 
 export default async function Page() {
   const user = await getCurrentUser()
