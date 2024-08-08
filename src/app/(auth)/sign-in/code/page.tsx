@@ -13,7 +13,7 @@ export default function Page() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-12 sm:px-8">
-      <Card className="w-full sm:mx-auto sm:max-w-[480px]">
+      <Card className="w-full sm:mx-auto sm:max-w-[500px]">
         <CardHeader>
           <CardTitle>Verify your sign in code</CardTitle>
         </CardHeader>

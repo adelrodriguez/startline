@@ -1,10 +1,17 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui"
 import SignUpForm from "./_components/SignUpForm"
 
 export default function Page() {
   return (
-    <div>
-      <h1>Sign Up</h1>
-      <SignUpForm />
+    <div className="flex min-h-screen items-center justify-center px-6 py-12 sm:px-8">
+      <Card className="w-full sm:mx-auto sm:max-w-[500px]">
+        <CardHeader>
+          <CardTitle>Sign Up</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <SignUpForm />
+        </CardContent>
+      </Card>
     </div>
   )
 }

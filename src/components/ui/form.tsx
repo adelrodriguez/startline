@@ -37,9 +37,9 @@ FormDescription.displayName = "FormDescription"
 
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement> & { errors?: string[] }
->(({ className, children, errors, ...props }, ref) => {
-  const body = errors?.[0] ?? children
+  React.HTMLAttributes<HTMLParagraphElement> & { children?: string | string[] }
+>(({ className, children, ...props }, ref) => {
+  const body = Array.isArray(children) ? children[0] : children
 
   if (!body) {
     return null

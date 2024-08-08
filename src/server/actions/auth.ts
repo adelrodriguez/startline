@@ -147,7 +147,6 @@ export async function signInWithCode(_: unknown, formData: FormData) {
     secure: isProduction,
     sameSite: "strict",
     maxAge: 60 * 10, // Ten minutes
-    path: "/sign-in/code",
   })
 
   redirect("/sign-in/code")

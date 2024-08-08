@@ -1,9 +1,19 @@
 "use client"
 
+import {
+  Form,
+  FormItem,
+  FormMessage,
+  FormSubmit,
+  Input,
+  Label,
+} from "@/components/ui"
 import { signUp } from "@/server/actions"
 import { createSignUpSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
+import { Loader2 } from "lucide-react"
+
 import { useFormState } from "react-dom"
 
 export default function SignUpForm() {
@@ -21,25 +31,50 @@ export default function SignUpForm() {
   })
 
   return (
-    <form {...getFormProps(form)} action={action}>
-      <div>
-        <label>Email</label>
-        <input {...getInputProps(fields.email, { type: "email" })} />
-        <div>{fields.email.errors}</div>
-      </div>
-      <div>
-        <label>Password</label>
-        <input {...getInputProps(fields.password, { type: "password" })} />
-        <div>{fields.password.errors}</div>
-      </div>
-      <div>
-        <label>Confirm Password</label>
-        <input
-          {...getInputProps(fields.confirmPassword, { type: "password" })}
+    <Form {...getFormProps(form)} action={action}>
+      <FormItem>
+        <Label htmlFor={fields.email.id}>Email</Label>
+        <Input
+          {...getInputProps(fields.email, { type: "email" })}
+          autoComplete="email"
         />
-        <div>{fields.confirmPassword.errors}</div>
-      </div>
-      <button type="submit">Sign Up</button>
-    </form>
+        <FormMessage id={fields.email.errorId}>
+          {fields.email.errors}
+        </FormMessage>
+      </FormItem>
+
+      <FormItem>
+        <Label htmlFor={fields.password.id}>Password</Label>
+        <Input
+          {...getInputProps(fields.password, { type: "password" })}
+          autoComplete="new-password"
+        />
+        <FormMessage id={fields.password.errorId}>
+          {fields.password.errors}
+        </FormMessage>
+      </FormItem>
+
+      <FormItem>
+        <Label htmlFor={fields.confirmPassword.id}>Confirm Password</Label>
+        <Input
+          {...getInputProps(fields.confirmPassword, { type: "password" })}
+          autoComplete="new-password"
+        />
+        <FormMessage id={fields.confirmPassword.errorId}>
+          {fields.confirmPassword.errors}
+        </FormMessage>
+      </FormItem>
+      <FormSubmit
+        className="w-full"
+        renderLoading={
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Signing up...
+          </>
+        }
+      >
+        Sign Up
+      </FormSubmit>
+    </Form>
   )
 }
