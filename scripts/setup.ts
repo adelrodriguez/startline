@@ -1,3 +1,3 @@
 import { $ } from "bun"
 
-await $`TODO: setup script`
+await $`echo "TODO: setup script"`
