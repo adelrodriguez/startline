@@ -36,6 +36,8 @@ AI-generated list (will fix):
 
 TODO. Finish the setup script.
 
+Testing sync updates.
+
 ## Updates
 
 TODO. Talk about the action: https://github.com/marketplace/actions/actions-template-sync
