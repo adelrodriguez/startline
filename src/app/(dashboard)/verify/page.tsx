@@ -1,3 +1,10 @@
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui"
 import { getCurrentUser } from "@/server/loader"
 import { redirect } from "next/navigation"
 import CheckEmailVerificationCodeForm from "./_components/check-email-verification-code-form"
@@ -10,9 +17,18 @@ export default async function Page() {
   }
 
   return (
-    <div>
-      <h1>Verify your email</h1>
-      <CheckEmailVerificationCodeForm />
+    <div className="flex min-h-screen items-center justify-center px-6 py-12 sm:px-8">
+      <Card className="w-full sm:mx-auto sm:max-w-[500px]">
+        <CardHeader>
+          <CardTitle>Verify your email</CardTitle>
+          <CardDescription>
+            Check your email for a verification code.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <CheckEmailVerificationCodeForm />
+        </CardContent>
+      </Card>
     </div>
   )
 }
