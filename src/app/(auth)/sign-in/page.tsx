@@ -43,6 +43,7 @@ export default function Page() {
             >
               <Separator decorative />
             </div>
+
             <div className="relative flex justify-center font-medium text-sm leading-6">
               <span className="bg-white px-6 text-gray-900">
                 Or continue with
