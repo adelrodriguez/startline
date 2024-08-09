@@ -110,7 +110,7 @@ export type { AuthUser }
 export const google = new Google(
   env.GOOGLE_CLIENT_ID,
   env.GOOGLE_CLIENT_SECRET,
-  buildUrl("/api/sign-in/google/callback"),
+  buildUrl("/api/auth/google/callback"),
 )
 
 export const github = new GitHub(env.GITHUB_CLIENT_ID, env.GITHUB_CLIENT_SECRET)

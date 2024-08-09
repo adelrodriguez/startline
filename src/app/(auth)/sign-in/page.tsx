@@ -53,13 +53,13 @@ export default function Page() {
 
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Button asChild variant="outline" className="w-full">
-              <Link href="/api/sign-in/google" className="flex gap-3">
+              <Link href="/api/auth/google" className="flex gap-3">
                 <GoogleIcon />
                 Google
               </Link>
             </Button>
             <Button asChild variant="outline" className="w-full">
-              <Link href="/api/sign-in/github" className="flex gap-3">
+              <Link href="/api/auth/github" className="flex gap-3">
                 <GitHubIcon />
                 GitHub
               </Link>

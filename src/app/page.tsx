@@ -1,3 +1,4 @@
+import { SignedIn, SignedOut } from "@/components/auth"
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -106,20 +107,33 @@ export default function Page() {
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link href="/sign-in" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Sign In
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link href="/sign-up" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Sign Up
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
+            <SignedOut>
+              <NavigationMenuItem>
+                <Link href="/sign-in" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Sign In
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+            </SignedOut>
+            <SignedOut>
+              <NavigationMenuItem>
+                <Link href="/sign-up" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Sign Up
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+            </SignedOut>
+            <SignedIn>
+              <NavigationMenuItem>
+                <Link href="/my" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    My Account
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+            </SignedIn>
           </NavigationMenuList>
         </NavigationMenu>
       </div>
