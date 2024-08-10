@@ -64,7 +64,6 @@ export const organizationRelations = relations(organization, ({ many }) => ({
 export const organizationMembership = createTable(
   "organization_membership",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
     createdAt: integer("created_at", { mode: "timestamp" })
       .default(CURRENT_TIMESTAMP)
       .notNull(),
