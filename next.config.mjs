@@ -22,6 +22,8 @@ let nextConfig = {
     typedRoutes: true,
   },
 
+  transpilePackages: ["lucide-react"],
+
   async rewrites() {
     return [
       {
