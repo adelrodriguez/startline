@@ -1,15 +1,18 @@
 "server-only"
 
 import { QueryError } from "@/utils/error"
-import { type SQL, eq, lt } from "drizzle-orm"
+import { type SQL, and, eq, lt } from "drizzle-orm"
 import db from "./client"
 import {
   type EmailVerificationCode,
+  type Organization,
   type PasswordResetToken,
   type SignInCode,
   type User,
   type WebhookEvent,
   emailVerificationCode,
+  organization,
+  organizationMembership,
   password,
   passwordResetToken,
   signInCode,
@@ -209,6 +212,83 @@ export function deletePasswordResetTokens(query: { expiresAt: Date }) {
   return db
     .delete(passwordResetToken)
     .where(lt(passwordResetToken.expiresAt, query.expiresAt))
+}
+
+// Organization
+export function selectOrganization(
+  query: Organization["id"] | { slug: string },
+) {
+  return db.query.organization.findFirst({
+    where: (model, { eq }) => {
+      if (typeof query === "number") {
+        return eq(model.id, query)
+      }
+
+      if ("slug" in query) {
+        return eq(model.slug, query.slug)
+      }
+
+      throw new QueryError("selectOrganization")
+    },
+  })
+}
+
+export function insertOrganization(
+  values: OmitId<typeof organization.$inferInsert>,
+) {
+  return db.insert(organization).values(values).returning().get()
+}
+
+export function updateOrganization(
+  organizationId: Organization["id"],
+  values: Partial<OmitId<typeof organization.$inferInsert>>,
+) {
+  return db
+    .update(organization)
+    .set({ ...values, updatedAt: new Date() })
+    .where(eq(organization.id, organizationId))
+    .returning()
+}
+
+export function selectOrganizationMembership(query: {
+  organizationId: Organization["id"]
+  userId: User["id"]
+}) {
+  return db.query.organizationMembership.findFirst({
+    where: (model, { eq, and }) =>
+      and(
+        eq(model.organizationId, query.organizationId),
+        eq(model.userId, query.userId),
+      ),
+  })
+}
+
+export function insertOrganizationMembership(
+  organizationId: Organization["id"],
+  userId: User["id"],
+  values: Omit<
+    typeof organizationMembership.$inferInsert,
+    "organizationId" | "userId"
+  >,
+) {
+  return db
+    .insert(organizationMembership)
+    .values({ ...values, organizationId, userId })
+    .returning()
+}
+
+export function deleteOrganizationMembership(
+  organizationId: Organization["id"],
+  userId: User["id"],
+) {
+  return db
+    .delete(organizationMembership)
+    .where(
+      and(
+        eq(organizationMembership.organizationId, organizationId),
+        eq(organizationMembership.userId, userId),
+      ),
+    )
 }
 
 // Webhook Event

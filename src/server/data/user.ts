@@ -8,7 +8,9 @@ import {
   upsertUser,
   type user,
 } from "@/server/db"
+import { encode } from "@/utils/obfuscator"
 import { sendEmailVerificationCode } from "./email-verification-code"
+import { createOrganization } from "./organization"
 
 export async function findUserByEmail(email: User["email"]) {
   const user = await selectUser({ email })
@@ -39,6 +41,14 @@ export async function createUser(
 ) {
   const user = await insertUser({ ...values, role: "user" })
 
+  await createOrganization(
+    {
+      name: "My Organization",
+      slug: encode(user.id),
+    },
+    { ownerId: user.id },
+  )
+
   await sendEmailVerificationCode(user)
 
   return user
@@ -47,7 +57,19 @@ export async function createUser(
 export async function createAdmin(
   values: Omit<typeof user.$inferInsert, "id" | "role">,
 ) {
-  const user = await insertUser({ ...values, role: "admin" })
+  const user = await insertUser({
+    ...values,
+    role: "admin",
+    emailVerifiedAt: new Date(),
+  })
+
+  await createOrganization(
+    {
+      name: "My Organization",
+      slug: encode(user.id),
+    },
+    { ownerId: user.id },
+  )
 
   return user
 }
@@ -60,6 +82,14 @@ export async function createUserFromCode(
     role: "user",
     emailVerifiedAt: new Date(),
   })
+
+  await createOrganization(
+    {
+      name: "My Organization",
+      slug: encode(user.id),
+    },
+    { ownerId: user.id },
+  )
 
   await deleteEmailVerificationCode({ userId: user.id })
 
@@ -78,6 +108,14 @@ export async function createUserFromGoogle(
     emailVerifiedAt: values.emailVerifiedAt,
   })
 
+  await createOrganization(
+    {
+      name: "My Organization",
+      slug: encode(user.id),
+    },
+    { ownerId: user.id },
+  )
+
   await deleteEmailVerificationCode({ userId: user.id })
 
   return user
@@ -91,6 +129,14 @@ export async function createUserFromGitHub(
     email: values.email,
     emailVerifiedAt: new Date(),
   })
+
+  await createOrganization(
+    {
+      name: "My Organization",
+      slug: encode(user.id),
+    },
+    { ownerId: user.id },
+  )
 
   await deleteEmailVerificationCode({ userId: user.id })
 

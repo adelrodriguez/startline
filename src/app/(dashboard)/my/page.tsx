@@ -53,7 +53,10 @@ export default async function Page() {
                 variant="outline"
                 renderLoading={
                   <>
-                    <Icon name="loader-circle" className="animate-spin" />
+                    <Icon
+                      name="loader-circle"
+                      className="r-2 h-4 w-4 animate-spin"
+                    />
                     Signing out...
                   </>
                 }
