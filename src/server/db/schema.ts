@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE, LOCALES } from "@/lib/consts"
 import { relations, sql } from "drizzle-orm"
 import {
   integer,
@@ -41,6 +42,42 @@ export const userRelations = relations(user, ({ many, one }) => ({
     references: [password.userId],
   }),
   organizationMemberships: many(organizationMembership),
+  profile: one(profile),
+}))
+
+export const profile = createTable(
+  "profile",
+  {
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .default(CURRENT_TIMESTAMP)
+      .notNull(),
+
+    userId: integer("user_id")
+      .notNull()
+      .unique()
+      .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+
+    name: text("name"),
+    avatarUrl: text("avatar_url"),
+    phoneNumber: text("phone_number"),
+    preferredLocale: text("preferred_locale", { enum: LOCALES })
+      .notNull()
+      .default(DEFAULT_LOCALE),
+  },
+  (table) => ({
+    pk: primaryKey({
+      name: "pk_profile",
+      columns: [table.userId],
+    }),
+  }),
+)
+export type Profile = typeof profile.$inferSelect
+
+export const profileRelations = relations(profile, ({ one }) => ({
+  user: one(user, {
+    fields: [profile.userId],
+    references: [user.id],
+  }),
 }))
 
 export const organization = createTable("organization", {

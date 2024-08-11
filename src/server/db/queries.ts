@@ -15,6 +15,7 @@ import {
   organizationMembership,
   password,
   passwordResetToken,
+  profile,
   signInCode,
   user,
   webhookEvent,
@@ -99,6 +100,36 @@ export function upsertPassword(
       target: password.userId,
       set: values,
     })
+    .returning()
+    .get()
+}
+
+// Profile
+export function selectProfile(userId: User["id"]) {
+  return db.query.profile.findFirst({
+    where: (model, { eq }) => eq(model.userId, userId),
+  })
+}
+
+export function insertProfile(
+  userId: User["id"],
+  values: Omit<OmitId<typeof profile.$inferInsert>, "userId">,
+) {
+  return db
+    .insert(profile)
+    .values({ ...values, userId })
+    .returning()
+    .get()
+}
+
+export function updateProfile(
+  userId: User["id"],
+  fields: Partial<Omit<OmitId<typeof profile.$inferInsert>, "userId">>,
+) {
+  return db
+    .update(profile)
+    .set(fields)
+    .where(eq(profile.userId, userId))
     .returning()
     .get()
 }
@@ -260,6 +291,27 @@ export function selectOrganizationMembership(query: {
         eq(model.organizationId, query.organizationId),
         eq(model.userId, query.userId),
       ),
+  })
+}
+
+export function selectOrganizationMemberships(query: {
+  userId?: User["id"]
+  organizationId?: Organization["id"]
+}) {
+  return db.query.organizationMembership.findMany({
+    where: (model, { and }) => {
+      const conditions: SQL[] = []
+
+      if (query.userId !== undefined) {
+        conditions.push(eq(model.userId, query.userId))
+      }
+
+      if (query.organizationId !== undefined) {
+        conditions.push(eq(model.organizationId, query.organizationId))
+      }
+
+      return and(...conditions)
+    },
   })
 }
 

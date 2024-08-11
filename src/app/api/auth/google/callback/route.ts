@@ -63,11 +63,20 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       })
     }
 
-    const user = await createUserFromGoogle({
-      googleId: googleUser.sub,
-      email: googleUser.email,
-      emailVerifiedAt: googleUser.email_verified ? new Date() : null,
-    })
+    const user = await createUserFromGoogle(
+      {
+        googleId: googleUser.sub,
+        email: googleUser.email,
+        emailVerifiedAt: googleUser.email_verified ? new Date() : null,
+      },
+      {
+        profile: {
+          name: googleUser.name,
+          avatarUrl: googleUser.picture,
+          preferredLocale: googleUser.locale,
+        },
+      },
+    )
 
     await setSession(user.id)
 

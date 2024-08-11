@@ -1,3 +1,4 @@
+import { LOCALES, type Locale } from "@/lib/consts"
 import { z } from "zod"
 
 export * from "./auth"
@@ -8,8 +9,12 @@ export const GoogleUserSchema = z.object({
   email: z.string().email(),
   email_verified: z.boolean(),
   picture: z.string().url().optional(),
-  locale: z.string().optional(),
+  locale: z.preprocess(
+    (v) => (LOCALES.includes(v as Locale) ? v : undefined),
+    z.enum(LOCALES).optional(),
+  ),
 })
+export type GoogleUser = z.infer<typeof GoogleUserSchema>
 
 export const GitHubUserSchema = z.object({
   id: z.coerce.string().min(1),
@@ -17,3 +22,4 @@ export const GitHubUserSchema = z.object({
   avatar_url: z.string().optional(),
   name: z.string().optional(),
 })
+export type GitHubUser = z.infer<typeof GitHubUserSchema>

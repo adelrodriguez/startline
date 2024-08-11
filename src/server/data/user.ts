@@ -1,9 +1,12 @@
 "server-only"
 
 import {
+  type Profile,
   type User,
   deleteEmailVerificationCode,
+  insertProfile,
   insertUser,
+  type profile,
   selectUser,
   upsertUser,
   type user,
@@ -38,16 +41,20 @@ export async function findUserById(userId: User["id"]) {
 
 export async function createUser(
   values: Omit<typeof user.$inferInsert, "id" | "role">,
+  options?: {
+    profile?: Omit<typeof profile.$inferInsert, "id" | "userId">
+  },
 ) {
   const user = await insertUser({ ...values, role: "user" })
 
   await createOrganization(
-    {
-      name: "My Organization",
-      slug: encode(user.id),
-    },
+    { name: "Default Organization", slug: encode(user.id) },
     { ownerId: user.id },
   )
+
+  if (options?.profile) {
+    await insertProfile(user.id, options.profile)
+  }
 
   await sendEmailVerificationCode(user)
 
@@ -63,33 +70,20 @@ export async function createAdmin(
     emailVerifiedAt: new Date(),
   })
 
-  await createOrganization(
-    {
-      name: "My Organization",
-      slug: encode(user.id),
-    },
-    { ownerId: user.id },
-  )
-
   return user
 }
 
 export async function createUserFromCode(
   values: Pick<typeof user.$inferInsert, "email">,
+  options?: {
+    profile?: Omit<Profile, "id" | "userId">
+  },
 ) {
   const user = await upsertUser({
     ...values,
     role: "user",
     emailVerifiedAt: new Date(),
   })
-
-  await createOrganization(
-    {
-      name: "My Organization",
-      slug: encode(user.id),
-    },
-    { ownerId: user.id },
-  )
 
   await deleteEmailVerificationCode({ userId: user.id })
 
@@ -101,20 +95,18 @@ export async function createUserFromGoogle(
     typeof user.$inferInsert,
     "email" | "googleId" | "emailVerifiedAt"
   >,
+  options?: {
+    profile?: Pick<
+      typeof profile.$inferInsert,
+      "name" | "avatarUrl" | "phoneNumber" | "preferredLocale"
+    >
+  },
 ) {
   const user = await upsertUser({
     googleId: values.googleId,
     email: values.email,
     emailVerifiedAt: values.emailVerifiedAt,
   })
-
-  await createOrganization(
-    {
-      name: "My Organization",
-      slug: encode(user.id),
-    },
-    { ownerId: user.id },
-  )
 
   await deleteEmailVerificationCode({ userId: user.id })
 
@@ -129,14 +121,6 @@ export async function createUserFromGitHub(
     email: values.email,
     emailVerifiedAt: new Date(),
   })
-
-  await createOrganization(
-    {
-      name: "My Organization",
-      slug: encode(user.id),
-    },
-    { ownerId: user.id },
-  )
 
   await deleteEmailVerificationCode({ userId: user.id })
 

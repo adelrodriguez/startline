@@ -9,6 +9,7 @@ import {
   type organization,
   selectOrganization,
   selectOrganizationMembership,
+  selectOrganizationMemberships,
 } from "@/server/db"
 import { throwIf } from "@/utils/assert"
 import { NotFoundError } from "@/utils/error"
@@ -32,6 +33,14 @@ export async function findOrganizationById(organizationId: Organization["id"]) {
   const organization = await selectOrganization(organizationId)
 
   return organization ?? null
+}
+
+export async function findOrganizationMembershipsByUserId(userId: User["id"]) {
+  const memberships = await selectOrganizationMemberships({
+    userId,
+  })
+
+  return memberships ?? null
 }
 
 export async function addMemberToOrganization(
