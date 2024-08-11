@@ -44,6 +44,8 @@ export class SendEmailError extends Error {
 
 export class PasswordResetError extends Error {}
 
+export class OrganizationError extends Error {}
+
 export class InternalError extends Error {}
 
 // Service errors

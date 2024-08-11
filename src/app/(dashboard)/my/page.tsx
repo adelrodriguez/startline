@@ -55,7 +55,7 @@ export default async function Page() {
                   <>
                     <Icon
                       name="loader-circle"
-                      className="r-2 h-4 w-4 animate-spin"
+                      className="mr-2 h-4 w-4 animate-spin"
                     />
                     Signing out...
                   </>

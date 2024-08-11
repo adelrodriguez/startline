@@ -1,108 +1,142 @@
 "server-only"
 
-import {
+import db, {
   type Organization,
   type User,
-  deleteOrganizationMembership,
-  insertOrganization,
-  insertOrganizationMembership,
-  type organization,
-  selectOrganization,
-  selectOrganizationMembership,
-  selectOrganizationMemberships,
+  filters,
+  organization,
+  organizationMembership,
 } from "@/server/db"
-import { throwIf } from "@/utils/assert"
-import { NotFoundError } from "@/utils/error"
+import { throwIf, throwUnless } from "@/utils/assert"
+import { OrganizationError } from "@/utils/error"
+import type { OmitId } from "@/utils/type"
 
 export async function createOrganization(
-  values: Omit<typeof organization.$inferInsert, "id">,
+  values: OmitId<typeof organization.$inferInsert>,
   options?: {
     ownerId?: User["id"]
   },
 ) {
-  const organization = await insertOrganization({ ...values })
+  const newOrganization = await db
+    .insert(organization)
+    .values(values)
+    .returning()
+    .get()
 
   if (options?.ownerId) {
-    await addOwnerToOrganization(organization.id, options.ownerId)
+    await addOwnerToOrganization(newOrganization.id, options.ownerId)
   }
 
-  return organization
+  return newOrganization
 }
 
 export async function findOrganizationById(organizationId: Organization["id"]) {
-  const organization = await selectOrganization(organizationId)
-
-  return organization ?? null
-}
-
-export async function findOrganizationMembershipsByUserId(userId: User["id"]) {
-  const memberships = await selectOrganizationMemberships({
-    userId,
+  const existingOrganization = await db.query.organization.findFirst({
+    where: (model, { eq }) => eq(model.id, organizationId),
   })
 
-  return memberships ?? null
+  return existingOrganization ?? null
+}
+
+export function findOrganizationMembershipsByUserId(userId: User["id"]) {
+  return db.query.organizationMembership.findMany({
+    where: (model, { eq }) => eq(model.userId, userId),
+  })
 }
 
 export async function addMemberToOrganization(
   organizationId: Organization["id"],
   userId: User["id"],
 ) {
-  await insertOrganizationMembership(organizationId, userId, {
-    role: "member",
-  })
+  return db
+    .insert(organizationMembership)
+    .values({
+      organizationId,
+      userId,
+      role: "member",
+    })
+    .returning()
 }
 
 export async function addAdminToOrganization(
   organizationId: Organization["id"],
   userId: User["id"],
 ) {
-  await insertOrganizationMembership(organizationId, userId, {
-    role: "admin",
-  })
+  return db
+    .insert(organizationMembership)
+    .values({
+      organizationId,
+      userId,
+      role: "admin",
+    })
+    .returning()
 }
 
-export async function addOwnerToOrganization(
+export function addOwnerToOrganization(
   organizationId: Organization["id"],
   userId: User["id"],
 ) {
-  await insertOrganizationMembership(organizationId, userId, {
-    role: "owner",
-  })
+  return db
+    .insert(organizationMembership)
+    .values({
+      organizationId,
+      userId,
+      role: "owner",
+    })
+    .returning()
 }
 
 export async function removeMemberFromOrganization(
   organizationId: Organization["id"],
   userId: User["id"],
 ) {
-  const membership = await selectOrganizationMembership({
-    organizationId,
-    userId,
+  const membership = await db.query.organizationMembership.findFirst({
+    where: (model, { eq, and }) =>
+      and(eq(model.organizationId, organizationId), eq(model.userId, userId)),
+    columns: {
+      role: true,
+    },
   })
 
-  if (!membership) {
-    throw new NotFoundError("User is not a member of the organization")
-  }
+  throwIf(
+    !membership,
+    new OrganizationError("User is not a member of the organization"),
+  )
 
-  throwIf(membership.role === "owner", "User is the owner of the organization")
+  throwIf(
+    membership?.role === "owner",
+    new OrganizationError("User is the owner of the organization"),
+  )
 
-  await deleteOrganizationMembership(organizationId, userId)
+  await db
+    .delete(organizationMembership)
+    .where(
+      filters.and(
+        filters.eq(organizationMembership.userId, userId),
+        filters.eq(organizationMembership.organizationId, organizationId),
+      ),
+    )
 }
 
 export async function assertIsOrganizationOwner(
   organizationId: Organization["id"],
   userId: User["id"],
 ) {
-  const membership = await selectOrganizationMembership({
-    organizationId,
-    userId,
+  const membership = await db.query.organizationMembership.findFirst({
+    where: (model, { eq, and }) =>
+      and(eq(model.organizationId, organizationId), eq(model.userId, userId)),
+    columns: {
+      role: true,
+    },
   })
 
-  if (!membership) {
-    throw new NotFoundError("User is not a member of the organization")
-  }
-
   throwIf(
-    membership.role !== "owner",
+    !membership,
+    new OrganizationError("User is not a member of the organization"),
+  )
+
+  throwUnless(
+    membership?.role === "owner",
     "User is not an owner of the organization",
   )
 }

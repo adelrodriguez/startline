@@ -17,8 +17,12 @@ export function throwUnless(
  * Throws an assertion error if the condition is true. This is useful for
  * business rules that do not need type narrowing.
  */
-export function throwIf(condition: boolean, message?: string): void {
+export function throwIf(condition: boolean, throwable: Error | string): void {
   if (!condition) return
 
-  throw new AssertionError(message)
+  if (typeof throwable === "string") {
+    throw new AssertionError(throwable)
+  }
+
+  throw throwable
 }

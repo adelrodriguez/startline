@@ -18,8 +18,8 @@ import {
   createPassword,
   createUser,
   createUserFromCode,
-  findPasswordResetToken,
   findUserByEmail,
+  findValidPasswordResetToken,
   markPasswordResetTokenAsUsed,
   sendPasswordResetToken,
   sendSignInCode,
@@ -282,7 +282,7 @@ export async function resetPassword(_: unknown, formData: FormData) {
     })
   }
 
-  const passwordResetToken = await findPasswordResetToken(
+  const passwordResetToken = await findValidPasswordResetToken(
     submission.value.token,
   )
 

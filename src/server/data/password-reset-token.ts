@@ -2,34 +2,34 @@
 
 import { PasswordResetTokenEmail } from "@/components/emails"
 import { sendEmail } from "@/lib/emails"
-import {
+import db, {
   type PasswordResetToken,
   type User,
-  batch,
-  deletePasswordResetToken,
-  deletePasswordResetTokens,
-  insertPasswordResetToken,
-  selectPasswordResetToken,
-  updateUser,
+  filters,
+  passwordResetToken,
 } from "@/server/db"
 import { hash } from "@/utils/hash"
 import { TimeSpan, generateIdFromEntropySize } from "lucia"
 import { createDate } from "oslo"
+import { markUserAsEmailVerified } from "./user"
 
-export async function findPasswordResetToken(token: string) {
-  const passwordResetToken = await selectPasswordResetToken({
-    hash: await hash(token),
+export async function findValidPasswordResetToken(input: string) {
+  const hashed = await hash(input)
+
+  const token = await db.query.passwordResetToken.findFirst({
+    where: (model, { eq, and, gte }) =>
+      and(eq(model.hash, hashed), gte(model.expiresAt, new Date())),
   })
 
-  return passwordResetToken ?? null
+  return token ?? null
 }
 
 export async function sendPasswordResetToken(user: User) {
-  await deletePasswordResetToken({ userId: user.id })
+  await deletePasswordResetToken(user.id)
 
   const token = generateIdFromEntropySize(25)
 
-  await insertPasswordResetToken({
+  await db.insert(passwordResetToken).values({
     userId: user.id,
     hash: await hash(token),
     expiresAt: createDate(new TimeSpan(24, "h")),
@@ -43,16 +43,25 @@ export async function sendPasswordResetToken(user: User) {
 }
 
 export async function markPasswordResetTokenAsUsed(token: PasswordResetToken) {
-  await batch([
-    deletePasswordResetToken({ userId: token.userId }),
+  await db.batch([
+    deletePasswordResetToken(token.userId),
     // If the user received received the password reset token and it was
     // verified, we can mark the user as verified.
-    updateUser(token.userId, { emailVerifiedAt: new Date() }),
+    markUserAsEmailVerified(token.userId),
   ])
 }
 
+export function deletePasswordResetToken(userId: User["id"]) {
+  return db
+    .delete(passwordResetToken)
+    .where(filters.eq(passwordResetToken.userId, userId))
+    .returning()
+}
+
 export async function cleanExpiredPasswordResetTokens() {
-  const result = await deletePasswordResetTokens({ expiresAt: new Date() })
+  const result = await db
+    .delete(passwordResetToken)
+    .where(filters.lt(passwordResetToken.expiresAt, new Date()))
 
   return result.rowsAffected
 }

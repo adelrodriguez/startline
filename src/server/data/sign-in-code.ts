@@ -2,23 +2,18 @@
 
 import { SignInCodeEmail } from "@/components/emails"
 import { sendEmail } from "@/lib/emails"
-import {
-  deleteSignInCode,
-  deleteSignInCodes,
-  insertSignInCode,
-  selectSignInCode,
-} from "@/server/db"
+import db, { filters, signInCode } from "@/server/db"
 import { hash, verify } from "@/utils/hash"
 import { TimeSpan, createDate } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
 
 export async function sendSignInCode(email: string) {
   // Delete old codes
-  await deleteSignInCode({ email })
+  await deleteSignInCode(email)
 
   const code = await generateRandomString(6, alphabet("0-9", "A-Z"))
 
-  await insertSignInCode({
+  await db.insert(signInCode).values({
     email,
     hash: await hash(code),
     expiresAt: createDate(new TimeSpan(15, "m")),
@@ -28,7 +23,10 @@ export async function sendSignInCode(email: string) {
 }
 
 export async function verifySignInCode(email: string, code: string) {
-  const signInCode = await selectSignInCode({ email })
+  const signInCode = await db.query.signInCode.findFirst({
+    where: (model, { eq, and, gte }) =>
+      and(eq(model.email, email), gte(model.expiresAt, new Date())),
+  })
 
   if (!signInCode) return false
 
@@ -37,13 +35,22 @@ export async function verifySignInCode(email: string, code: string) {
   if (!isValidCode) return false
 
   // Delete the verified code
-  await deleteSignInCode({ email })
+  await deleteSignInCode(email)
 
   return true
 }
 
+export function deleteSignInCode(email: string) {
+  return db
+    .delete(signInCode)
+    .where(filters.eq(signInCode.email, email))
+    .returning()
+}
+
 export async function cleanExpiredSignInCodes() {
-  const result = await deleteSignInCodes({ expiresAt: new Date() })
+  const result = await db
+    .delete(signInCode)
+    .where(filters.lt(signInCode.expiresAt, new Date()))
 
   return result.rowsAffected
 }

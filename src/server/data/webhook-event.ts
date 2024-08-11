@@ -1,17 +1,13 @@
 "server-only"
 
-import {
-  type WebhookEvent,
-  insertWebhookEvent,
-  selectWebhookEvent,
-  updateWebhookEvent,
-  type webhookEvent,
-} from "@/server/db"
+import db, { filters, type WebhookEvent, webhookEvent } from "@/server/db"
 
 export async function findWebhookEventByExternalId(
   externalId: WebhookEvent["externalId"],
 ) {
-  const webhookEvent = await selectWebhookEvent({ externalId })
+  const webhookEvent = await db.query.webhookEvent.findFirst({
+    where: (model, { eq }) => eq(model.externalId, externalId),
+  })
 
   return webhookEvent ?? null
 }
@@ -21,20 +17,21 @@ export async function createWebhookEvent(
     payload: unknown
   },
 ) {
-  const webhookEvent = await insertWebhookEvent({
-    ...values,
-    payload: JSON.stringify(values.payload),
-  })
-
-  return webhookEvent
+  return db
+    .insert(webhookEvent)
+    .values({
+      ...values,
+      payload: JSON.stringify(values.payload),
+    })
+    .returning()
+    .get()
 }
 
-export async function markWebhookEventAsProcessed(
-  webhookEventId: WebhookEvent["id"],
-) {
-  const webhookEvent = await updateWebhookEvent(webhookEventId, {
-    processedAt: new Date(),
-  })
-
-  return webhookEvent
+export async function markWebhookEventAsProcessed(id: WebhookEvent["id"]) {
+  return db
+    .update(webhookEvent)
+    .set({ processedAt: new Date() })
+    .where(filters.eq(webhookEvent.id, id))
+    .returning()
+    .get()
 }

@@ -1,93 +1,104 @@
 "server-only"
 
+import db, { type User, filters, type profile, user } from "@/server/db"
+import type { OmitUserId } from "@/utils/type"
 import {
-  type Profile,
-  type User,
   deleteEmailVerificationCode,
-  insertProfile,
-  insertUser,
-  type profile,
-  selectUser,
-  upsertUser,
-  type user,
-} from "@/server/db"
-import { encode } from "@/utils/obfuscator"
-import { sendEmailVerificationCode } from "./email-verification-code"
-import { createOrganization } from "./organization"
+  sendEmailVerificationCode,
+} from "./email-verification-code"
+import { createProfile } from "./profile"
 
 export async function findUserByEmail(email: User["email"]) {
-  const user = await selectUser({ email })
+  const existingUser = await db.query.user.findFirst({
+    where: (model, { eq }) => eq(model.email, email),
+  })
 
-  return user ?? null
+  db
+
+  return existingUser ?? null
 }
 
 export async function findUserByGoogleId(googleId: string) {
-  const user = await selectUser({ googleId })
+  const existingUser = await db.query.user.findFirst({
+    where: (model, { eq }) => eq(model.googleId, googleId),
+  })
 
-  return user ?? null
+  return existingUser ?? null
 }
 
 export async function findUserByGitHubId(githubId: string) {
-  const user = await selectUser({ githubId })
+  const existingUser = await db.query.user.findFirst({
+    where: (model, { eq }) => eq(model.githubId, githubId),
+  })
 
-  return user ?? null
+  return existingUser ?? null
 }
 
 export async function findUserById(userId: User["id"]) {
-  const user = await selectUser(userId)
+  const user = await db.query.user.findFirst({
+    where: (model, { eq }) => eq(model.id, userId),
+  })
 
   return user ?? null
 }
 
 export async function createUser(
   values: Omit<typeof user.$inferInsert, "id" | "role">,
-  options?: {
-    profile?: Omit<typeof profile.$inferInsert, "id" | "userId">
-  },
+  options?: { profile?: OmitUserId<typeof profile.$inferInsert> },
 ) {
-  const user = await insertUser({ ...values, role: "user" })
-
-  await createOrganization(
-    { name: "Default Organization", slug: encode(user.id) },
-    { ownerId: user.id },
-  )
+  const newUser = await db
+    .insert(user)
+    .values({ ...values, role: "user" })
+    .returning()
+    .get()
 
   if (options?.profile) {
-    await insertProfile(user.id, options.profile)
+    await createProfile(newUser.id, options.profile)
   }
 
-  await sendEmailVerificationCode(user)
+  await sendEmailVerificationCode(newUser)
 
-  return user
+  return newUser
 }
 
 export async function createAdmin(
   values: Omit<typeof user.$inferInsert, "id" | "role">,
+  options?: { profile?: OmitUserId<typeof profile.$inferInsert> },
 ) {
-  const user = await insertUser({
-    ...values,
-    role: "admin",
-    emailVerifiedAt: new Date(),
-  })
+  const newUser = await db
+    .insert(user)
+    .values({ ...values, role: "admin" })
+    .returning()
+    .get()
 
-  return user
+  if (options?.profile) {
+    await createProfile(newUser.id, options.profile)
+  }
+
+  return newUser
 }
 
 export async function createUserFromCode(
   values: Pick<typeof user.$inferInsert, "email">,
-  options?: {
-    profile?: Omit<Profile, "id" | "userId">
-  },
+  options?: { profile?: OmitUserId<typeof profile.$inferInsert> },
 ) {
-  const user = await upsertUser({
-    ...values,
-    role: "user",
-    emailVerifiedAt: new Date(),
-  })
+  const newUser = await db
+    .insert(user)
+    .values({ ...values, role: "user", emailVerifiedAt: new Date() })
+    .onConflictDoUpdate({
+      target: user.email,
+      set: { emailVerifiedAt: new Date() },
+    })
+    .returning()
+    .get()
 
-  await deleteEmailVerificationCode({ userId: user.id })
+  if (options?.profile) {
+    await createProfile(newUser.id, options.profile)
+  }
 
-  return user
+  await deleteEmailVerificationCode(newUser.id)
+
+  return newUser
 }
 
 export async function createUserFromGoogle(
@@ -95,36 +106,56 @@ export async function createUserFromGoogle(
     typeof user.$inferInsert,
     "email" | "googleId" | "emailVerifiedAt"
   >,
-  options?: {
-    profile?: Pick<
-      typeof profile.$inferInsert,
-      "name" | "avatarUrl" | "phoneNumber" | "preferredLocale"
-    >
-  },
+  options?: { profile?: OmitUserId<typeof profile.$inferInsert> },
 ) {
-  const user = await upsertUser({
-    googleId: values.googleId,
-    email: values.email,
-    emailVerifiedAt: values.emailVerifiedAt,
-  })
+  const newUser = await db
+    .insert(user)
+    .values({ ...values, role: "user", emailVerifiedAt: new Date() })
+    .onConflictDoUpdate({
+      target: user.email,
+      set: { googleId: values.googleId, emailVerifiedAt: new Date() },
+    })
+    .returning()
+    .get()
 
-  await deleteEmailVerificationCode({ userId: user.id })
+  if (options?.profile) {
+    await createProfile(newUser.id, options.profile)
+  }
 
-  return user
+  await deleteEmailVerificationCode(newUser.id)
+
+  return newUser
 }
 
 export async function createUserFromGitHub(
   values: Pick<typeof user.$inferInsert, "email" | "githubId">,
+  options?: { profile?: OmitUserId<typeof profile.$inferInsert> },
 ) {
-  const user = await upsertUser({
-    githubId: values.githubId,
-    email: values.email,
-    emailVerifiedAt: new Date(),
-  })
+  const newUser = await db
+    .insert(user)
+    .values({ ...values, role: "user", emailVerifiedAt: new Date() })
+    .onConflictDoUpdate({
+      target: user.email,
+      set: { emailVerifiedAt: new Date() },
+    })
+    .returning()
+    .get()
 
-  await deleteEmailVerificationCode({ userId: user.id })
+  if (options?.profile) {
+    await createProfile(newUser.id, options.profile)
+  }
 
-  return user
+  await deleteEmailVerificationCode(newUser.id)
+
+  return newUser
+}
+
+export function markUserAsEmailVerified(userId: User["id"]) {
+  return db
+    .update(user)
+    .set({ emailVerifiedAt: new Date() })
+    .where(filters.eq(user.id, userId))
+    .returning()
 }
 
 export function checkIsAdmin(user: User) {
