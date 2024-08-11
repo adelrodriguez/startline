@@ -3,7 +3,6 @@
 import { uploadthing, vercel } from "@t3-oss/env-core/presets"
 import { createEnv } from "@t3-oss/env-nextjs"
 import { z } from "zod"
-import { MOCK_RESEND_EMAIL } from "./consts"
 
 export default createEnv({
   server: {
@@ -28,7 +27,7 @@ export default createEnv({
       .default("development"),
 
     // Resend
-    RESEND_API_KEY: z.string().default(MOCK_RESEND_EMAIL),
+    RESEND_API_KEY: z.string(),
 
     // Sentry
     SENTRY_DSN: z.string(),
@@ -57,6 +56,6 @@ export default createEnv({
    * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and
    * `SOME_VAR=''` will throw an error.
    */
-  emptyStringAsUndefined: true,
+  emptyStringAsUndefined: process.env.NODE_ENV === "production",
   extends: [vercel(), uploadthing()],
 })

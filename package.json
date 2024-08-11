@@ -85,6 +85,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
+    "@clack/prompts": "0.7.0",
     "@next/bundle-analyzer": "14.2.5",
     "@tailwindcss/typography": "0.5.14",
     "@types/bun": "1.1.6",
