@@ -58,5 +58,5 @@ TODO. Talk about the action: https://github.com/marketplace/actions/actions-temp
 - [x] Beautify logs
 - [x] Set up basic UI
 - [x] Update script (pulls changes from template)
-- [ ] Create setup script
+- [x] Create setup script
 - [ ] Write a README
