@@ -1,5 +1,5 @@
 import fs from "node:fs/promises"
-import { cancel, intro, outro, select, spinner } from "@clack/prompts"
+import { cancel, intro, isCancel, outro, select, spinner } from "@clack/prompts"
 import { $ } from "bun"
 
 const s = spinner()
@@ -23,6 +23,12 @@ if (envLocalExists) {
       { label: "No", value: false },
     ],
   })
+
+  if (isCancel(confirmation)) {
+    cancel("Cancelled setup.")
+
+    process.exit(0)
+  }
 
   if (!confirmation) {
     cancel(
@@ -50,6 +56,12 @@ const hasDocker = await select({
     { label: "No", value: false },
   ],
 })
+
+if (isCancel(hasDocker)) {
+  cancel("Cancelled setup.")
+
+  process.exit(0)
+}
 
 if (!hasDocker) {
   cancel("Please install Docker before continuing.")
