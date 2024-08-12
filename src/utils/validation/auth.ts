@@ -2,7 +2,12 @@ import type { Intent } from "@conform-to/react"
 import { conformZodMessage } from "@conform-to/zod"
 import { z } from "zod"
 
-const PasswordSchema = z.string().min(8)
+const PasswordSchema = z
+  .string({ required_error: "Password is required" })
+  .min(1, "Password is required")
+  .min(8, "Password must be more than 8 characters")
+  .max(32, "Password must be less than 32 characters")
+
 const CodeSchema = z
   .string()
   .length(6)

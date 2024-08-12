@@ -54,6 +54,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       })
     }
 
+    // TODO(adelrodriguez): Only create the user if the email is verified
+
     const user = await createUserFromGitHub({
       githubId: githubUser.id,
       email: githubUser.email,

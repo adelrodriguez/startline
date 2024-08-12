@@ -63,11 +63,18 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       })
     }
 
+    // If the user has not verified their email with Google, we cannot create
+    // the user due to security concerns.
+    if (!googleUser.email_verified) {
+      return new NextResponse(null, {
+        status: StatusCodes.BAD_REQUEST,
+      })
+    }
+
     const user = await createUserFromGoogle(
       {
         googleId: googleUser.sub,
         email: googleUser.email,
-        emailVerifiedAt: googleUser.email_verified ? new Date() : null,
       },
       {
         profile: {
