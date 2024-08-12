@@ -1,5 +1,6 @@
 "use client"
 
+import { TooltipProvider } from "@/components/ui"
 import env from "@/lib/env.client"
 import { usePathname, useSearchParams } from "next/navigation"
 import posthog from "posthog-js"
@@ -21,7 +22,7 @@ export default function Providers({
   return (
     <PostHogProvider client={posthog}>
       <TrackPageview />
-      {children}
+      <TooltipProvider>{children}</TooltipProvider>
     </PostHogProvider>
   )
 }
