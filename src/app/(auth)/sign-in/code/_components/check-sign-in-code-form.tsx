@@ -28,6 +28,7 @@ export default function CheckSignInCodeForm() {
     shouldRevalidate: "onInput",
   })
 
+  // TODO(adelrodriguez): Add a link for resending the code
   return (
     <Form {...getFormProps(form)} action={action}>
       <FormItem className="flex flex-col items-center">
