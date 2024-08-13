@@ -7,15 +7,23 @@ import { cn } from "@/utils/ui"
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin"
 import { Analytics } from "@vercel/analytics/react"
 import type { Metadata } from "next"
+import PlausibleProvider from "next-plausible"
 import { extractRouterConfig } from "uploadthing/server"
 
 import "@/styles/tailwind.css"
-import PlausibleProvider from "next-plausible"
+import dynamic from "next/dynamic"
 
 export const metadata: Metadata = {
   title: "Startline",
   description: "This is your project's home page",
 }
+
+const PostHogTrackPageview = dynamic(
+  () => import("@/components/analytics/posthog-track-pageview"),
+  {
+    ssr: false,
+  },
+)
 
 export default function RootLayout({
   children,
@@ -34,6 +42,7 @@ export default function RootLayout({
             fonts.body.variable,
           )}
         >
+          <PostHogTrackPageview />
           {children}
         </body>
 
