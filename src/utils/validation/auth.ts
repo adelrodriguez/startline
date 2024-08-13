@@ -22,6 +22,9 @@ export function createSignUpSchema(
     checkIsEmailUnique: (email: string) => Promise<boolean>
   },
 ) {
+  // TODO(adelrodriguez): Fix this validation so we don't trigger the submission
+  // loading state. Another benefit of fixing this is that we can debounce the
+  // email validation.
   return z
     .object({
       email: z
