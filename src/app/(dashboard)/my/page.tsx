@@ -13,11 +13,10 @@ import {
   CardHeader,
   CardTitle,
   FormSubmit,
-  Icon,
   TypographySmall,
 } from "@/components/ui"
-import {} from "@/components/ui"
 import { signOut } from "@/server/actions"
+import { Loader2Icon } from "lucide-react"
 
 export default async function Page() {
   const user = await getCurrentUser()
@@ -53,7 +52,7 @@ export default async function Page() {
                 variant="outline"
                 renderLoading={
                   <>
-                    <Icon
+                    <Loader2Icon
                       name="loader-circle"
                       className="mr-2 h-4 w-4 animate-spin"
                     />

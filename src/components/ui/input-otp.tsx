@@ -1,9 +1,8 @@
 "use client"
 
 import { OTPInput, OTPInputContext } from "input-otp"
-import { Dot } from "lucide-react"
+import { DotIcon } from "lucide-react"
 import * as React from "react"
-
 import { cn } from "@/utils/ui"
 
 const InputOTP = React.forwardRef<
@@ -75,7 +74,7 @@ const InputOTPSeparator = React.forwardRef<
     aria-valuenow={50}
     {...props}
   >
-    <Dot />
+    <DotIcon />
   </div>
 ))
 InputOTPSeparator.displayName = "InputOTPSeparator"

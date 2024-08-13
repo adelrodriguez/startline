@@ -13,7 +13,7 @@ import { signInWithPassword } from "@/server/actions"
 import { createSignInWithPasswordSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
-import { Loader2 } from "lucide-react"
+import { Loader2Icon } from "lucide-react"
 import Link from "next/link"
 import { useFormState } from "react-dom"
 
@@ -60,7 +60,7 @@ export default function SignInForm() {
         className="w-full"
         renderLoading={
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
             Signing in...
           </>
         }

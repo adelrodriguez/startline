@@ -5,7 +5,7 @@ import { signInWithCode } from "@/server/actions"
 import { createSignInWithCodeSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
-import { Loader2 } from "lucide-react"
+import { Loader2Icon } from "lucide-react"
 import { useFormState } from "react-dom"
 
 export default function SignInWithCodeForm() {
@@ -34,7 +34,7 @@ export default function SignInWithCodeForm() {
         className="w-full"
         renderLoading={
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
             Sending...
           </>
         }
