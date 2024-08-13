@@ -6,7 +6,6 @@ import { z } from "zod"
 
 export default createEnv({
   server: {
-    BASE_URL: z.string().url(),
     EMAIL_FROM: z.string().email(),
 
     // GitHub

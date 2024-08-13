@@ -1,10 +1,10 @@
-import env from "@/lib/env.server"
+import { buildBaseUrl } from "@/utils/url"
 import type { MetadataRoute } from "next"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: env.BASE_URL,
+      url: buildBaseUrl(),
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 1,
