@@ -18,6 +18,7 @@ export default createEnv({
 
     // Inngest
     INNGEST_SIGNING_KEY: z.string(),
+    INNGEST_EVENT_KEY: z.string(),
     INNGEST_SIGNING_KEY_FALLBACK: z.string().optional(),
 
     // Node
