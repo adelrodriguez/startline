@@ -5,11 +5,11 @@ import { createClient } from "@libsql/client"
 import { drizzle } from "drizzle-orm/libsql"
 import * as schema from "./schema"
 
-const turso = createClient({
+const client = createClient({
   url: env.DATABASE_URL,
   authToken: env.DATABASE_AUTH_TOKEN,
 })
 
-const db = drizzle(turso, { schema })
+const db = drizzle(client, { schema })
 
 export default db

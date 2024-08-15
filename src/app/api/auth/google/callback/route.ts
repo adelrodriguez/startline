@@ -1,6 +1,7 @@
 import { google, setSession } from "@/lib/auth"
 import { AUTHORIZED_URL } from "@/lib/consts"
 import { createUserFromGoogle, findUserByGoogleId } from "@/server/data"
+import log from "@/utils/log"
 import { GoogleUserSchema } from "@/utils/validation"
 import { OAuth2RequestError } from "arctic"
 import { StatusCodes } from "http-status-codes"
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
     })
   } catch (e) {
-    console.error(e)
+    log.error(e)
     // The specific error message depends on the provider
     if (e instanceof OAuth2RequestError) {
       // Invalid code

@@ -6,6 +6,7 @@ import {
 } from "@/server/data"
 import stripe from "@/services/stripe"
 import { StripeError } from "@/utils/error"
+import log from "@/utils/log"
 import { StatusCodes } from "http-status-codes"
 import { type NextRequest, NextResponse } from "next/server"
 import type Stripe from "stripe"
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       { status: StatusCodes.OK },
     )
   } catch (e) {
-    console.error("Error handling Stripe webhook event", e)
+    log.error("Error handling Stripe webhook event", e)
 
     return NextResponse.json(
       { success: false, reason: (e as Error).message },

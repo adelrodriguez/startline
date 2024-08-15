@@ -14,7 +14,7 @@ import { cache } from "react"
 
 const adapter = new DrizzleSQLiteAdapter(db, session, user)
 
-export const lucia = new Lucia(adapter, {
+const lucia = new Lucia(adapter, {
   sessionCookie: {
     attributes: {
       secure: isProduction,
