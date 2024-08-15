@@ -70,7 +70,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
     })
   } catch (e) {
-    log.error(e)
+    console.error(e)
     // The specific error message depends on the provider
     if (e instanceof OAuth2RequestError) {
       // Invalid code

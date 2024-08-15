@@ -4,7 +4,6 @@ import { MOCK_RESEND_EMAIL } from "@/lib/consts"
 import env from "@/lib/env.server"
 import resend from "@/services/resend"
 import { SendEmailError } from "@/utils/error"
-import log from "@/utils/log"
 import { render } from "@react-email/render"
 import chalk from "chalk"
 import type { ReactElement } from "react"
@@ -15,10 +14,10 @@ export async function sendEmail(
   body: ReactElement,
 ) {
   if (env.RESEND_API_KEY === MOCK_RESEND_EMAIL) {
-    log.info("MOCKING EMAIL SEND")
+    console.info(chalk.bold.italic.blue("MOCKING EMAIL SEND"))
 
     console.info(chalk.bold.blue("Sending email to"), chalk.italic.white(email))
-    log.info("Email content:")
+    console.info("Email content:")
     console.info(
       chalk.italic(
         render(body, {
