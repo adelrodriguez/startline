@@ -1,15 +1,10 @@
 import env from "@/lib/env.server"
-import {
-  createWebhookEvent,
-  findWebhookEventByExternalId,
-  markWebhookEventAsProcessed,
-} from "@/server/data"
+import { createWebhookEvent, findWebhookEventByExternalId } from "@/server/data"
+import inngest from "@/services/inngest"
 import stripe from "@/services/stripe"
-import { StripeError } from "@/utils/error"
-import log from "@/utils/log"
+import chalk from "chalk"
 import { StatusCodes } from "http-status-codes"
 import { type NextRequest, NextResponse } from "next/server"
-import type Stripe from "stripe"
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const signature = req.headers.get("stripe-signature")
@@ -28,15 +23,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     env.STRIPE_WEBHOOK_SECRET,
   )
 
-  const webhookEvent = await findWebhookEventByExternalId(event.id)
+  const processedWebhookEvent = await findWebhookEventByExternalId(event.id)
 
-  if (webhookEvent?.processedAt) {
-    console.info("Webhook event already processed")
+  if (processedWebhookEvent?.processedAt) {
+    console.info(chalk.blue("Webhook event already processed"))
 
     return NextResponse.json(
       {
         success: false,
-        processedAt: webhookEvent.processedAt,
+        processedAt: processedWebhookEvent.processedAt,
         reason: "Webhook event already processed",
       },
       { status: StatusCodes.OK },
@@ -50,33 +45,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     payload: event.data,
   })
 
-  try {
-    await handleEvent(event)
+  await inngest.send({
+    name: "stripe/webhook-event",
+    data: { payload: event, webhookEventId: newWebhookEvent.id },
+  })
 
-    const { processedAt } = await markWebhookEventAsProcessed(
-      newWebhookEvent.id,
-    )
-
-    return NextResponse.json(
-      { success: true, processedAt },
-      { status: StatusCodes.OK },
-    )
-  } catch (e) {
-    log.error("Error handling Stripe webhook event", e)
-
-    return NextResponse.json(
-      { success: false, reason: (e as Error).message },
-      {
-        status: StatusCodes.INTERNAL_SERVER_ERROR,
-      },
-    )
-  }
-}
-
-async function handleEvent(event: Stripe.Event) {
-  switch (event.type) {
-    // Handle the necessary events here
-    default:
-      throw new StripeError(`Unhandled event type: ${event.type}`)
-  }
+  return NextResponse.json(
+    { success: true, receivedAt: new Date() },
+    { status: StatusCodes.OK },
+  )
 }
