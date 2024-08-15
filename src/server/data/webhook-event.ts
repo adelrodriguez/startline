@@ -1,6 +1,11 @@
 "server-only"
 
-import db, { filters, type WebhookEvent, webhookEvent } from "@/server/db"
+import db, {
+  filters,
+  increment,
+  type WebhookEvent,
+  webhookEvent,
+} from "@/server/db"
 
 export async function findWebhookEventByExternalId(
   externalId: WebhookEvent["externalId"],
@@ -22,6 +27,10 @@ export async function createWebhookEvent(
     .values({
       ...values,
       payload: JSON.stringify(values.payload),
+    })
+    .onConflictDoUpdate({
+      target: webhookEvent.externalId,
+      set: { retries: increment(webhookEvent.retries) },
     })
     .returning()
     .get()

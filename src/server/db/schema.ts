@@ -222,6 +222,8 @@ export const webhookEvent = createTable("webhook_event", {
   externalId: text("external_id").notNull(),
   payload: text("payload"),
   provider: text("provider", { enum: ["stripe"] }).notNull(),
+
+  retries: integer("retries").notNull().default(0),
 })
 export type WebhookEvent = typeof webhookEvent.$inferSelect
 export type WebhookProvider = WebhookEvent["provider"]

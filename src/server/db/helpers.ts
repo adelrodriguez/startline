@@ -1,5 +1,5 @@
-import db from "./client"
+import { type AnyColumn, sql } from "drizzle-orm"
 
-export function batch<T extends Parameters<typeof db.batch>[0]>(batchItems: T) {
-  return db.batch(batchItems)
+export function increment(column: AnyColumn, value = 1) {
+  return sql`${column} + ${value}`
 }
