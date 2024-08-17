@@ -1,3 +1,5 @@
+name: Sync with the Startline template
+
 on:
   schedule:
     - cron: '0 0 * * *' # every day at midnight
@@ -5,6 +7,7 @@ on:
 
 jobs:
   sync:
+    name: Sync with template
     runs-on: ubuntu-latest
     permissions:
       contents: write
