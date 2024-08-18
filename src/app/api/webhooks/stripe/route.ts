@@ -1,6 +1,6 @@
 import env from "@/lib/env.server"
+import { enqueueJob } from "@/lib/jobs"
 import { createWebhookEvent, findWebhookEventByExternalId } from "@/server/data"
-import inngest from "@/services/inngest"
 import stripe from "@/services/stripe"
 import chalk from "chalk"
 import { StatusCodes } from "http-status-codes"
@@ -45,9 +45,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     payload: event.data,
   })
 
-  await inngest.send({
-    name: "stripe/webhook-event",
-    data: { payload: event, webhookEventId: newWebhookEvent.id },
+  await enqueueJob("stripe/process-webhook-event", {
+    eventId: newWebhookEvent.id,
+    stripeEvent: event,
   })
 
   return NextResponse.json(

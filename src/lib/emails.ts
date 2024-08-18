@@ -1,6 +1,4 @@
 "server-only"
-
-import { MOCK_RESEND_EMAIL } from "@/lib/consts"
 import env from "@/lib/env.server"
 import resend from "@/services/resend"
 import { SendEmailError } from "@/utils/error"
@@ -13,7 +11,7 @@ export async function sendEmail(
   subject: string,
   body: ReactElement,
 ) {
-  if (env.RESEND_API_KEY === MOCK_RESEND_EMAIL) {
+  if (env.MOCK_RESEND) {
     console.info(chalk.bold.italic.blue("MOCKING EMAIL SEND"))
 
     console.info(chalk.bold.blue("Sending email to"), chalk.italic.white(email))

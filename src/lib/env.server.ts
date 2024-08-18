@@ -16,15 +16,19 @@ export default createEnv({
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
 
-    // Inngest
-    INNGEST_SIGNING_KEY: z.string(),
-    INNGEST_EVENT_KEY: z.string(),
-    INNGEST_SIGNING_KEY_FALLBACK: z.string().optional(),
+    // Mocks
+    MOCK_RESEND: z.preprocess((v) => v === "true", z.boolean().default(false)),
+    MOCK_QSTASH: z.preprocess((v) => v === "true", z.boolean().default(false)),
 
     // Node
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+
+    // QStash
+    QSTASH_TOKEN: z.string(),
+    QSTASH_CURRENT_SIGNING_KEY: z.string(),
+    QSTASH_NEXT_SIGNING_KEY: z.string(),
 
     // Resend
     RESEND_API_KEY: z.string(),

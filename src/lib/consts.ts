@@ -3,8 +3,6 @@ export const APP_ID = "startline"
 
 export const FALLBACK_IP = "127.0.0.1"
 
-export const MOCK_RESEND_EMAIL = "mock-resend-email"
-
 // Auth
 export const AUTHORIZED_URL = "/my"
 export const UNAUTHORIZED_URL = "/sign-in"

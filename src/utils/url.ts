@@ -30,6 +30,6 @@ export function buildUrl<T extends string>(
   return stringUrl
 }
 
-export function buildAuthUrl<T extends string>(pathname: T) {
+export function buildAuthPathname<T extends string>(pathname: T) {
   return `${AUTHORIZED_URL}/${pathname}` as const
 }

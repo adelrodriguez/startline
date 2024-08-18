@@ -10,12 +10,6 @@ services:
     volumes:
       - ./.data/libsql:/var/lib/sqld
 
-  inngest:
-    image: inngest/inngest:v0.29.3
-    command: 'inngest dev --no-discovery -u http://host.docker.internal:3000/api/inngest'
-    ports:
-      - '8288:8288'
-
   redis:
     image: redis:7.4.0
     ports:

@@ -219,7 +219,7 @@ export const webhookEvent = createTable("webhook_event", {
   processedAt: integer("processed_at", { mode: "timestamp" }),
 
   event: text("event").notNull(),
-  externalId: text("external_id").notNull(),
+  externalId: text("external_id").notNull().unique(),
   payload: text("payload"),
   provider: text("provider", { enum: ["stripe"] }).notNull(),
 

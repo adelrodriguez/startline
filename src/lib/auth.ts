@@ -1,7 +1,6 @@
 "server-only"
 
 import env from "@/lib/env.server"
-import { isProduction } from "@/lib/vars"
 import db, { type User, type UserRole } from "@/server/db"
 import { session, user } from "@/server/db"
 import { buildUrl } from "@/utils/url"
@@ -17,7 +16,7 @@ const adapter = new DrizzleSQLiteAdapter(db, session, user)
 const lucia = new Lucia(adapter, {
   sessionCookie: {
     attributes: {
-      secure: isProduction,
+      secure: env.NODE_ENV === "production",
     },
   },
   getUserAttributes: (attributes) => ({

@@ -50,7 +50,7 @@ if (envLocalExists) {
 
 const hasDocker = await select({
   message:
-    "Do you have Docker installed? We use Docker for running the database, the Redis server, and the Inngest server for local development.",
+    "Do you have Docker installed? We use Docker for running the database and the Redis server for local development.",
   options: [
     { label: "Yes", value: true },
     { label: "No", value: false },
