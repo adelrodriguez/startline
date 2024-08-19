@@ -1,5 +1,3 @@
-import "server-only"
-
 import { uploadthing, vercel } from "@t3-oss/env-core/presets"
 import { createEnv } from "@t3-oss/env-nextjs"
 import { z } from "zod"
