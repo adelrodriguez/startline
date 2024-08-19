@@ -1,52 +1,78 @@
-export class AssertionError extends Error {
-  constructor(message?: string) {
+class CustomError extends Error {
+  constructor(name: string, message: string, cause?: Error) {
     super(message)
-    this.name = "AssertionError"
+    this.name = name
+    if (cause) this.cause = cause
+    Object.setPrototypeOf(this, new.target.prototype)
   }
 }
 
-export class AuthError extends Error {}
-
-export class ContextError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = "ContextError"
+export class AssertionError extends CustomError {
+  constructor(message?: string, cause?: Error) {
+    super("AssertionError", message || "Assertion failed", cause)
   }
 }
 
-export class NotFoundError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = "NotFoundError"
+export class AuthError extends CustomError {
+  constructor(message: string, cause?: Error) {
+    super("AuthError", message, cause)
   }
 }
 
-export class ValidationError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = "ValidationError"
+export class ContextError extends CustomError {
+  constructor(message: string, cause?: Error) {
+    super("ContextError", message, cause)
   }
 }
 
-export class QueryError extends Error {
-  constructor(queryName: string) {
-    super(`Invalid query params provided for ${queryName}`)
-    this.name = "QueryError"
+export class NotFoundError extends CustomError {
+  constructor(resource: string, id: string, cause?: Error) {
+    super("NotFoundError", `${resource} with id ${id} not found`, cause)
   }
 }
 
-export class SendEmailError extends Error {
-  constructor(name: string, message: string, email: string) {
-    super(`Error sending email to ${email}. ${name}: ${message}`)
-    this.name = "SendEmailError"
+export class ValidationError extends CustomError {
+  constructor(message: string, cause?: Error) {
+    super("ValidationError", message, cause)
   }
 }
 
-export class PasswordResetError extends Error {}
+export class QueryError extends CustomError {
+  constructor(queryName: string, cause?: Error) {
+    super("QueryError", `Invalid query params provided for ${queryName}`, cause)
+  }
+}
 
-export class OrganizationError extends Error {}
+export class SendEmailError extends CustomError {
+  constructor(name: string, message: string, email: string, cause?: Error) {
+    super(
+      "SendEmailError",
+      `Error sending email to ${email}. ${name}: ${message}`,
+      cause,
+    )
+  }
+}
 
-export class InternalError extends Error {}
+export class PasswordResetError extends CustomError {
+  constructor(message: string, cause?: Error) {
+    super("PasswordResetError", message, cause)
+  }
+}
 
-// Service errors
-export class StripeError extends Error {}
+export class OrganizationError extends CustomError {
+  constructor(message: string, cause?: Error) {
+    super("OrganizationError", message, cause)
+  }
+}
+
+export class InternalError extends CustomError {
+  constructor(message: string, cause?: Error) {
+    super("InternalError", message, cause)
+  }
+}
+
+export class StripeError extends CustomError {
+  constructor(message: string, cause?: Error) {
+    super("StripeError", message, cause)
+  }
+}
