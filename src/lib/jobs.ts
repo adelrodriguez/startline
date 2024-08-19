@@ -1,4 +1,4 @@
-"server-only"
+import "server-only"
 
 import env from "@/lib/env.server"
 import qstash from "@/services/qstash"
@@ -27,6 +27,9 @@ type JobPayload<T extends JobType> = JobSchemaMap[T]
 /**
  * This is a wrapper around the `qstash.publishJSON` function that allows you to
  * mock the request in development.
+ *
+ * Only use this for background jobs. If you need LLM responses, use `publishJSON`
+ * directly (which you can't easily mock in development).
  */
 export async function enqueueJob<T extends JobType>(
   type: T,

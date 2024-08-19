@@ -1,5 +1,7 @@
 import qstash from "@/services/qstash"
 import { buildUrl } from "@/utils/url"
+import type { CreateScheduleRequest } from "@upstash/qstash"
+import chalk from "chalk"
 
 const schedules = qstash.schedules
 
@@ -7,17 +9,29 @@ function buildScheduleUrl(name: string) {
   return buildUrl(`/api/cron/${name}`)
 }
 
-await schedules.create({
-  destination: buildScheduleUrl("clean-password-reset-tokens"),
-  cron: "0 0 * * *",
-})
+const endpoints: CreateScheduleRequest[] = [
+  {
+    destination: buildScheduleUrl("clean-password-reset-tokens"),
+    cron: "0 0 * * *",
+  },
+  {
+    destination: buildScheduleUrl("clean-email-verification-codes"),
+    cron: "0 0 * * *",
+  },
+  { destination: buildScheduleUrl("clean-sign-in-codes"), cron: "0 0 * * *" },
+]
 
-await schedules.create({
-  destination: buildScheduleUrl("clean-email-verification-codes"),
-  cron: "0 0 * * *",
-})
+const existingSchedules = await schedules.list()
 
-await schedules.create({
-  destination: buildScheduleUrl("clean-sign-in-codes"),
-  cron: "0 0 * * *",
-})
+for (const endpoint of endpoints) {
+  if (
+    existingSchedules.find(
+      (schedule) => schedule.destination === endpoint.destination,
+    )
+  ) {
+    console.log(chalk.yellow("Schedule already exists:"), endpoint.destination)
+    continue
+  }
+
+  await schedules.create(endpoint)
+}
