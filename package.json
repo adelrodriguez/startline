@@ -29,6 +29,7 @@
     "format": "biome format --write src",
     "lint": "biome lint --fix src",
     "start": "next start",
+    "template:clean": "bun scripts/clean.ts",
     "template:email": "bun scripts/dev-email.ts",
     "template:schedules": "bun scripts/create-schedules.ts",
     "template:setup": "bun scripts/setup.ts",
