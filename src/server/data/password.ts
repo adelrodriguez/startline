@@ -1,4 +1,4 @@
-"server-only"
+import "server-only"
 
 import db, { type User, password } from "@/server/db"
 import { hash, verify } from "@node-rs/argon2"

@@ -1,4 +1,4 @@
-"server-only"
+import "server-only"
 
 import { validateRequest } from "@/lib/auth"
 import rateLimiter from "@/lib/rate-limit"

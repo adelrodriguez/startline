@@ -1,4 +1,4 @@
-"server-only"
+import "server-only"
 import env from "@/lib/env.server"
 import resend from "@/services/resend"
 import { SendEmailError } from "@/utils/error"

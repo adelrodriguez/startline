@@ -1,4 +1,4 @@
-"server-only"
+import "server-only"
 
 import env from "@/lib/env.server"
 import db, { type User, type UserRole } from "@/server/db"

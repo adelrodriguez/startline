@@ -11,7 +11,7 @@
   },
   "server-only": {
     "prefix": "/server-only",
-    "body": ["\"server-only\""],
-    "description": "Server-only directive"
+    "body": ["import \"server-only\""],
+    "description": "Server-only file"
   }
 }

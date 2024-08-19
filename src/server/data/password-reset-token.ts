@@ -1,4 +1,4 @@
-"server-only"
+import "server-only"
 
 import { PasswordResetTokenEmail } from "@/components/emails"
 import { sendEmail } from "@/lib/emails"

@@ -1,4 +1,4 @@
-"server-only"
+import "server-only"
 
 import db, { type User, filters, type profile, user } from "@/server/db"
 import type { OmitUserId } from "@/utils/type"

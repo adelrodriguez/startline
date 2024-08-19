@@ -1,4 +1,4 @@
-"server-only"
+import "server-only"
 
 import { uploadthing, vercel } from "@t3-oss/env-core/presets"
 import { createEnv } from "@t3-oss/env-nextjs"
@@ -26,6 +26,7 @@ export default createEnv({
       .default("development"),
 
     // QStash
+    QSTASH_URL: z.string(),
     QSTASH_TOKEN: z.string(),
     QSTASH_CURRENT_SIGNING_KEY: z.string(),
     QSTASH_NEXT_SIGNING_KEY: z.string(),
