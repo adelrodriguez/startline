@@ -8,10 +8,10 @@ import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin"
 import { Analytics } from "@vercel/analytics/react"
 import type { Metadata } from "next"
 import PlausibleProvider from "next-plausible"
+import dynamic from "next/dynamic"
 import { extractRouterConfig } from "uploadthing/server"
 
 import "@/styles/tailwind.css"
-import dynamic from "next/dynamic"
 
 export const metadata: Metadata = {
   title: "Startline",
