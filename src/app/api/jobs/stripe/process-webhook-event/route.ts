@@ -2,7 +2,7 @@ import env from "@/lib/env.server"
 import { parseJobRequest } from "@/lib/jobs"
 import { markWebhookEventAsProcessed } from "@/server/data"
 import { StripeError } from "@/utils/error"
-import { verifySignatureEdge } from "@upstash/qstash/nextjs"
+import { verifySignatureAppRouter } from "@upstash/qstash/nextjs"
 import { type NextRequest, NextResponse } from "next/server"
 
 async function handler(request: NextRequest) {
@@ -26,6 +26,6 @@ async function handler(request: NextRequest) {
   return NextResponse.json({ success: true })
 }
 
-export const POST = env.MOCK_QSTASH ? handler : verifySignatureEdge(handler)
-
-export const runtime = "edge"
+export const POST = env.MOCK_QSTASH
+  ? handler
+  : verifySignatureAppRouter(handler)
