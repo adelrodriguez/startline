@@ -18,7 +18,7 @@ export default function Page() {
           <CardTitle>Verify your sign in code</CardTitle>
         </CardHeader>
         <CardContent>
-          <CheckSignInCodeForm />
+          <CheckSignInCodeForm email={email} />
         </CardContent>
       </Card>
     </div>

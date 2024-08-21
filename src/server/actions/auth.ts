@@ -190,6 +190,16 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
   redirect(AUTHORIZED_URL)
 }
 
+export async function resendSignInCode(email: string) {
+  const limit = await rateLimiter.unknown.limit(email)
+
+  if (!limit.success) {
+    throw new RateLimitError("Too many requests")
+  }
+
+  await sendSignInCode(email)
+}
+
 export async function checkEmailVerificationCode(
   _: unknown,
   formData: FormData,

@@ -19,9 +19,11 @@ import { createCheckEmailVerificationCodeSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
+import { type ElementRef, useRef } from "react"
 import { useFormState } from "react-dom"
 
 export default function CheckEmailVerificationCodeForm() {
+  const formRef = useRef<ElementRef<typeof Form>>(null)
   const [lastResult, action] = useFormState(
     checkEmailVerificationCode,
     undefined,
@@ -38,13 +40,15 @@ export default function CheckEmailVerificationCodeForm() {
   })
 
   return (
-    <Form {...getFormProps(form)} action={action}>
+    <Form {...getFormProps(form)} action={action} ref={formRef}>
       <FormItem className="flex flex-col items-center">
         <InputOTP
           {...getInputProps(fields.code, { type: "text" })}
           maxLength={6}
           pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-          className="w-full"
+          onComplete={() => {
+            formRef?.current?.requestSubmit()
+          }}
         >
           <InputOTPGroup>
             <InputOTPSlot index={0} />
