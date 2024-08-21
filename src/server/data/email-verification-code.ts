@@ -4,6 +4,7 @@ import { EmailVerificationCodeEmail } from "@/components/emails"
 import { sendEmail } from "@/lib/emails"
 import db, { type User, emailVerificationCode, filters } from "@/server/db"
 import { hash, verify } from "@/utils/hash"
+import { TimeSpan, createDate } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
 import { markUserAsEmailVerified } from "./user"
 
@@ -24,7 +25,11 @@ export async function createEmailVerificationCode(
 
   return db
     .insert(emailVerificationCode)
-    .values({ hash: hashedCode, userId, expiresAt: new Date() })
+    .values({
+      hash: hashedCode,
+      userId,
+      expiresAt: createDate(new TimeSpan(24, "h")),
+    })
     .returning()
 }
 
