@@ -12,8 +12,8 @@ import {
   RESET_PASSWORD_URL,
   UNAUTHORIZED_URL,
 } from "@/lib/consts"
-import env from "@/lib/env.server"
 import rateLimiter from "@/lib/rate-limit"
+import { isProduction } from "@/lib/vars"
 import {
   createPassword,
   createUser,
@@ -144,7 +144,7 @@ export async function signInWithCode(_: unknown, formData: FormData) {
 
   cookies().set(VERIFICATION_EMAIL_COOKIE_NAME, submission.value.email, {
     httpOnly: true,
-    secure: env.NODE_ENV === "production",
+    secure: isProduction,
     sameSite: "strict",
     maxAge: 60 * 10, // Ten minutes
   })
