@@ -21,13 +21,14 @@ import {
   findUserByEmail,
   findValidPasswordResetToken,
   markPasswordResetTokenAsUsed,
+  sendEmailVerificationCode,
   sendPasswordResetToken,
   sendSignInCode,
   verifyEmailVerificationCode,
   verifyPassword,
   verifySignInCode,
 } from "@/server/data"
-import { PasswordResetError } from "@/utils/error"
+import { PasswordResetError, RateLimitError } from "@/utils/error"
 import { getIpAddress } from "@/utils/headers"
 import {
   RequestPasswordResetSchema,
@@ -50,7 +51,7 @@ export async function signUp(_: unknown, formData: FormData) {
   const limit = await rateLimiter.unknown.limit(ipAddress)
 
   if (!limit.success) {
-    throw new Error("Too many requests")
+    throw new RateLimitError("Too many requests")
   }
 
   const submission = await parseWithZod(formData, {
@@ -94,9 +95,7 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
   const limit = await rateLimiter.unknown.limit(ipAddress)
 
   if (!limit.success) {
-    return submission.reply({
-      formErrors: ["Too many requests"],
-    })
+    throw new RateLimitError("Too many requests")
   }
 
   const existingUser = await findUserByEmail(submission.value.email)
@@ -135,9 +134,7 @@ export async function signInWithCode(_: unknown, formData: FormData) {
   const limit = await rateLimiter.unknown.limit(submission.value.email)
 
   if (!limit.success) {
-    return submission.reply({
-      formErrors: ["Too many requests"],
-    })
+    throw new RateLimitError("Too many requests")
   }
 
   await sendSignInCode(submission.value.email)
@@ -172,9 +169,7 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
   const limit = await rateLimiter.unknown.limit(ipAddress)
 
   if (!limit.success) {
-    return submission.reply({
-      formErrors: ["Too many requests"],
-    })
+    throw new RateLimitError("Too many requests")
   }
 
   const isValidCode = await verifySignInCode(email, submission.value.code)
@@ -216,9 +211,7 @@ export async function checkEmailVerificationCode(
   const limit = await rateLimiter.user.limit(user.email)
 
   if (!limit.success) {
-    return submission.reply({
-      formErrors: ["Too many requests"],
-    })
+    throw new RateLimitError("Too many requests")
   }
 
   const isValidCode = await verifyEmailVerificationCode(
@@ -233,6 +226,24 @@ export async function checkEmailVerificationCode(
   }
 
   await redirect(AUTHORIZED_URL)
+}
+
+export async function resendEmailVerificationCode() {
+  const { user } = await validateRequest()
+
+  if (!user) {
+    return redirect(UNAUTHORIZED_URL)
+  }
+
+  // Even though the user is already logged in, we technically don't know them
+  // since they haven't verified their email yet
+  const limit = await rateLimiter.unknown.limit(user.email)
+
+  if (!limit.success) {
+    throw new RateLimitError("Too many requests")
+  }
+
+  await sendEmailVerificationCode(user)
 }
 
 export async function requestPasswordReset(_: unknown, formData: FormData) {

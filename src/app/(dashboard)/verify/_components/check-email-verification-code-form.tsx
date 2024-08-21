@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  Button,
   Form,
   FormItem,
   FormMessage,
@@ -10,7 +11,10 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui"
-import { checkEmailVerificationCode } from "@/server/actions"
+import {
+  checkEmailVerificationCode,
+  resendEmailVerificationCode,
+} from "@/server/actions"
 import { createCheckEmailVerificationCodeSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
@@ -33,7 +37,6 @@ export default function CheckEmailVerificationCodeForm() {
     shouldRevalidate: "onInput",
   })
 
-  // TODO(adelrodriguez): Add a link for resending the code
   return (
     <Form {...getFormProps(form)} action={action}>
       <FormItem className="flex flex-col items-center">
@@ -41,6 +44,7 @@ export default function CheckEmailVerificationCodeForm() {
           {...getInputProps(fields.code, { type: "text" })}
           maxLength={6}
           pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+          className="w-full"
         >
           <InputOTPGroup>
             <InputOTPSlot index={0} />
@@ -54,9 +58,12 @@ export default function CheckEmailVerificationCodeForm() {
             <InputOTPSlot index={5} />
           </InputOTPGroup>
         </InputOTP>
-
-        <FormMessage id={fields.code.errorId}>{fields.code.errors}</FormMessage>
       </FormItem>
+      <Button onClick={() => resendEmailVerificationCode()} variant="link">
+        Resend code
+      </Button>
+      <FormMessage id={fields.code.errorId}>{form.errors?.[0]}</FormMessage>
+
       <FormSubmit className="w-full" renderLoading={<>Sending...</>}>
         Verify
       </FormSubmit>

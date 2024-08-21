@@ -76,3 +76,9 @@ export class StripeError extends CustomError {
     super("StripeError", message, cause)
   }
 }
+
+export class RateLimitError extends CustomError {
+  constructor(message: string, cause?: Error) {
+    super("RateLimitError", message, cause)
+  }
+}

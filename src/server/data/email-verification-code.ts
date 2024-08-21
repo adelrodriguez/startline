@@ -8,7 +8,9 @@ import { TimeSpan, createDate } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
 import { markUserAsEmailVerified } from "./user"
 
-export async function findValidEmailVerificationCode(userId: User["id"]) {
+export async function findValidEmailVerificationCodeByUserId(
+  userId: User["id"],
+) {
   const code = await db.query.emailVerificationCode.findFirst({
     where: (model, { eq, and, gte }) =>
       and(eq(model.userId, userId), gte(model.expiresAt, new Date())),
@@ -33,7 +35,9 @@ export async function createEmailVerificationCode(
     .returning()
 }
 
-export async function sendEmailVerificationCode(user: User) {
+export async function sendEmailVerificationCode(
+  user: Pick<User, "id" | "email">,
+) {
   // Delete old codes
   await deleteEmailVerificationCode(user.id)
 
@@ -52,7 +56,8 @@ export async function verifyEmailVerificationCode(
   userId: User["id"],
   code: string,
 ) {
-  const emailVerificationCode = await findValidEmailVerificationCode(userId)
+  const emailVerificationCode =
+    await findValidEmailVerificationCodeByUserId(userId)
 
   if (!emailVerificationCode) return false
 
