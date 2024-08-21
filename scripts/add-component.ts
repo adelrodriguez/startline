@@ -6,8 +6,6 @@ import { z } from "zod"
 
 const s = spinner()
 
-console.log({ argv: Bun.argv })
-
 const { positionals } = parseArgs({
   args: Bun.argv.slice(2),
   allowPositionals: true,
