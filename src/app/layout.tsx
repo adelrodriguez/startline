@@ -5,7 +5,6 @@ import { fileRouter } from "@/services/uploadthing"
 import { fonts } from "@/utils/fonts"
 import { cn } from "@/utils/ui"
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin"
-import { Analytics } from "@vercel/analytics/react"
 import type { Metadata } from "next"
 import PlausibleProvider from "next-plausible"
 import dynamic from "next/dynamic"
@@ -45,8 +44,6 @@ export default function RootLayout({
           <PostHogTrackPageview />
           {children}
         </body>
-
-        <Analytics />
       </Providers>
     </html>
   )

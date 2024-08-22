@@ -38,7 +38,7 @@ Startline is an opinionated, batteries-included starter template to build SaaS a
 - [Upstash Redis](https://upstash.com) for serverless caching and rate limiting, and [Upstash Qstash](https://upstash.com/qstash) for serverless job queue
 - [Sentry](https://sentry.io) for error tracking
 - [PostHog](https://posthog.com) for analytics
-  - [Plausible](https://plausible.io) and [Vercel Analytics](https://vercel.com/analytics) are also supported
+  - [Plausible](https://plausible.io) is also supported
 - [Uploadthing](https://uploadthing.com) for file uploads
 - [next-intl](https://next-intl-docs.vercel.app/) for internationalization
 
