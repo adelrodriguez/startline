@@ -2,6 +2,7 @@ import "server-only"
 
 import env from "@/lib/env.server"
 import qstash from "@/services/qstash"
+import { throwUnless } from "@/utils/assert"
 import { buildUrl } from "@/utils/url"
 import type { PublishRequest } from "@upstash/qstash"
 import ky from "ky"
@@ -46,9 +47,13 @@ export async function enqueueJob<T extends JobType>(
 ) {
   const request = buildJobRequest(type, payload)
 
+  throwUnless(!!request.url, "request.url is required")
+
   if (env.MOCK_QSTASH) {
+    console.log("Mocking QStash request", request)
+
     return ky.post(request.url, {
-      json: request.payload,
+      json: request.body,
       retry: options?.retries,
     })
   }
@@ -62,12 +67,12 @@ export async function enqueueJob<T extends JobType>(
 export function buildJobRequest<T extends JobType>(
   type: T,
   payload: JobPayload<T>,
-) {
+): PublishRequest<JobPayload<T>> {
   return {
     url: buildUrl(`/api/jobs/${type}`, {
       protocol: env.MOCK_QSTASH ? "http" : "https",
     }),
-    payload,
+    body: payload,
   }
 }
 
