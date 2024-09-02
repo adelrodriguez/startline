@@ -1,7 +1,7 @@
 import { google, setSession } from "@/lib/auth"
 import { AUTHORIZED_URL } from "@/lib/consts"
+import { GoogleUserSchema } from "@/lib/validation"
 import { createUserFromGoogle, findUserByGoogleId } from "@/server/data"
-import { GoogleUserSchema } from "@/utils/validation"
 import { OAuth2RequestError } from "arctic"
 import { StatusCodes } from "http-status-codes"
 import { cookies } from "next/headers"

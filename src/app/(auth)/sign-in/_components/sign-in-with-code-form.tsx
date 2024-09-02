@@ -1,8 +1,8 @@
 "use client"
 
 import { Form, FormItem, FormSubmit, Input, Label } from "@/components/ui"
+import { createSignInWithCodeSchema } from "@/lib/validation"
 import { signInWithCode } from "@/server/actions"
-import { createSignInWithCodeSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { Loader2Icon } from "lucide-react"

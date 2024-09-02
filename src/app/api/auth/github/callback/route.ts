@@ -1,7 +1,7 @@
 import { github, setSession } from "@/lib/auth"
 import { AUTHORIZED_URL } from "@/lib/consts"
+import { GitHubUserSchema } from "@/lib/validation"
 import { createUserFromGitHub, findUserByGitHubId } from "@/server/data"
-import { GitHubUserSchema } from "@/utils/validation"
 import { OAuth2RequestError } from "arctic"
 import { StatusCodes } from "http-status-codes"
 import { cookies } from "next/headers"

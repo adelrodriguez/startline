@@ -11,8 +11,8 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui"
+import { createCheckInWithCodeSchema } from "@/lib/validation"
 import { checkSignInCode, resendSignInCode } from "@/server/actions"
-import { createCheckInWithCodeSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"

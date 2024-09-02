@@ -9,8 +9,8 @@ import {
   Input,
   Label,
 } from "@/components/ui"
+import { createSignInWithPasswordSchema } from "@/lib/validation"
 import { signInWithPassword } from "@/server/actions"
-import { createSignInWithPasswordSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { Loader2Icon } from "lucide-react"

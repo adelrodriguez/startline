@@ -8,8 +8,8 @@ import {
   Input,
   Label,
 } from "@/components/ui"
+import { createSignUpSchema } from "@/lib/validation"
 import { signUp } from "@/server/actions"
-import { createSignUpSchema } from "@/utils/validation"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { Loader2Icon } from "lucide-react"
