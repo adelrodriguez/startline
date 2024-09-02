@@ -48,6 +48,17 @@ export default createEnv({
     // Upstash
     UPSTASH_REDIS_REST_URL: z.string(),
     UPSTASH_REDIS_REST_TOKEN: z.string(),
+
+    // Authentication methods
+    AUTH_PASSWORD: z.preprocess(
+      (v) => v === "true",
+      z.boolean().default(false),
+    ),
+    AUTH_SIGN_IN_CODES: z.preprocess(
+      (v) => v === "true",
+      z.boolean().default(false),
+    ),
+    AUTH_OAUTH: z.preprocess((v) => v === "true", z.boolean().default(false)),
   },
   experimental__runtimeEnv: process.env,
   /**

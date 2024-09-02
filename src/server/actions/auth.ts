@@ -12,6 +12,7 @@ import {
   RESET_PASSWORD_URL,
   UNAUTHORIZED_URL,
 } from "@/lib/consts"
+import env from "@/lib/env.server"
 import rateLimiter from "@/lib/rate-limit"
 import {
   RequestPasswordResetSchema,
@@ -46,6 +47,10 @@ import { RedirectType, redirect } from "next/navigation"
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
 export async function signUp(_: unknown, formData: FormData) {
+  if (!env.AUTH_PASSWORD) {
+    throw new Error("Password authentication is disabled")
+  }
+
   const ipAddress = getIpAddress() ?? FALLBACK_IP
 
   const limit = await rateLimiter.unknown.limit(ipAddress)
@@ -82,6 +87,10 @@ export async function signUp(_: unknown, formData: FormData) {
 }
 
 export async function signInWithPassword(_: unknown, formData: FormData) {
+  if (!env.AUTH_PASSWORD) {
+    throw new Error("Password authentication is disabled")
+  }
+
   const submission = parseWithZod(formData, {
     schema: createSignInWithPasswordSchema(),
   })
@@ -123,6 +132,10 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
 }
 
 export async function signInWithCode(_: unknown, formData: FormData) {
+  if (!env.AUTH_SIGN_IN_CODES) {
+    throw new Error("Sign-in codes are disabled")
+  }
+
   const submission = parseWithZod(formData, {
     schema: createSignInWithCodeSchema(),
   })
@@ -150,6 +163,10 @@ export async function signInWithCode(_: unknown, formData: FormData) {
 }
 
 export async function checkSignInCode(_: unknown, formData: FormData) {
+  if (!env.AUTH_SIGN_IN_CODES) {
+    throw new Error("Sign-in codes are disabled")
+  }
+
   const email = cookies().get(VERIFICATION_EMAIL_COOKIE_NAME)?.value ?? null
 
   if (!email) {
@@ -191,6 +208,10 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
 }
 
 export async function resendSignInCode(email: string) {
+  if (!env.AUTH_SIGN_IN_CODES) {
+    throw new Error("Sign-in codes are disabled")
+  }
+
   const limit = await rateLimiter.unknown.limit(email)
 
   if (!limit.success) {

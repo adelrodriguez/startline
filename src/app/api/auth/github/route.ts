@@ -1,9 +1,18 @@
 import { github } from "@/lib/auth"
+import env from "@/lib/env.server"
 import { generateState } from "arctic"
+import { StatusCodes } from "http-status-codes"
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
 export async function GET(): Promise<NextResponse> {
+  if (!env.AUTH_OAUTH) {
+    return NextResponse.json(
+      { error: "OAuth authentication is disabled" },
+      { status: StatusCodes.FORBIDDEN },
+    )
+  }
+
   const state = generateState()
   const url = await github.createAuthorizationURL(state)
 
