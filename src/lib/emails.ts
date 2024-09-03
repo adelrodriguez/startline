@@ -10,6 +10,7 @@ export async function sendEmail(
   email: string,
   subject: string,
   body: ReactElement,
+  sendAt?: Date,
 ) {
   if (env.MOCK_RESEND) {
     const content = await render(body, { plainText: true })
@@ -27,6 +28,7 @@ export async function sendEmail(
     to: email,
     subject,
     react: body,
+    scheduledAt: sendAt?.toISOString(),
   })
 
   if (error) {
