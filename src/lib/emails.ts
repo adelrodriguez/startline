@@ -12,17 +12,12 @@ export async function sendEmail(
   body: ReactElement,
 ) {
   if (env.MOCK_RESEND) {
-    console.info(chalk.bold.italic.blue("MOCKING EMAIL SEND"))
+    const content = await render(body, { plainText: true })
 
+    console.info(chalk.bold.italic.blue("MOCKING EMAIL SEND"))
     console.info(chalk.bold.blue("Sending email to"), chalk.italic.white(email))
     console.info("Email content:")
-    console.info(
-      chalk.italic(
-        render(body, {
-          plainText: true,
-        }),
-      ),
-    )
+    console.info(chalk.italic(content))
 
     return
   }
