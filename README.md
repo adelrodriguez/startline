@@ -39,8 +39,9 @@ Startline is an opinionated, batteries-included starter template to build SaaS a
 - [Sentry](https://sentry.io) for error tracking
 - [PostHog](https://posthog.com) for analytics
   - [Plausible](https://plausible.io) is also supported
-- [Uploadthing](https://uploadthing.com) for file uploads
+- [UploadThing](https://uploadthing.com) for file uploads
 - [next-intl](https://next-intl-docs.vercel.app/) for internationalization
+- [nuqs](https://github.com/47ng/nuqs) to manage state in search params
 
 ### ...plus some other stuff to make development a breeze:
 
@@ -55,3 +56,34 @@ Startline is an opinionated, batteries-included starter template to build SaaS a
 ## Getting started
 
 TODO
+
+## How much does this cost to run?
+
+All the services used in this stack have generous free tiers:
+
+- Vercel: 100 GB of bandwidth and 100,000 function invocations per month
+- Turso: 500 databases, 9GB total storage, 1 billion row reads per month
+- Resend: 100 emails/day
+- Upstash Redis: 10,000 commands/day
+- Upstash QStash: 500 messages/day
+- Sentry: 5,000 errors/month
+- PostHog: 1 million events/month
+- UploadThing: 2GB of storage
+
+This can get you very far, but what you really want to know is how much it actually costs to run this stack for a real-world application.
+
+We're going to assume you'll be paying the basic "Professional" tier for each service (not counting usage-based pricing):
+
+- Vercel: $20/month
+- Turso: $24.92/month
+- Resend: $20/month
+- Sentry: $26/month
+- UploadThing: $10/month
+
+Total: $100.92/month
+
+Not taking into account usage-based pricing, this is $1,211.04/year. This can get you _very_ far, since you can share the services between all your projects.
+
+I understand this stack might not be for everyone. Maybe you're very price-sensitive. Maybe you like to self-host your own services and hate all the SaaS-glue. Maybe you just don't like serverless. That's fine. This stack isn't for you.
+
+I am planning to create something that can easily be hosted on a VPS and has much less dependencies. Expect that in the future.
