@@ -3,9 +3,9 @@ import "server-only"
 import db, {
   type Organization,
   type User,
+  account,
   filters,
   organization,
-  organizationMembership,
 } from "@/server/db"
 import { throwIf, throwUnless } from "@/utils/assert"
 import { OrganizationError } from "@/utils/error"
@@ -38,8 +38,8 @@ export async function findOrganizationById(organizationId: Organization["id"]) {
   return existingOrganization ?? null
 }
 
-export function findOrganizationMembershipsByUserId(userId: User["id"]) {
-  return db.query.organizationMembership.findMany({
+export function findAccountsByUserId(userId: User["id"]) {
+  return db.query.account.findMany({
     where: (model, { eq }) => eq(model.userId, userId),
   })
 }
@@ -49,7 +49,7 @@ export async function addMemberToOrganization(
   userId: User["id"],
 ) {
   return db
-    .insert(organizationMembership)
+    .insert(account)
     .values({
       organizationId,
       userId,
@@ -63,7 +63,7 @@ export async function addAdminToOrganization(
   userId: User["id"],
 ) {
   return db
-    .insert(organizationMembership)
+    .insert(account)
     .values({
       organizationId,
       userId,
@@ -77,7 +77,7 @@ export function addOwnerToOrganization(
   userId: User["id"],
 ) {
   return db
-    .insert(organizationMembership)
+    .insert(account)
     .values({
       organizationId,
       userId,
@@ -90,7 +90,7 @@ export async function removeMemberFromOrganization(
   organizationId: Organization["id"],
   userId: User["id"],
 ) {
-  const membership = await db.query.organizationMembership.findFirst({
+  const membership = await db.query.account.findFirst({
     where: (model, { eq, and }) =>
       and(eq(model.organizationId, organizationId), eq(model.userId, userId)),
     columns: {
@@ -109,11 +109,11 @@ export async function removeMemberFromOrganization(
   )
 
   await db
-    .delete(organizationMembership)
+    .delete(account)
     .where(
       filters.and(
-        filters.eq(organizationMembership.userId, userId),
-        filters.eq(organizationMembership.organizationId, organizationId),
+        filters.eq(account.userId, userId),
+        filters.eq(account.organizationId, organizationId),
       ),
     )
 }
@@ -122,7 +122,7 @@ export async function assertIsOrganizationOwner(
   organizationId: Organization["id"],
   userId: User["id"],
 ) {
-  const membership = await db.query.organizationMembership.findFirst({
+  const membership = await db.query.account.findFirst({
     where: (model, { eq, and }) =>
       and(eq(model.organizationId, organizationId), eq(model.userId, userId)),
     columns: {
