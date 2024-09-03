@@ -36,6 +36,7 @@ export default createEnv({
     SENTRY_DSN: z.string(),
     SENTRY_ORG: z.string(),
     SENTRY_PROJECT: z.string(),
+    SENTRY_AUTH_TOKEN: z.string(),
 
     // Stripe
     STRIPE_SECRET_KEY: z.string(),
