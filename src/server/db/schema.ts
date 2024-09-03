@@ -41,7 +41,7 @@ export const userRelations = relations(user, ({ many, one }) => ({
     fields: [user.id],
     references: [password.userId],
   }),
-  organizationMemberships: many(organizationMembership),
+  memberships: many(organizationMembership),
   profile: one(profile),
 }))
 
