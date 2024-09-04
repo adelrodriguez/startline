@@ -69,7 +69,6 @@ const FormSubmit = React.forwardRef<
     <Button
       ref={ref}
       type="submit"
-      className={cn("w-full", className)}
       disabled={pending}
       aria-disabled={pending}
       {...props}

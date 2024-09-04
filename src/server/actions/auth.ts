@@ -27,7 +27,7 @@ import { isProduction } from "@/lib/vars"
 import {
   createPassword,
   createUser,
-  createUserFromCode,
+  findOrCreateUserFromCode,
   findUserByEmail,
   findValidPasswordResetToken,
   markPasswordResetTokenAsUsed,
@@ -75,9 +75,10 @@ export async function signUp(_: unknown, formData: FormData) {
     return submission.reply()
   }
 
-  const newUser = await createUser({
-    email: submission.value.email,
-  })
+  const newUser = await createUser(
+    { email: submission.value.email },
+    { organization: { name: "Personal Workspace" } },
+  )
 
   await createPassword(newUser.id, submission.value.password)
 
@@ -200,7 +201,10 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
   cookies().set(VERIFICATION_EMAIL_COOKIE_NAME, "")
 
   // If the user already exists, we just update their emailVerifiedAt
-  const user = await createUserFromCode({ email })
+  const user = await findOrCreateUserFromCode(
+    { email },
+    { organization: { name: "Personal Workspace" } },
+  )
 
   await setSession(user.id, { ipAddress })
 

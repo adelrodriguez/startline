@@ -2,9 +2,9 @@ import "server-only"
 
 import db, {
   filters,
-  increment,
   type WebhookEvent,
   webhookEvent,
+  helpers,
 } from "@/server/db"
 
 export async function findWebhookEventByExternalId(
@@ -30,7 +30,7 @@ export async function createWebhookEvent(
     })
     .onConflictDoUpdate({
       target: webhookEvent.externalId,
-      set: { retries: increment(webhookEvent.retries) },
+      set: { retries: helpers.increment(webhookEvent.retries) },
     })
     .returning()
     .get()

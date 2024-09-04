@@ -1,11 +1,8 @@
-import { getCurrentUser } from "@/server/loader"
-
 import { AdminOnly } from "@/components/auth"
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-  Button,
   Card,
   CardContent,
   CardDescription,
@@ -16,22 +13,25 @@ import {
   TypographySmall,
 } from "@/components/ui"
 import { signOut } from "@/server/actions"
+import { getCurrentUser, getFirstOrganization } from "@/server/loader"
 import { Loader2Icon } from "lucide-react"
+import InviteMemberForm from "./_components/invite-member-form"
 
 export default async function Page() {
   const user = await getCurrentUser()
+  const organization = await getFirstOrganization()
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-12 sm:px-8">
-      <div className="mx-auto max-w-md space-y-4">
-        <Card>
+      <div className="mx-auto w-full max-w-md space-y-4">
+        <Card className="">
           <CardHeader>
             <CardTitle>Welcome Back!</CardTitle>
             <CardDescription>
-              You have successfully logged in to your account.
+              You are a member of {organization.name}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col gap-4">
             <div className="flex items-center gap-4">
               <Avatar>
                 <AvatarImage src="/placeholder-user.jpg" alt="Avatar" />
@@ -42,6 +42,9 @@ export default async function Page() {
                 <div className="text-muted-foreground">{user.email}</div>
               </div>
             </div>
+            <div>
+              <InviteMemberForm organizationId={organization.id} />
+            </div>
           </CardContent>
           <CardFooter className="flex gap-2">
             <AdminOnly>
@@ -50,6 +53,7 @@ export default async function Page() {
             <form action={signOut}>
               <FormSubmit
                 variant="outline"
+                className="w-full"
                 renderLoading={
                   <>
                     <Loader2Icon
@@ -63,7 +67,6 @@ export default async function Page() {
                 Sign out
               </FormSubmit>
             </form>
-            <Button>View Profile</Button>
           </CardFooter>
         </Card>
       </div>

@@ -65,6 +65,12 @@ export class OrganizationError extends CustomError {
   }
 }
 
+export class OrganizationInvitationError extends CustomError {
+  constructor(message: string, cause?: Error) {
+    super("OrganizationInvitationError", message, cause)
+  }
+}
+
 export class InternalError extends CustomError {
   constructor(message: string, cause?: Error) {
     super("InternalError", message, cause)

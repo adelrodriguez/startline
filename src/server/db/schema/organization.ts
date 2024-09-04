@@ -12,7 +12,6 @@ export const organization = createTable("organization", {
     .notNull(),
 
   name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
 })
 export type Organization = typeof organization.$inferSelect
 
@@ -47,3 +46,27 @@ export const account = createTable(
   }),
 )
 export type Account = typeof account.$inferSelect
+
+export const organizationInvitation = createTable("organization_invitation", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .default(CURRENT_TIMESTAMP)
+    .notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .default(CURRENT_TIMESTAMP)
+    .notNull(),
+
+  organizationId: integer("organization_id")
+    .notNull()
+    .references(() => organization.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  email: text("email").notNull(),
+  role: text("role", { enum: ["admin", "member"] })
+    .notNull()
+    .default("member"),
+  token: text("token").notNull().unique(),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+})
+export type OrganizationInvitation = typeof organizationInvitation.$inferSelect

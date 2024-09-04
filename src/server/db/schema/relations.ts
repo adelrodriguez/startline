@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm"
-import { account, organization } from "./organization"
+import { account, organization, organizationInvitation } from "./organization"
 import { password, profile, user } from "./user"
 
 export const userRelations = relations(user, ({ many, one }) => ({
@@ -19,7 +19,8 @@ export const profileRelations = relations(profile, ({ one }) => ({
 }))
 
 export const organizationRelations = relations(organization, ({ many }) => ({
-  members: many(account),
+  accounts: many(account),
+  invitations: many(organizationInvitation),
 }))
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -32,3 +33,13 @@ export const accountRelations = relations(account, ({ one }) => ({
     references: [organization.id],
   }),
 }))
+
+export const organizationInvitationRelations = relations(
+  organizationInvitation,
+  ({ one }) => ({
+    organization: one(organization, {
+      fields: [organizationInvitation.organizationId],
+      references: [organization.id],
+    }),
+  }),
+)

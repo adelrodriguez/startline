@@ -19,3 +19,6 @@ export type Locale = (typeof Locales)[keyof typeof Locales]
 export const LOCALES = [Locales.EN, Locales.ES] as const
 
 export const DEFAULT_LOCALE = Locales.EN
+
+// Organization Invitation
+export const ACCEPT_INVITATION_URL = "/accept"

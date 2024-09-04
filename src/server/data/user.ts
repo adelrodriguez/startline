@@ -1,11 +1,17 @@
 import "server-only"
 
-import db, { type User, filters, type profile, user } from "@/server/db"
-import type { OmitUserId } from "@/utils/type"
+import db, {
+  type User,
+  filters,
+  type organization,
+  type profile,
+  user,
+} from "@/server/db"
 import {
   deleteEmailVerificationCode,
   sendEmailVerificationCode,
 } from "./email-verification-code"
+import { createOrganization } from "./organization"
 import { createProfile } from "./profile"
 
 export async function findUserByEmail(email: User["email"]) {
@@ -44,7 +50,10 @@ export async function findUserById(userId: User["id"]) {
 
 export async function createUser(
   values: Omit<typeof user.$inferInsert, "id" | "role">,
-  options?: { profile?: OmitUserId<typeof profile.$inferInsert> },
+  options?: {
+    profile?: Omit<typeof profile.$inferInsert, "id" | "userId">
+    organization?: Omit<typeof organization.$inferInsert, "id">
+  },
 ) {
   const newUser = await db
     .insert(user)
@@ -56,6 +65,10 @@ export async function createUser(
     await createProfile(newUser.id, options.profile)
   }
 
+  if (options?.organization) {
+    await createOrganization(options.organization, { ownerId: newUser.id })
+  }
+
   await sendEmailVerificationCode(newUser)
 
   return newUser
@@ -63,7 +76,7 @@ export async function createUser(
 
 export async function createAdmin(
   values: Omit<typeof user.$inferInsert, "id" | "role">,
-  options?: { profile?: OmitUserId<typeof profile.$inferInsert> },
+  options?: { profile?: Omit<typeof profile.$inferInsert, "id" | "userId"> },
 ) {
   const newUser = await db
     .insert(user)
@@ -78,22 +91,37 @@ export async function createAdmin(
   return newUser
 }
 
-export async function createUserFromCode(
+export async function findOrCreateUserFromCode(
   values: Pick<typeof user.$inferInsert, "email">,
-  options?: { profile?: OmitUserId<typeof profile.$inferInsert> },
+  options?: {
+    profile?: Omit<typeof profile.$inferInsert, "id" | "userId">
+    organization?: Omit<typeof organization.$inferInsert, "id">
+  },
 ) {
+  const existingUser = await findUserByEmail(values.email)
+
+  if (existingUser) {
+    if (!existingUser.emailVerifiedAt) {
+      await markUserAsEmailVerified(existingUser.id)
+    }
+
+    await deleteEmailVerificationCode(existingUser.id)
+
+    return existingUser
+  }
+
   const newUser = await db
     .insert(user)
     .values({ ...values, role: "user", emailVerifiedAt: new Date() })
-    .onConflictDoUpdate({
-      target: user.email,
-      set: { emailVerifiedAt: new Date() },
-    })
     .returning()
     .get()
 
   if (options?.profile) {
     await createProfile(newUser.id, options.profile)
+  }
+
+  if (options?.organization) {
+    await createOrganization(options.organization, { ownerId: newUser.id })
   }
 
   await deleteEmailVerificationCode(newUser.id)
@@ -106,7 +134,10 @@ export async function createUserFromGoogle(
     typeof user.$inferInsert,
     "email" | "googleId" | "emailVerifiedAt"
   >,
-  options?: { profile?: OmitUserId<typeof profile.$inferInsert> },
+  options?: {
+    profile?: Omit<typeof profile.$inferInsert, "id" | "userId">
+    organization?: Omit<typeof organization.$inferInsert, "id">
+  },
 ) {
   const newUser = await db
     .insert(user)
@@ -122,6 +153,10 @@ export async function createUserFromGoogle(
     await createProfile(newUser.id, options.profile)
   }
 
+  if (options?.organization) {
+    await createOrganization(options.organization, { ownerId: newUser.id })
+  }
+
   await deleteEmailVerificationCode(newUser.id)
 
   return newUser
@@ -129,7 +164,10 @@ export async function createUserFromGoogle(
 
 export async function createUserFromGitHub(
   values: Pick<typeof user.$inferInsert, "email" | "githubId">,
-  options?: { profile?: OmitUserId<typeof profile.$inferInsert> },
+  options?: {
+    profile?: Omit<typeof profile.$inferInsert, "id" | "userId">
+    organization?: Omit<typeof organization.$inferInsert, "id">
+  },
 ) {
   const newUser = await db
     .insert(user)
@@ -143,6 +181,10 @@ export async function createUserFromGitHub(
 
   if (options?.profile) {
     await createProfile(newUser.id, options.profile)
+  }
+
+  if (options?.organization) {
+    await createOrganization(options.organization, { ownerId: newUser.id })
   }
 
   await deleteEmailVerificationCode(newUser.id)
