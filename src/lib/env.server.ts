@@ -1,4 +1,4 @@
-import { uploadthing, vercel } from "@t3-oss/env-core/presets"
+import { vercel } from "@t3-oss/env-core/presets"
 import { createEnv } from "@t3-oss/env-nextjs"
 import { z } from "zod"
 
@@ -50,6 +50,10 @@ export default createEnv({
     UPSTASH_REDIS_REST_URL: z.string(),
     UPSTASH_REDIS_REST_TOKEN: z.string(),
 
+    // Uploadthing
+    UPLOADTHING_SECRET: z.string(),
+    UPLOADTHING_APP_ID: z.string().optional(),
+
     // Authentication methods
     AUTH_PASSWORD: z.preprocess(
       (v) => v === "true",
@@ -62,15 +66,10 @@ export default createEnv({
     AUTH_OAUTH: z.preprocess((v) => v === "true", z.boolean().default(false)),
   },
   experimental__runtimeEnv: process.env,
-  /**
-   * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
-   * useful for Docker builds.
-   */
-  skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
-  /**
-   * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and
-   * `SOME_VAR=''` will throw an error.
-   */
+
+  skipValidation:
+    process.env.SKIP_ENV_VALIDATION === "true" || process.env.CI === "true",
+
   emptyStringAsUndefined: process.env.NODE_ENV === "production",
-  extends: [vercel(), uploadthing()],
+  extends: [vercel()],
 })
