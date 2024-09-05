@@ -3,3 +3,4 @@
 # We exclude the lockfile since we don't want conflicts from installing project dependencies
 
 bun.lockb
+migrations
