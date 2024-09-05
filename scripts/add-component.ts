@@ -34,7 +34,7 @@ if (isCancel(component)) {
 }
 
 s.start(`Creating ${componentName.toString()} component...`)
-await $`shadcn-ui add ${componentName}`
+await $`shadcn add ${componentName}`
 s.stop("Component created")
 
 s.start("Adding component to index.ts...")
