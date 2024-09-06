@@ -6,6 +6,7 @@ import db, {
   webhookEvent,
   helpers,
 } from "@/server/db"
+import type { StrictOmit } from "@/utils/type"
 
 export async function findWebhookEventByExternalId(
   externalId: WebhookEvent["externalId"],
@@ -18,7 +19,7 @@ export async function findWebhookEventByExternalId(
 }
 
 export async function createWebhookEvent(
-  values: Omit<typeof webhookEvent.$inferInsert, "id" | "payload"> & {
+  values: StrictOmit<typeof webhookEvent.$inferInsert, "id" | "payload"> & {
     payload: unknown
   },
 ) {

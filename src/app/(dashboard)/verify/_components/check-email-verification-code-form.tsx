@@ -15,7 +15,7 @@ import { createCheckEmailVerificationCodeSchema } from "@/lib/validation"
 import {
   checkEmailVerificationCode,
   resendEmailVerificationCode,
-} from "@/server/actions"
+} from "@/server/actions/auth"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"

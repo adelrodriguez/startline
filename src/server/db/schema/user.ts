@@ -1,4 +1,5 @@
 import { DEFAULT_LOCALE, LOCALES } from "@/lib/consts"
+import type { Branded } from "@/utils/type"
 import { integer, primaryKey, text } from "drizzle-orm/sqlite-core"
 import { CURRENT_TIMESTAMP, createTable } from "./helpers"
 
@@ -23,6 +24,7 @@ export const user = createTable("user", {
   githubId: text("github_id").unique(),
 })
 export type User = typeof user.$inferSelect
+export type UserId = Branded<User["id"], "UserId">
 export type UserRole = User["role"]
 
 export const profile = createTable(

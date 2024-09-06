@@ -32,6 +32,7 @@ import { isProduction } from "@/lib/vars"
 import {
   createPassword,
   createUser,
+  createUserId,
   findOrCreateUserFromCode,
   findUserByEmail,
   findValidPasswordResetToken,
@@ -86,7 +87,9 @@ export async function signUp(_: unknown, formData: FormData) {
     { organization: true },
   )
 
-  await createPassword(newUser.id, submission.value.password)
+  const userId = createUserId(newUser.id)
+
+  await createPassword(userId, submission.value.password)
 
   await setSession(newUser.id, { ipAddress })
 
@@ -123,7 +126,7 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
   }
 
   const isValidPassword = await verifyPassword(
-    existingUser.id,
+    createUserId(existingUser.id),
     submission.value.password,
   )
 
@@ -239,7 +242,7 @@ export async function checkEmailVerificationCode(
   }
 
   const isValidCode = await verifyEmailVerificationCode(
-    user.id,
+    createUserId(user.id),
     submission.value.code,
   )
 
@@ -274,7 +277,10 @@ export async function requestPasswordReset(_: unknown, formData: FormData) {
   const existingUser = await findUserByEmail(submission.value.email)
 
   if (existingUser) {
-    await sendPasswordResetToken(existingUser)
+    await sendPasswordResetToken(
+      createUserId(existingUser.id),
+      existingUser.email,
+    )
   }
 
   redirect(`${RESET_PASSWORD_URL}/confirm?to=${submission.value.email}`)
@@ -307,13 +313,15 @@ export async function resetPassword(_: unknown, formData: FormData) {
     throw new PasswordResetError("Your token has expired or is invalid")
   }
 
+  const userId = createUserId(passwordResetToken.userId)
+
   // Log the user out of all sessions
-  await invalidateAllSessions(passwordResetToken.userId)
+  await invalidateAllSessions(userId)
 
-  await createPassword(passwordResetToken.userId, submission.value.password)
-  await markPasswordResetTokenAsUsed(passwordResetToken)
+  await createPassword(userId, submission.value.password)
+  await markPasswordResetTokenAsUsed(userId)
 
-  await setSession(passwordResetToken.userId, { ipAddress })
+  await setSession(userId, { ipAddress })
 
   redirect(AUTHORIZED_URL, RedirectType.replace)
 }
@@ -333,6 +341,6 @@ export const resendSignInCode = actionClient
 
 export const resendEmailVerificationCode = authActionClient
   .use(rateLimitByIp)
-  .action(async ({ ctx }) => {
-    await sendEmailVerificationCode(ctx.user)
-  })
+  .action(({ ctx }) =>
+    sendEmailVerificationCode(createUserId(ctx.user.id), ctx.user.email),
+  )

@@ -2,7 +2,7 @@
 
 import { Form, FormItem, FormSubmit, Input, Label } from "@/components/ui"
 import { InviteMemberSchema } from "@/lib/validation"
-import { inviteMember } from "@/server/actions"
+import { inviteMember } from "@/server/actions/organization"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { useFormState } from "react-dom"

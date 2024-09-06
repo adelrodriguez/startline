@@ -2,15 +2,13 @@ import "server-only"
 
 import { EmailVerificationCodeEmail } from "@/components/emails"
 import { sendEmail } from "@/lib/emails"
-import db, { type User, emailVerificationCode, filters } from "@/server/db"
+import db, { type UserId, emailVerificationCode, filters } from "@/server/db"
 import { hash, verify } from "@/utils/hash"
 import { TimeSpan, createDate } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
 import { markUserAsEmailVerified } from "./user"
 
-export async function findValidEmailVerificationCodeByUserId(
-  userId: User["id"],
-) {
+export async function findValidEmailVerificationCodeByUserId(userId: UserId) {
   const code = await db.query.emailVerificationCode.findFirst({
     where: (model, { eq, and, gte }) =>
       and(eq(model.userId, userId), gte(model.expiresAt, new Date())),
@@ -20,7 +18,7 @@ export async function findValidEmailVerificationCodeByUserId(
 }
 
 export async function createEmailVerificationCode(
-  userId: User["id"],
+  userId: UserId,
   input: string,
 ) {
   const hashedCode = await hash(input)
@@ -35,25 +33,23 @@ export async function createEmailVerificationCode(
     .returning()
 }
 
-export async function sendEmailVerificationCode(
-  user: Pick<User, "id" | "email">,
-) {
+export async function sendEmailVerificationCode(userId: UserId, email: string) {
   // Delete old codes
-  await deleteEmailVerificationCode(user.id)
+  await deleteEmailVerificationCode(userId)
 
   const code = await generateRandomString(6, alphabet("0-9", "A-Z"))
 
-  await createEmailVerificationCode(user.id, code)
+  await createEmailVerificationCode(userId, code)
 
   await sendEmail(
-    user.email,
-    "Verify email",
+    email,
+    "Verify your email",
     EmailVerificationCodeEmail({ code }),
   )
 }
 
 export async function verifyEmailVerificationCode(
-  userId: User["id"],
+  userId: UserId,
   code: string,
 ) {
   const emailVerificationCode =
@@ -73,7 +69,7 @@ export async function verifyEmailVerificationCode(
   return true
 }
 
-export function deleteEmailVerificationCode(userId: User["id"]) {
+export function deleteEmailVerificationCode(userId: UserId) {
   return db
     .delete(emailVerificationCode)
     .where(filters.eq(emailVerificationCode.userId, userId))

@@ -9,11 +9,10 @@ import {
   Label,
 } from "@/components/ui"
 import { createSignUpSchema } from "@/lib/validation"
-import { signUp } from "@/server/actions"
+import { signUp } from "@/server/actions/auth"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { Loader2Icon } from "lucide-react"
-
 import { useFormState } from "react-dom"
 
 export default function SignUpForm() {

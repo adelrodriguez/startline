@@ -1,6 +1,8 @@
 import { validateRequest } from "@/lib/auth"
 import { UNAUTHORIZED_URL } from "@/lib/consts"
 import {
+  createOrganizationId,
+  createUserId,
   findAccountsByUserId,
   findOrganizationById,
   findOrganizationInvitationByToken,
@@ -18,7 +20,7 @@ export const getCurrentUser = cache(async () => {
     return redirect(UNAUTHORIZED_URL)
   }
 
-  const user = await findUserById(authUser.id)
+  const user = await findUserById(createUserId(authUser.id))
 
   throwUnless(user !== null, "User does not exist")
 
@@ -28,14 +30,16 @@ export const getCurrentUser = cache(async () => {
 export const getFirstOrganization = cache(async () => {
   const user = await getCurrentUser()
 
-  const accounts = await findAccountsByUserId(user.id)
+  const accounts = await findAccountsByUserId(createUserId(user.id))
   const firstAccount = accounts[0]
 
   if (!firstAccount) {
     throw new OrganizationError("User does not have any organizations")
   }
 
-  const organization = await findOrganizationById(firstAccount.organizationId)
+  const organization = await findOrganizationById(
+    createOrganizationId(firstAccount.organizationId),
+  )
 
   throwUnless(organization !== null, "Organization does not exist")
 
@@ -49,7 +53,9 @@ export const getOrganizationFromInvitation = cache(async (token: string) => {
     throw new OrganizationInvitationError("Invalid or expired invitation")
   }
 
-  const organization = await findOrganizationById(invitation.organizationId)
+  const organization = await findOrganizationById(
+    createOrganizationId(invitation.organizationId),
+  )
 
   throwUnless(organization !== null, "Organization does not exist")
 

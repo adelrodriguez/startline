@@ -1,8 +1,9 @@
-import db, { profile, type User } from "@/server/db"
+import db, { profile, type UserId } from "@/server/db"
+import type { StrictOmit } from "@/utils/type"
 
 export async function createProfile(
-  userId: User["id"],
-  values: Omit<typeof profile.$inferInsert, "id" | "userId">,
+  userId: UserId,
+  values: StrictOmit<typeof profile.$inferInsert, "userId">,
 ) {
   return db
     .insert(profile)

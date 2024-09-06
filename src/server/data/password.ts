@@ -1,9 +1,9 @@
 import "server-only"
 
-import db, { type User, password } from "@/server/db"
+import db, { type UserId, password } from "@/server/db"
 import { hash, verify } from "@node-rs/argon2"
 
-export async function createPassword(userId: User["id"], input: string) {
+export async function createPassword(userId: UserId, input: string) {
   const hashedPassword = await hash(input)
 
   return db
@@ -17,7 +17,7 @@ export async function createPassword(userId: User["id"], input: string) {
     .get()
 }
 
-export async function findPassword(userId: User["id"]) {
+export async function findPassword(userId: UserId) {
   const password = await db.query.password.findFirst({
     where: (model, { eq }) => eq(model.userId, userId),
   })
@@ -25,7 +25,7 @@ export async function findPassword(userId: User["id"]) {
   return password ?? null
 }
 
-export async function verifyPassword(userId: User["id"], input: string) {
+export async function verifyPassword(userId: UserId, input: string) {
   const password = await findPassword(userId)
 
   if (!password) {

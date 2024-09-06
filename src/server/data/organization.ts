@@ -5,8 +5,9 @@ import { sendEmail } from "@/lib/emails"
 import db, {
   type Account,
   type Organization,
+  type OrganizationId,
   type OrganizationInvitation,
-  type User,
+  type UserId,
   account,
   filters,
   organization,
@@ -14,16 +15,19 @@ import db, {
   user,
 } from "@/server/db"
 import { OrganizationError } from "@/utils/error"
+import type { StrictOmit } from "@/utils/type"
 import { TimeSpan, createDate } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
 
+export function createOrganizationId(id: Organization["id"]) {
+  return id as OrganizationId
+}
+
 export async function createOrganization(
-  values: Omit<typeof organization.$inferInsert, "id"> = {
+  values: StrictOmit<typeof organization.$inferInsert, "id"> = {
     name: "Personal Workspace",
   },
-  options?: {
-    ownerId?: User["id"]
-  },
+  options?: { ownerId?: UserId },
 ): Promise<Organization> {
   const newOrganization = await db
     .insert(organization)
@@ -32,14 +36,18 @@ export async function createOrganization(
     .get()
 
   if (options?.ownerId) {
-    await createAccount(options.ownerId, newOrganization.id, "owner")
+    await createAccount(
+      options.ownerId,
+      createOrganizationId(newOrganization.id),
+      "owner",
+    )
   }
 
   return newOrganization
 }
 
 export async function findOrganizationById(
-  organizationId: Organization["id"],
+  organizationId: OrganizationId,
 ): Promise<Organization | null> {
   const existingOrganization = await db.query.organization.findFirst({
     where: (model, { eq }) => eq(model.id, organizationId),
@@ -48,17 +56,15 @@ export async function findOrganizationById(
   return existingOrganization ?? null
 }
 
-export async function findAccountsByUserId(
-  userId: User["id"],
-): Promise<Account[]> {
+export async function findAccountsByUserId(userId: UserId): Promise<Account[]> {
   return db.query.account.findMany({
     where: (model, { eq }) => eq(model.userId, userId),
   })
 }
 
 export async function createAccount(
-  userId: User["id"],
-  organizationId: Organization["id"],
+  userId: UserId,
+  organizationId: OrganizationId,
   role: Account["role"],
 ): Promise<Account> {
   return db
@@ -69,8 +75,8 @@ export async function createAccount(
 }
 
 export async function removeMemberFromOrganization(
-  organizationId: Organization["id"],
-  userId: User["id"],
+  organizationId: OrganizationId,
+  userId: UserId,
 ): Promise<void> {
   const membership = await db.query.account.findFirst({
     where: (model, { eq, and }) =>
@@ -99,8 +105,8 @@ export async function removeMemberFromOrganization(
 }
 
 export async function assertIsOrganizationOwner(
-  organizationId: Organization["id"],
-  userId: User["id"],
+  organizationId: OrganizationId,
+  userId: UserId,
 ): Promise<void> {
   const existingAccount = await db.query.account.findFirst({
     where: (model, { eq, and }) =>
@@ -120,8 +126,8 @@ export async function assertIsOrganizationOwner(
 }
 
 export async function assertIsOrganizationMember(
-  organizationId: Organization["id"],
-  userId: User["id"],
+  organizationId: OrganizationId,
+  userId: UserId,
 ): Promise<void> {
   const existingAccount = await db.query.account.findFirst({
     where: (model, { eq, and }) =>
@@ -134,7 +140,7 @@ export async function assertIsOrganizationMember(
 }
 
 export async function createOrganizationInvitation(
-  organizationId: Organization["id"],
+  organizationId: OrganizationId,
   email: string,
   role: OrganizationInvitation["role"],
 ): Promise<OrganizationInvitation> {
@@ -195,7 +201,9 @@ export async function createOrganizationInvitation(
 async function sendOrganizationInvitationEmail(
   invitation: OrganizationInvitation,
 ): Promise<void> {
-  const organization = await findOrganizationById(invitation.organizationId)
+  const organization = await findOrganizationById(
+    createOrganizationId(invitation.organizationId),
+  )
 
   if (!organization) {
     throw new OrganizationError("Organization not found")
@@ -224,7 +232,7 @@ export async function findOrganizationInvitationByToken(
 
 export async function acceptOrganizationInvitation(
   token: string,
-  userId: User["id"],
+  userId: UserId,
 ): Promise<OrganizationInvitation> {
   const invitation = await findOrganizationInvitationByToken(token)
 

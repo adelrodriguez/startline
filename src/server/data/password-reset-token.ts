@@ -2,12 +2,7 @@ import "server-only"
 
 import { PasswordResetTokenEmail } from "@/components/emails"
 import { sendEmail } from "@/lib/emails"
-import db, {
-  type PasswordResetToken,
-  type User,
-  filters,
-  passwordResetToken,
-} from "@/server/db"
+import db, { type UserId, filters, passwordResetToken } from "@/server/db"
 import { hash } from "@/utils/hash"
 import { generateIdFromEntropySize } from "lucia"
 import { TimeSpan, createDate } from "oslo"
@@ -24,34 +19,34 @@ export async function findValidPasswordResetToken(input: string) {
   return token ?? null
 }
 
-export async function sendPasswordResetToken(user: User) {
-  await deletePasswordResetToken(user.id)
+export async function sendPasswordResetToken(userId: UserId, email: string) {
+  await deletePasswordResetTokens(userId)
 
   const token = generateIdFromEntropySize(25)
 
   await db.insert(passwordResetToken).values({
-    userId: user.id,
+    userId,
     hash: await hash(token),
     expiresAt: createDate(new TimeSpan(24, "h")),
   })
 
   await sendEmail(
-    user.email,
+    email,
     "Reset your password",
     PasswordResetTokenEmail({ token }),
   )
 }
 
-export async function markPasswordResetTokenAsUsed(token: PasswordResetToken) {
+export async function markPasswordResetTokenAsUsed(userId: UserId) {
   await db.batch([
-    deletePasswordResetToken(token.userId),
+    deletePasswordResetTokens(userId),
     // If the user received received the password reset token and it was
     // verified, we can mark the user as verified.
-    markUserAsEmailVerified(token.userId),
+    markUserAsEmailVerified(userId),
   ])
 }
 
-export function deletePasswordResetToken(userId: User["id"]) {
+export function deletePasswordResetTokens(userId: UserId) {
   return db
     .delete(passwordResetToken)
     .where(filters.eq(passwordResetToken.userId, userId))

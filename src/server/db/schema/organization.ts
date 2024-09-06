@@ -1,3 +1,4 @@
+import type { Branded } from "@/utils/type"
 import { integer, primaryKey, text } from "drizzle-orm/sqlite-core"
 import { CURRENT_TIMESTAMP, createTable } from "./helpers"
 import { user } from "./user"
@@ -14,6 +15,7 @@ export const organization = createTable("organization", {
   name: text("name").notNull(),
 })
 export type Organization = typeof organization.$inferSelect
+export type OrganizationId = Branded<Organization["id"], "OrganizationId">
 
 export const account = createTable(
   "account",

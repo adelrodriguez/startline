@@ -4,7 +4,9 @@ import { validateRequest } from "@/lib/auth"
 import { InviteMemberSchema } from "@/lib/validation"
 import {
   assertIsOrganizationMember,
+  createOrganizationId,
   createOrganizationInvitation,
+  createUserId,
 } from "@/server/data"
 import { AuthError } from "@/utils/error"
 import { parseWithZod } from "@conform-to/zod"
@@ -24,10 +26,13 @@ export async function inviteMember(_: unknown, formData: FormData) {
     throw new AuthError("User not found")
   }
 
-  await assertIsOrganizationMember(submission.value.organizationId, user.id)
+  const organizationId = createOrganizationId(submission.value.organizationId)
+  const userId = createUserId(user.id)
+
+  await assertIsOrganizationMember(organizationId, userId)
 
   await createOrganizationInvitation(
-    submission.value.organizationId,
+    organizationId,
     submission.value.email,
     submission.value.role,
   )
