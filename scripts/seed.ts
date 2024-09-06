@@ -69,6 +69,7 @@ await db.transaction(async (tx) => {
       name: faker.person.fullName(),
       preferredLocale: faker.helpers.arrayElement(["en", "es"]),
       avatarUrl: faker.image.avatar(),
+      phoneNumber: faker.phone.number(),
     })),
   )
 
@@ -76,14 +77,12 @@ await db.transaction(async (tx) => {
 
   // Create passwords
   const hashedPassword = await hash("password123")
-  await tx
-    .insert(password)
-    .values(
-      users.map((user): typeof password.$inferInsert => ({
-        userId: user.id,
-        hash: hashedPassword,
-      })),
-    )
+  await tx.insert(password).values(
+    users.map((user): typeof password.$inferInsert => ({
+      userId: user.id,
+      hash: hashedPassword,
+    })),
+  )
 
   log.success("Created passwords")
 

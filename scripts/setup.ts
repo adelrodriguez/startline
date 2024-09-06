@@ -6,18 +6,18 @@ const s = spinner()
 
 intro("Setting up the `startline` template")
 
-s.start("Checking for a .env.local file...")
+s.start("Checking for a .env file...")
 
-const envLocalExists = await fs.exists(".env.local")
+const envLocalExists = await fs.exists(".env")
 
 if (envLocalExists) {
-  s.stop("Found .env.local file.")
+  s.stop("Found .env file.")
 } else {
-  s.stop("No .env.local file found")
+  s.stop("No .env file found")
 
   const confirmation = await select({
     message:
-      "Do you want to create a .env.local file? This will copy the .env.example file to .env.local.",
+      "Do you want to create a .env file? This will copy the .env.example file to .env.",
     options: [
       { label: "Yes", value: true },
       { label: "No", value: false },
@@ -32,16 +32,16 @@ if (envLocalExists) {
 
   if (!confirmation) {
     cancel(
-      "Please create a .env.local following the template of the .env.example file.",
+      "Please create a .env following the template of the .env.example file.",
     )
 
     process.exit(0)
   } else {
-    s.start("Creating .env.local file...")
+    s.start("Creating .env file...")
 
-    await fs.copyFile(".env.example", ".env.local")
+    await fs.copyFile(".env.example", ".env")
 
-    s.stop("Created .env.local file")
+    s.stop("Created .env file")
   }
 }
 
