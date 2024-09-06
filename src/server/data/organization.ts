@@ -30,7 +30,7 @@ export async function createOrganization(
     .get()
 
   if (options?.ownerId) {
-    await addOwnerToOrganization(newOrganization.id, options.ownerId)
+    await createAccount(options.ownerId, newOrganization.id, "owner")
   }
 
   return newOrganization
@@ -54,47 +54,14 @@ export async function findAccountsByUserId(
   })
 }
 
-export async function addMemberToOrganization(
-  organizationId: Organization["id"],
+export async function createAccount(
   userId: User["id"],
+  organizationId: Organization["id"],
+  role: Account["role"],
 ): Promise<Account> {
   return db
     .insert(account)
-    .values({
-      organizationId,
-      userId,
-      role: "member",
-    })
-    .returning()
-    .get()
-}
-
-export async function addAdminToOrganization(
-  organizationId: Organization["id"],
-  userId: User["id"],
-): Promise<Account> {
-  return db
-    .insert(account)
-    .values({
-      organizationId,
-      userId,
-      role: "admin",
-    })
-    .returning()
-    .get()
-}
-
-export async function addOwnerToOrganization(
-  organizationId: Organization["id"],
-  userId: User["id"],
-): Promise<Account> {
-  return db
-    .insert(account)
-    .values({
-      organizationId,
-      userId,
-      role: "owner",
-    })
+    .values({ userId, organizationId, role })
     .returning()
     .get()
 }
