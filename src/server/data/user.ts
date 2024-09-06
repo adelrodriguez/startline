@@ -52,7 +52,7 @@ export async function createUser(
   values: Omit<typeof user.$inferInsert, "id" | "role">,
   options?: {
     profile?: Omit<typeof profile.$inferInsert, "id" | "userId">
-    organization?: Omit<typeof organization.$inferInsert, "id">
+    organization?: Omit<typeof organization.$inferInsert, "id"> | true
   },
 ) {
   const newUser = await db
@@ -66,7 +66,12 @@ export async function createUser(
   }
 
   if (options?.organization) {
-    await createOrganization(options.organization, { ownerId: newUser.id })
+    await createOrganization(
+      typeof options.organization !== "boolean"
+        ? options.organization
+        : undefined,
+      { ownerId: newUser.id },
+    )
   }
 
   await sendEmailVerificationCode(newUser)
@@ -76,7 +81,10 @@ export async function createUser(
 
 export async function createAdmin(
   values: Omit<typeof user.$inferInsert, "id" | "role">,
-  options?: { profile?: Omit<typeof profile.$inferInsert, "id" | "userId"> },
+  options?: {
+    profile?: Omit<typeof profile.$inferInsert, "id" | "userId">
+    organization?: Omit<typeof organization.$inferInsert, "id"> | true
+  },
 ) {
   const newUser = await db
     .insert(user)
@@ -88,6 +96,15 @@ export async function createAdmin(
     await createProfile(newUser.id, options.profile)
   }
 
+  if (options?.organization) {
+    await createOrganization(
+      typeof options.organization !== "boolean"
+        ? options.organization
+        : undefined,
+      { ownerId: newUser.id },
+    )
+  }
+
   return newUser
 }
 
@@ -95,7 +112,7 @@ export async function findOrCreateUserFromCode(
   values: Pick<typeof user.$inferInsert, "email">,
   options?: {
     profile?: Omit<typeof profile.$inferInsert, "id" | "userId">
-    organization?: Omit<typeof organization.$inferInsert, "id">
+    organization?: Omit<typeof organization.$inferInsert, "id"> | true
   },
 ) {
   const existingUser = await findUserByEmail(values.email)
@@ -121,7 +138,12 @@ export async function findOrCreateUserFromCode(
   }
 
   if (options?.organization) {
-    await createOrganization(options.organization, { ownerId: newUser.id })
+    await createOrganization(
+      typeof options.organization !== "boolean"
+        ? options.organization
+        : undefined,
+      { ownerId: newUser.id },
+    )
   }
 
   await deleteEmailVerificationCode(newUser.id)
@@ -136,7 +158,7 @@ export async function createUserFromGoogle(
   >,
   options?: {
     profile?: Omit<typeof profile.$inferInsert, "id" | "userId">
-    organization?: Omit<typeof organization.$inferInsert, "id">
+    organization?: Omit<typeof organization.$inferInsert, "id"> | true
   },
 ) {
   const newUser = await db
@@ -154,7 +176,12 @@ export async function createUserFromGoogle(
   }
 
   if (options?.organization) {
-    await createOrganization(options.organization, { ownerId: newUser.id })
+    await createOrganization(
+      typeof options.organization !== "boolean"
+        ? options.organization
+        : undefined,
+      { ownerId: newUser.id },
+    )
   }
 
   await deleteEmailVerificationCode(newUser.id)
@@ -166,7 +193,7 @@ export async function createUserFromGitHub(
   values: Pick<typeof user.$inferInsert, "email" | "githubId">,
   options?: {
     profile?: Omit<typeof profile.$inferInsert, "id" | "userId">
-    organization?: Omit<typeof organization.$inferInsert, "id">
+    organization?: Omit<typeof organization.$inferInsert, "id"> | true
   },
 ) {
   const newUser = await db
@@ -184,7 +211,12 @@ export async function createUserFromGitHub(
   }
 
   if (options?.organization) {
-    await createOrganization(options.organization, { ownerId: newUser.id })
+    await createOrganization(
+      typeof options.organization !== "boolean"
+        ? options.organization
+        : undefined,
+      { ownerId: newUser.id },
+    )
   }
 
   await deleteEmailVerificationCode(newUser.id)

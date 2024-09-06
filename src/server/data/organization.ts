@@ -18,14 +18,16 @@ import { TimeSpan, createDate } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
 
 export async function createOrganization(
-  values: Omit<typeof organization.$inferInsert, "id">,
+  values: Omit<typeof organization.$inferInsert, "id"> = {
+    name: "Personal Workspace",
+  },
   options?: {
     ownerId?: User["id"]
   },
 ): Promise<Organization> {
   const newOrganization = await db
     .insert(organization)
-    .values({ ...values, name: values.name ?? "Personal Workspace" })
+    .values(values)
     .returning()
     .get()
 

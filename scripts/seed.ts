@@ -1,7 +1,16 @@
 import db, { user, profile, organization, account, password } from "@/server/db"
-import { cancel, isCancel, log, outro, select, spinner } from "@clack/prompts"
+import {
+  cancel,
+  isCancel,
+  log,
+  outro,
+  select,
+  spinner,
+  text,
+} from "@clack/prompts"
 import { faker } from "@faker-js/faker"
 import { hash } from "@node-rs/argon2"
+import { z } from "zod"
 
 const s = spinner()
 
@@ -19,76 +28,89 @@ if (!confirmation || isCancel(confirmation)) {
   process.exit(0)
 }
 
+const userCountInput = await text({
+  message: "How many users do you want to create?",
+  initialValue: "3",
+  validate: (value) => {
+    const result = z.coerce.number().min(1).safeParse(value)
+
+    if (result.success) return
+
+    return "Please enter a number"
+  },
+})
+
 s.start("Seeding database...")
 
 await db.transaction(async (tx) => {
+  const userCount = Number.parseInt(userCountInput.toString(), 10)
+
   log.info("Starting transaction...")
   // Create users with profiles
-  const [user1, user2, user3] = await tx
+  const users = await tx
     .insert(user)
-    .values([
-      { email: faker.internet.email(), role: "admin" },
-      { email: faker.internet.email(), role: "user" },
-      { email: faker.internet.email(), role: "user" },
-    ])
+    .values(
+      Array.from({ length: userCount }).map(() => ({
+        email: faker.internet.email(),
+        role: faker.helpers.arrayElement(["admin", "user"]),
+      })),
+    )
     .returning()
 
-  if (!user1 || !user2 || !user3) {
+  if (users.length !== userCount) {
     throw new Error("Failed to create users")
   }
 
   log.success("Created users")
 
-  await tx.insert(profile).values([
-    {
-      userId: user1.id,
+  await tx.insert(profile).values(
+    users.map((user): typeof profile.$inferInsert => ({
+      userId: user.id,
       name: faker.person.fullName(),
       preferredLocale: faker.helpers.arrayElement(["en", "es"]),
-    },
-    {
-      userId: user2.id,
-      name: faker.person.fullName(),
-      preferredLocale: faker.helpers.arrayElement(["en", "es"]),
-    },
-    {
-      userId: user3.id,
-      name: faker.person.fullName(),
-      preferredLocale: faker.helpers.arrayElement(["en", "es"]),
-    },
-  ])
+      avatarUrl: faker.image.avatar(),
+    })),
+  )
 
   log.success("Created profiles")
 
   // Create passwords
   const hashedPassword = await hash("password123")
-  await tx.insert(password).values([
-    { userId: user1.id, hash: hashedPassword },
-    { userId: user2.id, hash: hashedPassword },
-    { userId: user3.id, hash: hashedPassword },
-  ])
+  await tx
+    .insert(password)
+    .values(
+      users.map((user): typeof password.$inferInsert => ({
+        userId: user.id,
+        hash: hashedPassword,
+      })),
+    )
 
   log.success("Created passwords")
 
   // Create organizations
-  const [org1, org2] = await tx
+  const [org1, org2, org3] = await tx
     .insert(organization)
-    .values([{ name: faker.company.name() }, { name: faker.company.name() }])
+    .values([
+      { name: faker.company.name() },
+      { name: faker.company.name() },
+      { name: faker.company.name() },
+    ])
     .returning()
 
-  if (!org1 || !org2) {
+  if (!org1 || !org2 || !org3) {
     throw new Error("Failed to create organizations")
   }
 
   s.message("Created organizations")
 
   // Create accounts (organization memberships)
-  await tx.insert(account).values([
-    { userId: user1.id, organizationId: org1.id, role: "owner" },
-    { userId: user2.id, organizationId: org1.id, role: "member" },
-    { userId: user3.id, organizationId: org1.id, role: "admin" },
-    { userId: user2.id, organizationId: org2.id, role: "owner" },
-    { userId: user3.id, organizationId: org2.id, role: "member" },
-  ])
+  await tx.insert(account).values(
+    users.map((user): typeof account.$inferInsert => ({
+      userId: user.id,
+      organizationId: faker.helpers.arrayElement([org1.id, org2.id, org3.id]),
+      role: faker.helpers.arrayElement(["owner", "member", "admin"]),
+    })),
+  )
 
   s.message("Created accounts")
 })

@@ -82,6 +82,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           avatarUrl: googleUser.picture,
           preferredLocale: googleUser.locale,
         },
+        organization: true,
       },
     )
 

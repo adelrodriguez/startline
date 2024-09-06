@@ -77,7 +77,7 @@ export async function signUp(_: unknown, formData: FormData) {
 
   const newUser = await createUser(
     { email: submission.value.email },
-    { organization: { name: "Personal Workspace" } },
+    { organization: true },
   )
 
   await createPassword(newUser.id, submission.value.password)
@@ -201,10 +201,7 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
   cookies().set(VERIFICATION_EMAIL_COOKIE_NAME, "")
 
   // If the user already exists, we just update their emailVerifiedAt
-  const user = await findOrCreateUserFromCode(
-    { email },
-    { organization: { name: "Personal Workspace" } },
-  )
+  const user = await findOrCreateUserFromCode({ email }, { organization: true })
 
   await setSession(user.id, { ipAddress })
 

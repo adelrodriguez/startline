@@ -57,7 +57,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const user = await createUserFromGitHub(
       { githubId: githubUser.id, email: githubUser.email },
-      { organization: { name: "Personal Workspace" } },
+      { organization: true },
     )
 
     await setSession(user.id)
