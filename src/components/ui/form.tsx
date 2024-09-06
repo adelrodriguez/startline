@@ -62,7 +62,7 @@ const FormSubmit = React.forwardRef<
   Omit<React.ComponentPropsWithoutRef<typeof Button>, "type"> & {
     renderLoading?: React.ReactNode
   }
->(({ className, children, renderLoading, ...props }, ref) => {
+>(({ children, renderLoading, ...props }, ref) => {
   const { pending } = useFormStatus()
 
   return (
