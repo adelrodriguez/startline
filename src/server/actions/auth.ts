@@ -15,6 +15,11 @@ import {
 import env from "@/lib/env.server"
 import rateLimiter from "@/lib/rate-limit"
 import {
+  actionClient,
+  authActionClient,
+  rateLimitByIp,
+} from "@/lib/safe-action"
+import {
   RequestPasswordResetSchema,
   createCheckEmailVerificationCodeSchema,
   createCheckInWithCodeSchema,
@@ -43,6 +48,7 @@ import { getIpAddress } from "@/utils/headers"
 import { parseWithZod } from "@conform-to/zod"
 import { cookies } from "next/headers"
 import { RedirectType, redirect } from "next/navigation"
+import { z } from "zod"
 
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
@@ -194,7 +200,7 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
 
   if (!isValidCode) {
     return submission.reply({
-      formErrors: ["Invalid code"],
+      fieldErrors: { code: ["Invalid code"] },
     })
   }
 
@@ -206,20 +212,6 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
   await setSession(user.id, { ipAddress })
 
   redirect(AUTHORIZED_URL)
-}
-
-export async function resendSignInCode(email: string) {
-  if (!env.AUTH_SIGN_IN_CODES) {
-    throw new Error("Sign-in codes are disabled")
-  }
-
-  const limit = await rateLimiter.unknown.limit(email)
-
-  if (!limit.success) {
-    throw new RateLimitError("Too many requests")
-  }
-
-  await sendSignInCode(email)
 }
 
 export async function checkEmailVerificationCode(
@@ -258,24 +250,6 @@ export async function checkEmailVerificationCode(
   }
 
   await redirect(AUTHORIZED_URL)
-}
-
-export async function resendEmailVerificationCode() {
-  const { user } = await validateRequest()
-
-  if (!user) {
-    return redirect(UNAUTHORIZED_URL)
-  }
-
-  // Even though the user is already logged in, we technically don't know them
-  // since they haven't verified their email yet
-  const limit = await rateLimiter.unknown.limit(user.email)
-
-  if (!limit.success) {
-    throw new RateLimitError("Too many requests")
-  }
-
-  await sendEmailVerificationCode(user)
 }
 
 export async function requestPasswordReset(_: unknown, formData: FormData) {
@@ -344,14 +318,21 @@ export async function resetPassword(_: unknown, formData: FormData) {
   redirect(AUTHORIZED_URL, RedirectType.replace)
 }
 
-export async function signOut() {
-  const { session } = await validateRequest()
-
-  if (!session) {
-    return redirect(UNAUTHORIZED_URL)
-  }
-
-  await invalidateSession(session)
+export const signOut = authActionClient.action(async ({ ctx }) => {
+  await invalidateSession(ctx.session)
 
   redirect(UNAUTHORIZED_URL)
-}
+})
+
+export const resendSignInCode = actionClient
+  .use(rateLimitByIp)
+  .schema(z.object({ email: z.string().email() }))
+  .action(async ({ parsedInput }) => {
+    await sendSignInCode(parsedInput.email)
+  })
+
+export const resendEmailVerificationCode = authActionClient
+  .use(rateLimitByIp)
+  .action(async ({ ctx }) => {
+    await sendEmailVerificationCode(ctx.user)
+  })

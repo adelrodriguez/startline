@@ -1,4 +1,5 @@
 import Providers from "@/components/providers"
+import { Toaster } from "@/components/ui/sonner"
 import type { Locale } from "@/lib/consts"
 import env from "@/lib/env.client"
 import { fileRouter } from "@/services/uploadthing"
@@ -42,6 +43,7 @@ export default function RootLayout({
           )}
         >
           <PostHogTrackPageview />
+          <Toaster />
           {children}
         </body>
       </Providers>

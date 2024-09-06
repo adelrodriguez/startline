@@ -12,12 +12,15 @@ import {
   InputOTPSlot,
 } from "@/components/ui"
 import { createCheckInWithCodeSchema } from "@/lib/validation"
-import { checkSignInCode, resendSignInCode } from "@/server/actions"
+import { checkSignInCode, resendSignInCode } from "@/server/actions/auth"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
+import { Loader2Icon } from "lucide-react"
+import { useAction } from "next-safe-action/hooks"
 import { type ElementRef, useRef } from "react"
 import { useFormState } from "react-dom"
+import { toast } from "sonner"
 
 export default function CheckSignInCodeForm({ email }: { email: string }) {
   const formRef = useRef<ElementRef<typeof Form>>(null)
@@ -27,8 +30,8 @@ export default function CheckSignInCodeForm({ email }: { email: string }) {
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: createCheckInWithCodeSchema() })
     },
-    shouldValidate: "onBlur",
-    shouldRevalidate: "onInput",
+    shouldValidate: "onSubmit",
+    shouldRevalidate: "onBlur",
   })
 
   return (
@@ -55,13 +58,39 @@ export default function CheckSignInCodeForm({ email }: { email: string }) {
           </InputOTPGroup>
         </InputOTP>
       </FormItem>
-      <Button onClick={() => resendSignInCode(email)} variant="link">
-        Resend code
-      </Button>
+      <ResendCodeButton email={email} />
       <FormMessage id={fields.code.errorId}>{fields.code.errors}</FormMessage>
-      <FormSubmit className="w-full" renderLoading={<>Sending...</>}>
+      <FormSubmit
+        className="w-full"
+        renderLoading={
+          <>
+            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+            Verifying...
+          </>
+        }
+      >
         Verify
       </FormSubmit>
     </Form>
+  )
+}
+
+function ResendCodeButton({ email }: { email: string }) {
+  const { execute } = useAction(resendSignInCode, {
+    onExecute() {
+      toast.loading("Sending code...", { id: "resend-code" })
+    },
+    onSuccess() {
+      toast.success("Code sent", { id: "resend-code" })
+    },
+    onError(error) {
+      toast.error(error.error.serverError)
+    },
+  })
+
+  return (
+    <Button onClick={() => execute({ email })} variant="link">
+      Resend code
+    </Button>
   )
 }

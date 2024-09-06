@@ -9,13 +9,11 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  FormSubmit,
   TypographySmall,
 } from "@/components/ui"
-import { signOut } from "@/server/actions"
 import { getCurrentUser, getFirstOrganization } from "@/server/loader"
-import { Loader2Icon } from "lucide-react"
 import InviteMemberForm from "./_components/invite-member-form"
+import SignOutButton from "./_components/sign-out-button"
 
 export default async function Page() {
   const user = await getCurrentUser()
@@ -50,23 +48,7 @@ export default async function Page() {
             <AdminOnly>
               <TypographySmall>Only admins can see this</TypographySmall>
             </AdminOnly>
-            <form action={signOut}>
-              <FormSubmit
-                variant="outline"
-                className="w-full"
-                renderLoading={
-                  <>
-                    <Loader2Icon
-                      name="loader-circle"
-                      className="mr-2 h-4 w-4 animate-spin"
-                    />
-                    Signing out...
-                  </>
-                }
-              >
-                Sign out
-              </FormSubmit>
-            </form>
+            <SignOutButton />
           </CardFooter>
         </Card>
       </div>
