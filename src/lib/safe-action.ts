@@ -5,17 +5,17 @@
 // For forms, we use the Conform library, which provides form validation both on
 // server and client plus handling form state.
 
-import { validateRequest } from "@/lib/auth"
-import { FALLBACK_IP, UNAUTHORIZED_URL } from "@/lib/consts"
-import rateLimiter from "@/lib/rate-limit"
-import { AuthError, RateLimitError } from "@/utils/error"
-import { getIpAddress } from "@/utils/headers"
 import {
   DEFAULT_SERVER_ERROR_MESSAGE,
   createMiddleware,
   createSafeActionClient,
 } from "next-safe-action"
 import { redirect } from "next/navigation"
+import { validateRequest } from "~/lib/auth"
+import { FALLBACK_IP, UNAUTHORIZED_URL } from "~/lib/consts"
+import rateLimiter from "~/lib/rate-limit"
+import { AuthError, RateLimitError } from "~/utils/error"
+import { getIpAddress } from "~/utils/headers"
 export const actionClient = createSafeActionClient({
   handleServerError(e) {
     console.error(e)

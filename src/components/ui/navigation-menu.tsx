@@ -3,7 +3,7 @@ import { cva } from "class-variance-authority"
 import { ChevronDownIcon } from "lucide-react"
 import * as React from "react"
 
-import { cn } from "@/utils/ui"
+import { cn } from "~/utils/ui"
 
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,

@@ -1,7 +1,7 @@
-import qstash from "@/services/qstash"
-import { buildUrl } from "@/utils/url"
 import type { CreateScheduleRequest } from "@upstash/qstash"
 import chalk from "chalk"
+import qstash from "~/services/qstash"
+import { buildUrl } from "~/utils/url"
 
 const schedules = qstash.schedules
 

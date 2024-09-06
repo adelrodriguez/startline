@@ -5,8 +5,8 @@ import db, {
   type WebhookEvent,
   webhookEvent,
   helpers,
-} from "@/server/db"
-import type { StrictOmit } from "@/utils/type"
+} from "~/server/db"
+import type { StrictOmit } from "~/utils/type"
 
 export async function findWebhookEventByExternalId(
   externalId: WebhookEvent["externalId"],

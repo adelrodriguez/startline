@@ -1,5 +1,5 @@
-import { getCurrentUser } from "@/server/loader"
 import { redirect } from "next/navigation"
+import { getCurrentUser } from "~/server/loader"
 
 export default async function Layout({
   children,

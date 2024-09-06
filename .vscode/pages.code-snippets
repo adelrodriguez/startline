@@ -6,7 +6,7 @@
   "layout": {
     "prefix": "/layout",
     "body": [
-      "import { getCurrentUser } from \"@/server/loader\"",
+      "import { getCurrentUser } from \"~/server/loader\"",
       "import { redirect } from \"next/navigation\"",
       "",
       "export default async function Layout({",

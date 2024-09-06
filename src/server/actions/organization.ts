@@ -1,15 +1,15 @@
 "use server"
 
-import { validateRequest } from "@/lib/auth"
-import { InviteMemberSchema } from "@/lib/validation"
+import { parseWithZod } from "@conform-to/zod"
+import { validateRequest } from "~/lib/auth"
+import { InviteMemberSchema } from "~/lib/validation"
 import {
   assertIsOrganizationMember,
   createOrganizationId,
   createOrganizationInvitation,
   createUserId,
-} from "@/server/data"
-import { AuthError } from "@/utils/error"
-import { parseWithZod } from "@conform-to/zod"
+} from "~/server/data"
+import { AuthError } from "~/utils/error"
 
 export async function inviteMember(_: unknown, formData: FormData) {
   const submission = parseWithZod(formData, {

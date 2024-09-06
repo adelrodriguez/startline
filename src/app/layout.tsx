@@ -1,17 +1,17 @@
-import Providers from "@/components/providers"
-import { Toaster } from "@/components/ui/sonner"
-import type { Locale } from "@/lib/consts"
-import env from "@/lib/env.client"
-import { fileRouter } from "@/services/uploadthing"
-import { fonts } from "@/utils/fonts"
-import { cn } from "@/utils/ui"
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin"
 import type { Metadata } from "next"
 import PlausibleProvider from "next-plausible"
 import dynamic from "next/dynamic"
 import { extractRouterConfig } from "uploadthing/server"
+import Providers from "~/components/providers"
+import { Toaster } from "~/components/ui/sonner"
+import type { Locale } from "~/lib/consts"
+import env from "~/lib/env.client"
+import { fileRouter } from "~/services/uploadthing"
+import { fonts } from "~/utils/fonts"
+import { cn } from "~/utils/ui"
 
-import "@/styles/tailwind.css"
+import "~/styles/tailwind.css"
 
 export const metadata: Metadata = {
   title: "Startline",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 }
 
 const PostHogTrackPageview = dynamic(
-  () => import("@/components/analytics/posthog-track-pageview"),
+  () => import("~/components/analytics/posthog-track-pageview"),
   {
     ssr: false,
   },

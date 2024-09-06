@@ -1,13 +1,13 @@
 import "server-only"
 
-import { validateRequest } from "@/lib/auth"
-import rateLimiter from "@/lib/rate-limit"
 import {
   type FileRouter as UploadThingFileRouter,
   createUploadthing,
 } from "uploadthing/next"
 import { UploadThingError } from "uploadthing/server"
 import { UTApi } from "uploadthing/server"
+import { validateRequest } from "~/lib/auth"
+import rateLimiter from "~/lib/rate-limit"
 
 export const utapi = new UTApi()
 

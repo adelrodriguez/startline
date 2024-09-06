@@ -1,5 +1,7 @@
-import { validateRequest } from "@/lib/auth"
-import { UNAUTHORIZED_URL } from "@/lib/consts"
+import { redirect } from "next/navigation"
+import { cache } from "react"
+import { validateRequest } from "~/lib/auth"
+import { UNAUTHORIZED_URL } from "~/lib/consts"
 import {
   createOrganizationId,
   createUserId,
@@ -7,11 +9,9 @@ import {
   findOrganizationById,
   findOrganizationInvitationByToken,
   findUserById,
-} from "@/server/data"
-import { throwUnless } from "@/utils/assert"
-import { OrganizationError, OrganizationInvitationError } from "@/utils/error"
-import { redirect } from "next/navigation"
-import { cache } from "react"
+} from "~/server/data"
+import { throwUnless } from "~/utils/assert"
+import { OrganizationError, OrganizationInvitationError } from "~/utils/error"
 
 export const getCurrentUser = cache(async () => {
   const { user: authUser } = await validateRequest()

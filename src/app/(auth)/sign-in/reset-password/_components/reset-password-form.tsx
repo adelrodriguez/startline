@@ -1,12 +1,12 @@
 "use client"
 
-import { Form, FormItem, FormSubmit, Input, Label } from "@/components/ui"
-import { RequestPasswordResetSchema } from "@/lib/validation"
-import { requestPasswordReset } from "@/server/actions/auth"
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { Loader2Icon } from "lucide-react"
 import { useFormState } from "react-dom"
+import { Form, FormItem, FormSubmit, Input, Label } from "~/components/ui"
+import { RequestPasswordResetSchema } from "~/lib/validation"
+import { requestPasswordReset } from "~/server/actions/auth"
 
 export default function ResetPasswordForm() {
   const [lastResult, action] = useFormState(requestPasswordReset, undefined)

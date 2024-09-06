@@ -1,7 +1,9 @@
 import "server-only"
 
-import { OrganizationInvitationEmail } from "@/components/emails"
-import { sendEmail } from "@/lib/emails"
+import { TimeSpan, createDate } from "oslo"
+import { alphabet, generateRandomString } from "oslo/crypto"
+import { OrganizationInvitationEmail } from "~/components/emails"
+import { sendEmail } from "~/lib/emails"
 import db, {
   type Account,
   type Organization,
@@ -13,11 +15,9 @@ import db, {
   organization,
   organizationInvitation,
   user,
-} from "@/server/db"
-import { OrganizationError } from "@/utils/error"
-import type { StrictOmit } from "@/utils/type"
-import { TimeSpan, createDate } from "oslo"
-import { alphabet, generateRandomString } from "oslo/crypto"
+} from "~/server/db"
+import { OrganizationError } from "~/utils/error"
+import type { StrictOmit } from "~/utils/type"
 
 export function createOrganizationId(id: Organization["id"]) {
   return id as OrganizationId

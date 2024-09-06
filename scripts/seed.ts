@@ -1,4 +1,3 @@
-import db, { user, profile, organization, account, password } from "@/server/db"
 import {
   cancel,
   isCancel,
@@ -11,6 +10,7 @@ import {
 import { faker } from "@faker-js/faker"
 import { hash } from "@node-rs/argon2"
 import { z } from "zod"
+import db, { user, profile, organization, account, password } from "~/server/db"
 
 const s = spinner()
 

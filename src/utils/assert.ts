@@ -1,4 +1,4 @@
-import { AssertionError } from "@/utils/error"
+import { AssertionError } from "~/utils/error"
 
 /**
  * Throws an assertion error if the condition is false. This is useful if you

@@ -1,5 +1,5 @@
-import { buildUrl } from "@/utils/url"
 import type { MetadataRoute } from "next"
+import { buildUrl } from "~/utils/url"
 
 export default function robots(): MetadataRoute.Robots {
   return {

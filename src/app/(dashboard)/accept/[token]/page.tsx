@@ -1,4 +1,5 @@
-import { Button } from "@/components/ui/button"
+import { CheckCircle, XCircle } from "lucide-react"
+import { Button } from "~/components/ui/button"
 import {
   Card,
   CardContent,
@@ -6,9 +7,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { getOrganizationFromInvitation } from "@/server/loader"
-import { CheckCircle, XCircle } from "lucide-react"
+} from "~/components/ui/card"
+import { getOrganizationFromInvitation } from "~/server/loader"
 
 export default async function Page({ params }: { params: { token: string } }) {
   const organization = await getOrganizationFromInvitation(params.token)

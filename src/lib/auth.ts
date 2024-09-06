@@ -1,16 +1,16 @@
 import "server-only"
 
-import env from "@/lib/env.server"
-import { isProduction } from "@/lib/vars"
-import db, { type User, type UserRole } from "@/server/db"
-import { session, user } from "@/server/db"
-import { buildUrl } from "@/utils/url"
 import { DrizzleSQLiteAdapter } from "@lucia-auth/adapter-drizzle"
 import { GitHub, Google } from "arctic"
 import { Lucia } from "lucia"
 import type { User as AuthUser, Session } from "lucia"
 import { cookies } from "next/headers"
 import { cache } from "react"
+import env from "~/lib/env.server"
+import { isProduction } from "~/lib/vars"
+import db, { type User, type UserRole } from "~/server/db"
+import { session, user } from "~/server/db"
+import { buildUrl } from "~/utils/url"
 
 const adapter = new DrizzleSQLiteAdapter(db, session, user)
 

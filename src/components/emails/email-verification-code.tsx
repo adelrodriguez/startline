@@ -1,4 +1,3 @@
-import { APP_NAME } from "@/lib/consts"
 import {
   Body,
   Head,
@@ -9,6 +8,7 @@ import {
   Text,
 } from "@react-email/components"
 import { Fragment } from "react"
+import { APP_NAME } from "~/lib/consts"
 
 export default function SignInCodeEmail({ code }: { code: string }) {
   return (

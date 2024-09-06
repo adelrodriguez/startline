@@ -1,5 +1,5 @@
-import { until } from "@/utils/until"
 import { describe, expect, it } from "vitest"
+import { until } from "~/utils/until"
 
 describe("until", () => {
   it("should return [result, null] for a successful promise", async () => {

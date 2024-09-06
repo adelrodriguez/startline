@@ -1,5 +1,5 @@
-import db, { profile, type UserId } from "@/server/db"
-import type { StrictOmit } from "@/utils/type"
+import db, { profile, type UserId } from "~/server/db"
+import type { StrictOmit } from "~/utils/type"
 
 export async function createProfile(
   userId: UserId,

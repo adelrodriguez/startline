@@ -1,6 +1,6 @@
-import { validateRequest } from "@/lib/auth"
-import { AUTHORIZED_URL } from "@/lib/consts"
 import { redirect } from "next/navigation"
+import { validateRequest } from "~/lib/auth"
+import { AUTHORIZED_URL } from "~/lib/consts"
 
 export default async function Layout({
   children,

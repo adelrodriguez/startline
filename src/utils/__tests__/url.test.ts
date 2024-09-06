@@ -1,5 +1,5 @@
-import { buildBaseUrl, buildUrl } from "@/utils/url"
 import { describe, expect, test } from "vitest"
+import { buildBaseUrl, buildUrl } from "~/utils/url"
 
 describe("buildBaseUrl", () => {
   test("builds a base url with the correct protocol", () => {

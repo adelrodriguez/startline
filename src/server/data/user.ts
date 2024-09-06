@@ -7,8 +7,8 @@ import db, {
   type organization,
   type profile,
   user,
-} from "@/server/db"
-import type { StrictOmit } from "@/utils/type"
+} from "~/server/db"
+import type { StrictOmit } from "~/utils/type"
 import {
   deleteEmailVerificationCode,
   sendEmailVerificationCode,

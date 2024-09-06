@@ -1,5 +1,5 @@
-import { PostHogIdentifyUser } from "@/components/analytics"
-import { getCurrentUser } from "@/server/loader"
+import { PostHogIdentifyUser } from "~/components/analytics"
+import { getCurrentUser } from "~/server/loader"
 
 export default async function Layout({
   children,

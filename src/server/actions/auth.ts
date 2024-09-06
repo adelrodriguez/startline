@@ -1,24 +1,28 @@
 "use server"
 
+import { parseWithZod } from "@conform-to/zod"
+import { cookies } from "next/headers"
+import { RedirectType, redirect } from "next/navigation"
+import { z } from "zod"
 import {
   invalidateAllSessions,
   invalidateSession,
   setSession,
   validateRequest,
-} from "@/lib/auth"
+} from "~/lib/auth"
 import {
   AUTHORIZED_URL,
   FALLBACK_IP,
   RESET_PASSWORD_URL,
   UNAUTHORIZED_URL,
-} from "@/lib/consts"
-import env from "@/lib/env.server"
-import rateLimiter from "@/lib/rate-limit"
+} from "~/lib/consts"
+import env from "~/lib/env.server"
+import rateLimiter from "~/lib/rate-limit"
 import {
   actionClient,
   authActionClient,
   rateLimitByIp,
-} from "@/lib/safe-action"
+} from "~/lib/safe-action"
 import {
   RequestPasswordResetSchema,
   createCheckEmailVerificationCodeSchema,
@@ -27,8 +31,8 @@ import {
   createSignInWithCodeSchema,
   createSignInWithPasswordSchema,
   createSignUpSchema,
-} from "@/lib/validation"
-import { isProduction } from "@/lib/vars"
+} from "~/lib/validation"
+import { isProduction } from "~/lib/vars"
 import {
   createPassword,
   createUser,
@@ -43,13 +47,9 @@ import {
   verifyEmailVerificationCode,
   verifyPassword,
   verifySignInCode,
-} from "@/server/data"
-import { PasswordResetError, RateLimitError } from "@/utils/error"
-import { getIpAddress } from "@/utils/headers"
-import { parseWithZod } from "@conform-to/zod"
-import { cookies } from "next/headers"
-import { RedirectType, redirect } from "next/navigation"
-import { z } from "zod"
+} from "~/server/data"
+import { PasswordResetError, RateLimitError } from "~/utils/error"
+import { getIpAddress } from "~/utils/headers"
 
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 

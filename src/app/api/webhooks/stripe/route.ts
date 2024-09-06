@@ -1,10 +1,10 @@
-import env from "@/lib/env.server"
-import { enqueueJob } from "@/lib/jobs"
-import { createWebhookEvent, findWebhookEventByExternalId } from "@/server/data"
-import stripe from "@/services/stripe"
 import chalk from "chalk"
 import { StatusCodes } from "http-status-codes"
 import { type NextRequest, NextResponse } from "next/server"
+import env from "~/lib/env.server"
+import { enqueueJob } from "~/lib/jobs"
+import { createWebhookEvent, findWebhookEventByExternalId } from "~/server/data"
+import stripe from "~/services/stripe"
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const signature = req.headers.get("stripe-signature")

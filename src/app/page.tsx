@@ -1,4 +1,6 @@
-import { SignedIn, SignedOut } from "@/components/auth"
+import { RabbitIcon } from "lucide-react"
+import Link from "next/link"
+import { SignedIn, SignedOut } from "~/components/auth"
 import {
   Button,
   Tooltip,
@@ -6,9 +8,7 @@ import {
   TooltipTrigger,
   TypographyH1,
   TypographyLead,
-} from "@/components/ui"
-import { RabbitIcon } from "lucide-react"
-import Link from "next/link"
+} from "~/components/ui"
 
 export default function Page() {
   return (

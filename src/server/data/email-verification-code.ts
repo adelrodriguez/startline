@@ -1,11 +1,11 @@
 import "server-only"
 
-import { EmailVerificationCodeEmail } from "@/components/emails"
-import { sendEmail } from "@/lib/emails"
-import db, { type UserId, emailVerificationCode, filters } from "@/server/db"
-import { hash, verify } from "@/utils/hash"
 import { TimeSpan, createDate } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
+import { EmailVerificationCodeEmail } from "~/components/emails"
+import { sendEmail } from "~/lib/emails"
+import db, { type UserId, emailVerificationCode, filters } from "~/server/db"
+import { hash, verify } from "~/utils/hash"
 import { markUserAsEmailVerified } from "./user"
 
 export async function findValidEmailVerificationCodeByUserId(userId: UserId) {

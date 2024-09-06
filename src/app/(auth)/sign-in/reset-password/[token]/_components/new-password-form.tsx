@@ -1,5 +1,9 @@
 "use client"
 
+import { getFormProps, getInputProps, useForm } from "@conform-to/react"
+import { parseWithZod } from "@conform-to/zod"
+import { Loader2Icon } from "lucide-react"
+import { useFormState } from "react-dom"
 import {
   Form,
   FormItem,
@@ -7,13 +11,9 @@ import {
   FormSubmit,
   Input,
   Label,
-} from "@/components/ui"
-import { createNewPasswordSchema } from "@/lib/validation"
-import { resetPassword } from "@/server/actions/auth"
-import { getFormProps, getInputProps, useForm } from "@conform-to/react"
-import { parseWithZod } from "@conform-to/zod"
-import { Loader2Icon } from "lucide-react"
-import { useFormState } from "react-dom"
+} from "~/components/ui"
+import { createNewPasswordSchema } from "~/lib/validation"
+import { resetPassword } from "~/server/actions/auth"
 
 export default function NewPasswordForm({ token }: { token: string }) {
   const [lastResult, action] = useFormState(resetPassword, undefined)

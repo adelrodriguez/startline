@@ -30,7 +30,7 @@ Error Handling and Validation:
 - Prioritize error handling: handle errors and edge cases early
 - Use early returns and guard clauses
 - Implement proper error logging and user-friendly messages
-- Use Zod for form validation. Add the schemas to the `@/lib/validation` folder.
+- Use Zod for form validation. Add the schemas to the `~/lib/validation` folder.
 - Return errors from Server Actions to be handled by the UI. Map the errors to the fields.
 - Use error boundaries for unexpected errors
 
@@ -38,7 +38,7 @@ UI and Styling:
 
 - Use Shadcn UI, Radix, and Tailwind Aria for components and styling
 - Implement responsive design with Tailwind CSS; use a mobile-first approach
-- Use the `cn` helper function inside `@/utils/ui` for class name composition
+- Use the `cn` helper function inside `~/utils/ui` for class name composition
 
 Performance Optimization:
 

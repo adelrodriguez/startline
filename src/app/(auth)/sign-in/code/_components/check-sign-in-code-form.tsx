@@ -1,5 +1,13 @@
 "use client"
 
+import { getFormProps, getInputProps, useForm } from "@conform-to/react"
+import { parseWithZod } from "@conform-to/zod"
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
+import { Loader2Icon } from "lucide-react"
+import { useAction } from "next-safe-action/hooks"
+import { type ElementRef, useRef } from "react"
+import { useFormState } from "react-dom"
+import { toast } from "sonner"
 import {
   Button,
   Form,
@@ -10,17 +18,9 @@ import {
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "@/components/ui"
-import { createCheckInWithCodeSchema } from "@/lib/validation"
-import { checkSignInCode, resendSignInCode } from "@/server/actions/auth"
-import { getFormProps, getInputProps, useForm } from "@conform-to/react"
-import { parseWithZod } from "@conform-to/zod"
-import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
-import { Loader2Icon } from "lucide-react"
-import { useAction } from "next-safe-action/hooks"
-import { type ElementRef, useRef } from "react"
-import { useFormState } from "react-dom"
-import { toast } from "sonner"
+} from "~/components/ui"
+import { createCheckInWithCodeSchema } from "~/lib/validation"
+import { checkSignInCode, resendSignInCode } from "~/server/actions/auth"
 
 export default function CheckSignInCodeForm({ email }: { email: string }) {
   const formRef = useRef<ElementRef<typeof Form>>(null)

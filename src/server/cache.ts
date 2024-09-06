@@ -1,6 +1,6 @@
 import "server-only"
 
-import env from "@/lib/env.server"
+import env from "~/lib/env.server"
 
 import { Redis } from "@upstash/redis"
 

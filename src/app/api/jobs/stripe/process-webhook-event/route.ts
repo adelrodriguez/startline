@@ -1,9 +1,9 @@
-import env from "@/lib/env.server"
-import { parseJobRequest } from "@/lib/jobs"
-import { markWebhookEventAsProcessed } from "@/server/data"
-import { StripeError } from "@/utils/error"
 import { verifySignatureAppRouter } from "@upstash/qstash/nextjs"
 import { type NextRequest, NextResponse } from "next/server"
+import env from "~/lib/env.server"
+import { parseJobRequest } from "~/lib/jobs"
+import { markWebhookEventAsProcessed } from "~/server/data"
+import { StripeError } from "~/utils/error"
 
 async function handler(request: NextRequest) {
   const { stripeEvent, eventId } = await parseJobRequest(

@@ -1,5 +1,5 @@
-import { nextIntlMiddleware } from "@/server/middlewares"
 import type { MiddlewareConfig } from "next/server"
+import { nextIntlMiddleware } from "~/server/middlewares"
 
 export const middleware = nextIntlMiddleware
 

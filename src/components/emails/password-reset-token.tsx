@@ -1,5 +1,3 @@
-import { APP_NAME, RESET_PASSWORD_URL } from "@/lib/consts"
-import { buildUrl } from "@/utils/url"
 import {
   Body,
   Head,
@@ -10,6 +8,8 @@ import {
   Tailwind,
 } from "@react-email/components"
 import { Fragment } from "react"
+import { APP_NAME, RESET_PASSWORD_URL } from "~/lib/consts"
+import { buildUrl } from "~/utils/url"
 
 export default function PasswordResetTokenEmail({ token }: { token: string }) {
   return (

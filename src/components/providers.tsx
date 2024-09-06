@@ -1,9 +1,9 @@
 "use client"
 
-import { TooltipProvider } from "@/components/ui"
-import env from "@/lib/env.client"
 import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
+import { TooltipProvider } from "~/components/ui"
+import env from "~/lib/env.client"
 
 if (typeof window !== "undefined") {
   posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {

@@ -1,11 +1,11 @@
 import "server-only"
 
-import { PasswordResetTokenEmail } from "@/components/emails"
-import { sendEmail } from "@/lib/emails"
-import db, { type UserId, filters, passwordResetToken } from "@/server/db"
-import { hash } from "@/utils/hash"
 import { generateIdFromEntropySize } from "lucia"
 import { TimeSpan, createDate } from "oslo"
+import { PasswordResetTokenEmail } from "~/components/emails"
+import { sendEmail } from "~/lib/emails"
+import db, { type UserId, filters, passwordResetToken } from "~/server/db"
+import { hash } from "~/utils/hash"
 import { markUserAsEmailVerified } from "./user"
 
 export async function findValidPasswordResetToken(input: string) {

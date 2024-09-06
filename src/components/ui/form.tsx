@@ -1,9 +1,9 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { cn } from "@/utils/ui"
 import * as React from "react"
 import { useFormStatus } from "react-dom"
+import { Button } from "~/components/ui/button"
+import { cn } from "~/utils/ui"
 
 const Form = React.forwardRef<
   HTMLFormElement,

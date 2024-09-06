@@ -1,7 +1,7 @@
 import "server-only"
 
-import db, { type UserId, password } from "@/server/db"
 import { hash, verify } from "@node-rs/argon2"
+import db, { type UserId, password } from "~/server/db"
 
 export async function createPassword(userId: UserId, input: string) {
   const hashedPassword = await hash(input)

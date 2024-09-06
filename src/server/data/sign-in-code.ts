@@ -1,11 +1,11 @@
 import "server-only"
 
-import { SignInCodeEmail } from "@/components/emails"
-import { sendEmail } from "@/lib/emails"
-import db, { filters, signInCode } from "@/server/db"
-import { hash, verify } from "@/utils/hash"
 import { TimeSpan, createDate } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
+import { SignInCodeEmail } from "~/components/emails"
+import { sendEmail } from "~/lib/emails"
+import db, { filters, signInCode } from "~/server/db"
+import { hash, verify } from "~/utils/hash"
 
 export async function sendSignInCode(email: string) {
   // Delete old codes

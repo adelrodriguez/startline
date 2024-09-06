@@ -1,11 +1,11 @@
-import { google, setSession } from "@/lib/auth"
-import { AUTHORIZED_URL } from "@/lib/consts"
-import { GoogleUserSchema } from "@/lib/validation"
-import { createUserFromGoogle, findUserByGoogleId } from "@/server/data"
 import { OAuth2RequestError } from "arctic"
 import { StatusCodes } from "http-status-codes"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
+import { google, setSession } from "~/lib/auth"
+import { AUTHORIZED_URL } from "~/lib/consts"
+import { GoogleUserSchema } from "~/lib/validation"
+import { createUserFromGoogle, findUserByGoogleId } from "~/server/data"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url)

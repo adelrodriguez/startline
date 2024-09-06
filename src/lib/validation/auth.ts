@@ -1,7 +1,7 @@
-import { LOCALES, type Locale } from "@/lib/consts"
 import type { Intent } from "@conform-to/react"
 import { conformZodMessage } from "@conform-to/zod"
 import { z } from "zod"
+import { LOCALES, type Locale } from "~/lib/consts"
 
 const PasswordSchema = z
   .string({ required_error: "Password is required" })

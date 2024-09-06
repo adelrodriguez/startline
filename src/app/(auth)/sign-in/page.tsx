@@ -1,3 +1,4 @@
+import Link from "next/link"
 import {
   Button,
   Card,
@@ -5,8 +6,7 @@ import {
   CardHeader,
   CardTitle,
   Separator,
-} from "@/components/ui"
-import Link from "next/link"
+} from "~/components/ui"
 import SignInWithCodeForm from "./_components/sign-in-with-code-form"
 import SignInWithPasswordForm from "./_components/sign-in-with-password-form"
 

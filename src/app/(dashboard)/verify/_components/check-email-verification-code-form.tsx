@@ -1,5 +1,10 @@
 "use client"
 
+import { getFormProps, getInputProps, useForm } from "@conform-to/react"
+import { parseWithZod } from "@conform-to/zod"
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
+import { type ElementRef, useRef } from "react"
+import { useFormState } from "react-dom"
 import {
   Button,
   Form,
@@ -10,17 +15,12 @@ import {
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "@/components/ui"
-import { createCheckEmailVerificationCodeSchema } from "@/lib/validation"
+} from "~/components/ui"
+import { createCheckEmailVerificationCodeSchema } from "~/lib/validation"
 import {
   checkEmailVerificationCode,
   resendEmailVerificationCode,
-} from "@/server/actions/auth"
-import { getFormProps, getInputProps, useForm } from "@conform-to/react"
-import { parseWithZod } from "@conform-to/zod"
-import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
-import { type ElementRef, useRef } from "react"
-import { useFormState } from "react-dom"
+} from "~/server/actions/auth"
 
 export default function CheckEmailVerificationCodeForm() {
   const formRef = useRef<ElementRef<typeof Form>>(null)

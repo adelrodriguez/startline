@@ -1,5 +1,5 @@
-import { generateSlug } from "@/utils/slug"
 import { describe, expect, test } from "vitest"
+import { generateSlug } from "~/utils/slug"
 
 describe("generateSlug", () => {
   test("generates a basic slug", () => {

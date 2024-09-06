@@ -1,5 +1,6 @@
-import { cn } from "@/utils/ui"
 import React from "react"
+
+import { cn } from "~/utils/ui"
 
 const TypographyH1 = React.forwardRef<
   React.ElementRef<"h1">,

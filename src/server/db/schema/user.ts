@@ -1,6 +1,6 @@
-import { DEFAULT_LOCALE, LOCALES } from "@/lib/consts"
-import type { Branded } from "@/utils/type"
 import { integer, primaryKey, text } from "drizzle-orm/sqlite-core"
+import { DEFAULT_LOCALE, LOCALES } from "~/lib/consts"
+import type { Branded } from "~/utils/type"
 import { CURRENT_TIMESTAMP, createTable } from "./helpers"
 
 export const user = createTable("user", {

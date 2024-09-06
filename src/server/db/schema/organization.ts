@@ -1,5 +1,5 @@
-import type { Branded } from "@/utils/type"
 import { integer, primaryKey, text } from "drizzle-orm/sqlite-core"
+import type { Branded } from "~/utils/type"
 import { CURRENT_TIMESTAMP, createTable } from "./helpers"
 import { user } from "./user"
 

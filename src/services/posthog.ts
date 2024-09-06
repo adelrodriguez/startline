@@ -1,5 +1,5 @@
-import env from "@/lib/env.client"
 import { PostHog } from "posthog-node"
+import env from "~/lib/env.client"
 
 export function getPostHog() {
   return new PostHog(env.NEXT_PUBLIC_POSTHOG_KEY, {

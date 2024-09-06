@@ -1,3 +1,5 @@
+import Link from "next/link"
+import { redirect } from "next/navigation"
 import {
   Button,
   Card,
@@ -5,10 +7,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui"
-import { RESET_PASSWORD_URL } from "@/lib/consts"
-import Link from "next/link"
-import { redirect } from "next/navigation"
+} from "~/components/ui"
+import { RESET_PASSWORD_URL } from "~/lib/consts"
 
 export default function Page({
   searchParams: { to },

@@ -1,5 +1,3 @@
-import { ACCEPT_INVITATION_URL, APP_NAME } from "@/lib/consts"
-import { buildUrl } from "@/utils/url"
 import {
   Body,
   Head,
@@ -11,6 +9,8 @@ import {
   Text,
 } from "@react-email/components"
 import { Fragment } from "react"
+import { ACCEPT_INVITATION_URL, APP_NAME } from "~/lib/consts"
+import { buildUrl } from "~/utils/url"
 
 export default function OrganizationInvitationEmail({
   organizationName,
