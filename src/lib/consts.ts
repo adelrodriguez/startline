@@ -9,6 +9,17 @@ export const UNAUTHORIZED_URL = "/sign-in"
 export const RESET_PASSWORD_URL = "/sign-in/reset-password"
 export const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
+// Storage
+export const StorageBuckets = {
+  MAIN: "startline-main",
+  IMAGES: "startline-images",
+} as const
+export type StorageBucket = (typeof StorageBuckets)[keyof typeof StorageBuckets]
+export const STORAGE_BUCKETS = [
+  StorageBuckets.MAIN,
+  StorageBuckets.IMAGES,
+] as const
+
 // i18n
 export const Locales = {
   EN: "en",

@@ -88,3 +88,9 @@ export class RateLimitError extends CustomError {
     super("RateLimitError", message, cause)
   }
 }
+
+export class UploadError extends CustomError {
+  constructor(message: string, cause?: Error) {
+    super("UploadError", message, cause)
+  }
+}

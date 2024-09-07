@@ -1,3 +1,4 @@
+export * from "./asset"
 export * from "./email-verification-code"
 export * from "./organization"
 export * from "./password-reset-token"

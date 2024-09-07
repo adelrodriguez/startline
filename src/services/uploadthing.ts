@@ -1,5 +1,3 @@
-import "server-only"
-
 import {
   type FileRouter as UploadThingFileRouter,
   createUploadthing,
@@ -8,6 +6,7 @@ import { UploadThingError } from "uploadthing/server"
 import { UTApi } from "uploadthing/server"
 import { validateRequest } from "~/lib/auth"
 import rateLimiter from "~/lib/rate-limit"
+import { RateLimitError } from "~/utils/error"
 
 export const utapi = new UTApi()
 
@@ -24,7 +23,7 @@ export const fileRouter = {
       const limit = await rateLimiter.user.limit(user.email)
 
       if (!limit.success) {
-        throw new UploadThingError("Rate limit exceeded")
+        throw new RateLimitError("Rate limit exceeded")
       }
 
       return { userId: user.id }

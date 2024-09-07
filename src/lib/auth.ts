@@ -2,9 +2,11 @@ import "server-only"
 
 import { DrizzleSQLiteAdapter } from "@lucia-auth/adapter-drizzle"
 import { GitHub, Google } from "arctic"
+import { StatusCodes } from "http-status-codes"
 import { Lucia } from "lucia"
 import type { User as AuthUser, Session } from "lucia"
 import { cookies } from "next/headers"
+import { type NextRequest, NextResponse } from "next/server"
 import { cache } from "react"
 import env from "~/lib/env.server"
 import { isProduction } from "~/lib/vars"
@@ -105,6 +107,28 @@ export const validateRequest = cache(
     return result
   },
 )
+
+type ProtectedRouteHandler = (
+  request: NextRequest,
+  user: AuthUser,
+  params: Record<string, string> | undefined,
+) => Promise<NextResponse> | NextResponse
+
+export function protectedRoute(handler: ProtectedRouteHandler) {
+  return async (request: NextRequest, params?: Record<string, string>) => {
+    const { user, session } = await validateRequest()
+
+    if (!session) {
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: StatusCodes.UNAUTHORIZED },
+      )
+    }
+
+    return handler(request, user, params)
+  }
+}
+
 export type { AuthUser }
 
 export const google = new Google(

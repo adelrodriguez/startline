@@ -32,6 +32,12 @@ export default createEnv({
     // Resend
     RESEND_API_KEY: z.string(),
 
+    // S3
+    S3_ACCESS_KEY: z.string(),
+    S3_SECRET: z.string(),
+    S3_ENDPOINT: z.string(),
+    S3_REGION: z.string().default("auto"),
+
     // Sentry
     SENTRY_DSN: z.string(),
     SENTRY_ORG: z.string(),

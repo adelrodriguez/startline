@@ -1,48 +1,54 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, test } from "vitest"
 import { until } from "~/utils/until"
 
 describe("until", () => {
-  it("should return [result, null] for a successful promise", async () => {
+  test("should return [null, result] for a successful promise", async () => {
     const successPromise = async () => "success"
-    const [result, error] = await until(successPromise)
+    const [error, result] = await until(successPromise)
 
-    expect(result).toBe("success")
     expect(error).toBeNull()
+    expect(result).toBe("success")
   })
 
-  it("should return [null, error] for a rejected promise", async () => {
+  test("should return [error, null] for a rejected promise", async () => {
     const failurePromise = async () => {
       throw new Error("failure")
     }
-    const [result, error] = await until(failurePromise)
+    const [error, result] = await until(failurePromise)
 
-    expect(result).toBeNull()
     expect(error).toBeInstanceOf(Error)
-    expect(error?.message).toBe("failure")
+    expect(result).toBeNull()
+    if (error instanceof Error) {
+      expect(error.message).toBe("failure")
+    } else {
+      throw new Error("Expected error to be an instance of Error")
+    }
   })
 
-  it("should work with different return types", async () => {
+  test("should work with different return types", async () => {
     const numberPromise = async () => 42
-    const [result, error] = await until(numberPromise)
+    const [error, result] = await until(numberPromise)
 
+    expect(error).toBeNull()
     expect(result).toBe(42)
-    expect(error).toBeNull()
   })
 
-  it("should handle async functions with parameters", async () => {
+  test("should handle async functions with parameters", async () => {
     const paramPromise = async (x: number, y: number) => x + y
-    const [result, error] = await until(() => paramPromise(2, 3))
+    const [error, result] = await until(() => paramPromise(2, 3))
 
-    expect(result).toBe(5)
     expect(error).toBeNull()
+    expect(result).toBe(5)
   })
 
-  it("should handle promises that resolve after a delay", async () => {
+  test("should handle promises that resolve after a delay", async () => {
     const delayedPromise = () =>
-      new Promise((resolve) => setTimeout(() => resolve("delayed"), 100))
-    const [result, error] = await until(delayedPromise)
+      new Promise<string>((resolve) =>
+        setTimeout(() => resolve("delayed"), 100),
+      )
+    const [error, result] = await until(delayedPromise)
 
-    expect(result).toBe("delayed")
     expect(error).toBeNull()
+    expect(result).toBe("delayed")
   })
 })

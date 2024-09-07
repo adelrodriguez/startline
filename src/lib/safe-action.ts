@@ -11,7 +11,7 @@ import {
   createSafeActionClient,
 } from "next-safe-action"
 import { redirect } from "next/navigation"
-import { validateRequest } from "~/lib/auth"
+import { type AuthUser, validateRequest } from "~/lib/auth"
 import { FALLBACK_IP, UNAUTHORIZED_URL } from "~/lib/consts"
 import rateLimiter from "~/lib/rate-limit"
 import { AuthError, RateLimitError } from "~/utils/error"
@@ -55,3 +55,15 @@ export const rateLimitByIp = createMiddleware().define(
     return next({ ctx })
   },
 )
+
+export const rateLimitByUser = createMiddleware<{
+  ctx: { user: AuthUser }
+}>().define(async ({ next, ctx }) => {
+  const limit = await rateLimiter.user.limit(ctx.user.email)
+
+  if (!limit.success) {
+    throw new RateLimitError("Rate limit exceeded")
+  }
+
+  return next({ ctx })
+})

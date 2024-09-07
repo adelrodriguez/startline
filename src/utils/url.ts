@@ -30,6 +30,10 @@ export function buildUrl<T extends string>(
   return stringUrl
 }
 
+export function buildAssetUrl(key: string) {
+  return `https://${env.NEXT_PUBLIC_ASSETS_DOMAIN}/${key}`
+}
+
 export function buildAuthPathname<T extends string>(pathname: T) {
   return `${AUTHORIZED_URL}/${pathname}` as const
 }
