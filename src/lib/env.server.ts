@@ -1,6 +1,7 @@
 import { vercel } from "@t3-oss/env-core/presets"
 import { createEnv } from "@t3-oss/env-nextjs"
 import { z } from "zod"
+import { environment, isProduction } from "~/lib/vars"
 
 export default createEnv({
   server: {
@@ -45,7 +46,15 @@ export default createEnv({
     SENTRY_AUTH_TOKEN: z.string(),
 
     // Stripe
-    STRIPE_SECRET_KEY: z.string(),
+    STRIPE_SECRET_KEY: z
+      .string()
+      .refine(
+        (v) =>
+          isProduction ? v.startsWith("sk_live") : v.startsWith("sk_test"),
+        `Must start with ${isProduction ? "sk_live" : "sk_test"} in ${
+          environment
+        }`,
+      ),
     STRIPE_WEBHOOK_SECRET: z.string(),
 
     // Turso
