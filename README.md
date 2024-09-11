@@ -84,6 +84,6 @@ Total: $100.92/month
 
 Not taking into account usage-based pricing, this is $1,211.04/year. This can get you _very_ far, since you can share the services between all your projects.
 
-I understand this stack might not be for everyone. Maybe you're very price-sensitive. Maybe you like to self-host your own services and hate all the SaaS-glue. Maybe you just don't like serverless. That's fine. This stack isn't for you.
+But it is expensive. You can run a VPS for much cheaper. Maybe you like to self-host your own services and hate all the SaaS-glue. Maybe you just don't like serverless. That's fine. This stack isn't for you. I wouldn't recommend this stack unless you are actually aiming to build a SaaS where usage correlates with paying customers. If you build something for free and traffic spikes, if you don't have spend limits set... then yeah, you'll get rekt'd.
 
-I am planning to create something that can easily be hosted on a VPS and has much less dependencies. Expect that in the future.
+I am planning on building a cheaper, more traditional, VPS-based stack in the future which can be used to host fun experiments and side projects without worrying about serverless tax. I'll add it here when it's ready.
