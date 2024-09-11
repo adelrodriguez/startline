@@ -1,7 +1,7 @@
 import { vercel } from "@t3-oss/env-core/presets"
 import { createEnv } from "@t3-oss/env-nextjs"
 import { z } from "zod"
-import { environment, isProduction } from "~/lib/vars"
+import { environment, isProduction } from "./vars"
 
 export default createEnv({
   server: {
