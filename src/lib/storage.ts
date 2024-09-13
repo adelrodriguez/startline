@@ -3,10 +3,10 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { type StorageBucket, StorageBuckets } from "~/lib/consts"
 import type { UserId } from "~/server/db"
 import s3 from "~/services/s3"
-import { encode } from "~/utils/obfuscator"
+import { obfuscate } from "~/utils/obfuscator"
 
 export function generateKey(userId: UserId, filename: string): string {
-  return `${encode(userId)}/${sanitizeKey(filename)}`
+  return `${obfuscate(userId)}/${sanitizeKey(filename)}`
 }
 
 export function sanitizeKey(key: string): string {
