@@ -1,6 +1,5 @@
 import "server-only"
 import { render } from "@react-email/render"
-import chalk from "chalk"
 import type { ReactElement } from "react"
 import env from "~/lib/env.server"
 import resend from "~/services/resend"
@@ -15,10 +14,12 @@ export async function sendEmail(
   if (env.MOCK_RESEND) {
     const content = await render(body, { plainText: true })
 
-    console.info(chalk.bold.italic.blue("MOCKING EMAIL SEND"))
-    console.info(chalk.bold.blue("Sending email to"), chalk.italic.white(email))
-    console.info("Email content:")
-    console.info(chalk.italic(content))
+    console.info("===> MOCKING EMAIL SEND")
+    console.info("===> Sending email to", email)
+    console.info("===> Email content:")
+    console.info("----------------------------------------")
+    console.info(content)
+    console.info("----------------------------------------")
 
     return
   }

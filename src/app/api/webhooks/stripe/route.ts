@@ -1,4 +1,3 @@
-import chalk from "chalk"
 import { StatusCodes } from "http-status-codes"
 import { type NextRequest, NextResponse } from "next/server"
 import env from "~/lib/env.server"
@@ -26,7 +25,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const processedWebhookEvent = await findWebhookEventByExternalId(event.id)
 
   if (processedWebhookEvent?.processedAt) {
-    console.info(chalk.blue("Webhook event already processed"))
+    console.info("Webhook event already processed")
 
     return NextResponse.json(
       {

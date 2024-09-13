@@ -1,7 +1,7 @@
 import type { CreateScheduleRequest } from "@upstash/qstash"
-import chalk from "chalk"
 import qstash from "~/services/qstash"
 import { buildUrl } from "~/utils/url"
+import { intro, outro, log, spinner } from "@clack/prompts"
 
 const schedules = qstash.schedules
 
@@ -21,7 +21,14 @@ const endpoints: CreateScheduleRequest[] = [
   { destination: buildScheduleUrl("clean-sign-in-codes"), cron: "0 0 * * *" },
 ]
 
+intro("Creating schedules")
+
+const s = spinner()
+s.start("Fetching existing schedules")
+
 const existingSchedules = await schedules.list()
+
+s.stop("Existing schedules fetched")
 
 for (const endpoint of endpoints) {
   if (
@@ -29,9 +36,13 @@ for (const endpoint of endpoints) {
       (schedule) => schedule.destination === endpoint.destination,
     )
   ) {
-    console.log(chalk.yellow("Schedule already exists:"), endpoint.destination)
+    log.warn(`Schedule already exists: ${endpoint.destination}`)
     continue
   }
 
+  s.start(`Creating schedule for ${endpoint.destination}`)
   await schedules.create(endpoint)
+  s.stop(`Schedule created for ${endpoint.destination}`)
 }
+
+outro("All schedules created successfully")
