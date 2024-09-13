@@ -27,7 +27,7 @@
     "docker:down": "docker-compose down",
     "docker:up": "docker-compose up -d",
     "format": "biome format --write src",
-    "lint": "biome lint --fix src",
+    "lint": "biome lint --fix --unsafe src",
     "start": "next start",
     "template:clean": "bun scripts/clean.ts",
     "template:email": "bun scripts/dev-email.ts",
