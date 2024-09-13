@@ -1,5 +1,6 @@
 "use client"
 
+import { ThemeProvider } from "next-themes"
 import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
 import { TooltipProvider } from "~/components/ui"
@@ -20,7 +21,14 @@ export default function Providers({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <PostHogProvider client={posthog}>
-      <TooltipProvider>{children}</TooltipProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <TooltipProvider>{children}</TooltipProvider>
+      </ThemeProvider>
     </PostHogProvider>
   )
 }
