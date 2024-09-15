@@ -65,8 +65,10 @@ const InputOTPSeparator = React.forwardRef<
   React.ElementRef<"div">,
   React.ComponentPropsWithoutRef<"div">
 >(({ ...props }, ref) => (
+  // biome-ignore lint/a11y/useFocusableInteractive: Element is not interactive
   <div
     ref={ref}
+    // biome-ignore lint/a11y/useSemanticElements: Element is not interactive
     role="separator"
     aria-orientation="vertical"
     aria-valuemin={0}
