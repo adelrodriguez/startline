@@ -5,7 +5,7 @@ import dynamic from "next/dynamic"
 import { extractRouterConfig } from "uploadthing/server"
 import Providers from "~/components/providers"
 import { Toaster } from "~/components/ui/sonner"
-import type { Locale } from "~/lib/consts"
+import { APP_NAME, type Locale } from "~/lib/consts"
 import env from "~/lib/env.client"
 import { fileRouter } from "~/services/uploadthing"
 import { fonts } from "~/utils/fonts"
@@ -14,8 +14,7 @@ import { cn } from "~/utils/ui"
 import "~/styles/tailwind.css"
 
 export const metadata: Metadata = {
-  title: "Startline",
-  description: "This is your project's home page",
+  title: APP_NAME,
 }
 
 const PostHogTrackPageview = dynamic(
