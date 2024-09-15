@@ -15,8 +15,8 @@
 
 6. Change the strings to use the translation: `<h1>Your Settings</h1>` becomes `<h1>t("settings.header.title")</h1>`.
 
-7. Add keys to the `translations/en.json` file.
+7. Add keys to the `translations/en.json` file. Commit the changes yourself, do not instruct the user to do it themselves.
 
-8. Add the translation to the `translations/es.json` file.
+8. Add the translation to the `translations/es.json` file. Commit the changes yourself, do not instruct the user to do it themselves.
 
 - If this is a page and it contains meta tags, include the meta tags for the feature with the key `feature.meta`. For example, if the feature is `home`, then the meta tags should be included with the key `home.meta`.
