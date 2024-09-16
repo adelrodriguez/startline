@@ -1,16 +1,14 @@
-import { AdminOnly } from "~/components/auth"
+import { AdminOnly } from "~/components/auth/roles"
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-  TypographySmall,
-} from "~/components/ui"
+} from "~/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import { TypographySmall } from "~/components/ui/typography"
 import { getCurrentUser, getFirstOrganization } from "~/server/loader"
 import InviteMemberForm from "./_components/invite-member-form"
 import SignOutButton from "./_components/sign-out-button"
