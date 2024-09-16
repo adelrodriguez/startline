@@ -14,8 +14,10 @@ import { redirect } from "next/navigation"
 import { type AuthUser, validateRequest } from "~/lib/auth"
 import { FALLBACK_IP, UNAUTHORIZED_URL } from "~/lib/consts"
 import rateLimiter from "~/lib/rate-limit"
+import type { UserId } from "~/server/data/user"
 import { AuthError, RateLimitError } from "~/utils/error"
 import { getIpAddress } from "~/utils/headers"
+
 export const actionClient = createSafeActionClient({
   handleServerError(e) {
     console.error(e)
@@ -42,7 +44,7 @@ export const authActionClient = actionClient.use(async ({ next }) => {
   return next({ ctx: { session, user } })
 })
 
-export const rateLimitByIp = createMiddleware().define(
+export const withRateLimitByIp = createMiddleware().define(
   async ({ next, ctx }) => {
     const ipAddress = getIpAddress() ?? FALLBACK_IP
 
@@ -56,7 +58,7 @@ export const rateLimitByIp = createMiddleware().define(
   },
 )
 
-export const rateLimitByUser = createMiddleware<{
+export const withRateLimitByUser = createMiddleware<{
   ctx: { user: AuthUser }
 }>().define(async ({ next, ctx }) => {
   const limit = await rateLimiter.user.limit(ctx.user.email)
@@ -67,3 +69,9 @@ export const rateLimitByUser = createMiddleware<{
 
   return next({ ctx })
 })
+
+export const withUserId = createMiddleware<{
+  ctx: { user: AuthUser }
+}>().define(async ({ next, ctx }) =>
+  next({ ctx: { userId: ctx.user.id as UserId } }),
+)

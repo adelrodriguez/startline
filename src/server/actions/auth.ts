@@ -21,7 +21,8 @@ import rateLimiter from "~/lib/rate-limit"
 import {
   actionClient,
   authActionClient,
-  rateLimitByIp,
+  withRateLimitByIp,
+  withUserId,
 } from "~/lib/safe-action"
 import {
   RequestPasswordResetSchema,
@@ -333,14 +334,13 @@ export const signOut = authActionClient.action(async ({ ctx }) => {
 })
 
 export const resendSignInCode = actionClient
-  .use(rateLimitByIp)
+  .use(withRateLimitByIp)
   .schema(z.object({ email: z.string().email() }))
   .action(async ({ parsedInput }) => {
     await sendSignInCode(parsedInput.email)
   })
 
 export const resendEmailVerificationCode = authActionClient
-  .use(rateLimitByIp)
-  .action(({ ctx }) =>
-    sendEmailVerificationCode(createUserId(ctx.user.id), ctx.user.email),
-  )
+  .use(withUserId)
+  .use(withRateLimitByIp)
+  .action(({ ctx }) => sendEmailVerificationCode(ctx.userId, ctx.user.email))

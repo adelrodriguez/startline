@@ -1,7 +1,7 @@
 "use server"
 
 import { StorageBuckets } from "~/lib/consts"
-import { authActionClient, rateLimitByUser } from "~/lib/safe-action"
+import { authActionClient, withRateLimitByUser } from "~/lib/safe-action"
 import {
   generateKey,
   getBucketFromMimeType,
@@ -21,7 +21,7 @@ import { buildAssetUrl } from "~/utils/url"
 
 export const uploadFile = authActionClient
   .schema(UploadFileRequestSchema)
-  .use(rateLimitByUser)
+  .use(withRateLimitByUser)
   .action(
     async ({ parsedInput: { filename, mimeType, size }, ctx: { user } }) => {
       const userId = createUserId(user.id)
