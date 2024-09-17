@@ -4,7 +4,7 @@ import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 import { github, setSession } from "~/lib/auth"
 import { AUTHORIZED_URL, DEFAULT_ORGANIZATION_NAME } from "~/lib/consts"
-import { GitHubUserSchema } from "~/lib/validation/auth"
+import { GitHubUserSchema } from "~/lib/validation/external"
 import { createOrganization } from "~/server/data/organization"
 import {
   createProfile,

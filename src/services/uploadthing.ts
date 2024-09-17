@@ -9,7 +9,8 @@ import rateLimiter from "~/lib/rate-limit"
 import { createAsset } from "~/server/data/asset"
 import { UserId } from "~/server/data/user"
 import { RateLimitError } from "~/utils/error"
-import type { MimeType } from "~/lib/consts"
+import type { AssetMimeType } from "~/server/data/asset"
+import { logActivity } from "~/server/data/activity-log"
 
 export const utapi = new UTApi()
 
@@ -17,7 +18,6 @@ const router = createUploadthing()
 
 export const fileRouter = {
   imageUploader: router({ image: { maxFileSize: "4MB" } })
-    // Set permissions and file types for this FileRoute
     .middleware(async ({ req }) => {
       const { user } = await validateRequest()
 
@@ -32,13 +32,18 @@ export const fileRouter = {
       return { userId: UserId.parse(user.id) }
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      await createAsset(metadata.userId, {
-        service: "uploadthing",
-        mimeType: file.type as MimeType,
-        filename: file.name,
-        size: file.size,
-        url: file.url,
-      })
+      await Promise.all([
+        createAsset(metadata.userId, {
+          service: "uploadthing",
+          mimeType: file.type as AssetMimeType,
+          filename: file.name,
+          size: file.size,
+          url: file.url,
+        }),
+        logActivity("created_asset", {
+          userId: metadata.userId,
+        }),
+      ])
 
       return { uploadedBy: metadata.userId }
     }),

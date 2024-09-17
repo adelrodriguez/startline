@@ -12,7 +12,7 @@ import {
   Input,
   Label,
 } from "~/components/ui"
-import { createSignUpSchema } from "~/lib/validation/auth"
+import { createSignUpSchema } from "~/lib/validation/forms"
 import { signUp } from "~/server/actions/auth"
 
 export default function SignUpForm() {

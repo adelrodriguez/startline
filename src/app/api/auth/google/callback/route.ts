@@ -4,7 +4,7 @@ import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 import { google, setSession } from "~/lib/auth"
 import { AUTHORIZED_URL, DEFAULT_ORGANIZATION_NAME } from "~/lib/consts"
-import { GoogleUserSchema } from "~/lib/validation/auth"
+import { GoogleUserSchema } from "~/lib/validation/external"
 import { createOrganization } from "~/server/data"
 import {
   createProfile,

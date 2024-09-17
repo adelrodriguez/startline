@@ -16,7 +16,7 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "~/components/ui"
-import { createCheckEmailVerificationCodeSchema } from "~/lib/validation/auth"
+import { createCheckEmailVerificationCodeSchema } from "~/lib/validation/forms"
 import {
   checkEmailVerificationCode,
   resendEmailVerificationCode,

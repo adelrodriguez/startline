@@ -19,7 +19,7 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "~/components/ui"
-import { createCheckInWithCodeSchema } from "~/lib/validation/auth"
+import { createCheckInWithCodeSchema } from "~/lib/validation/forms"
 import { checkSignInCode, resendSignInCode } from "~/server/actions/auth"
 
 export default function CheckSignInCodeForm({ email }: { email: string }) {

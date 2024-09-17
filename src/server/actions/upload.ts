@@ -14,13 +14,15 @@ import {
 import {
   ConfirmUploadRequestSchema,
   UploadFileRequestSchema,
-} from "~/lib/validation"
+} from "~/lib/validation/upload"
 import {
+  AssetId,
   createAsset,
   markAssetAsUploaded,
-  type AssetId,
+  type AssetMimeType,
 } from "~/server/data/asset"
 import { buildAssetUrl } from "~/utils/url"
+import { logActivity } from "../data/activity-log"
 
 export const uploadFile = authActionClient
   .schema(UploadFileRequestSchema)
@@ -37,17 +39,19 @@ export const uploadFile = authActionClient
       })
 
       const pendingAsset = await createAsset(userId, {
-        bucket: getBucketFromMimeType(mimeType),
+        bucket: getBucketFromMimeType(mimeType as AssetMimeType),
         filename,
-        mimeType,
+        mimeType: mimeType as AssetMimeType,
         service: "r2",
         size,
         url: buildAssetUrl(key),
       })
 
+      await logActivity("created_asset", { userId })
+
       return {
         presignedUrl: url,
-        assetId: pendingAsset.id as AssetId,
+        assetId: AssetId.parse(pendingAsset.id),
       }
     },
   )
@@ -56,7 +60,12 @@ export const confirmUpload = authActionClient
   .schema(ConfirmUploadRequestSchema)
   .use(withUserId)
   .action(async ({ parsedInput: { assetId }, ctx: { userId } }) => {
-    const uploadedAsset = await markAssetAsUploaded(assetId as AssetId, userId)
+    const uploadedAsset = await markAssetAsUploaded(
+      AssetId.parse(assetId),
+      userId,
+    )
+
+    await logActivity("marked_asset_as_uploaded", { userId })
 
     return { url: uploadedAsset.url }
   })

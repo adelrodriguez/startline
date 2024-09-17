@@ -2,13 +2,14 @@
 
 import { parseWithZod } from "@conform-to/zod"
 import { validateRequest } from "~/lib/auth"
-import { InviteMemberSchema } from "~/lib/validation"
+import { InviteMemberSchema } from "~/lib/validation/forms"
 import {
   assertIsOrganizationMember,
   createOrganizationInvitation,
   OrganizationId,
 } from "~/server/data/organization"
 import { UserId } from "~/server/data/user"
+import { logActivity } from "~/server/data/activity-log"
 import { AuthError } from "~/utils/error"
 
 export async function inviteMember(_: unknown, formData: FormData) {
@@ -36,4 +37,9 @@ export async function inviteMember(_: unknown, formData: FormData) {
     submission.value.email,
     submission.value.role,
   )
+
+  await logActivity("invited_member_to_organization", {
+    userId,
+    organizationId,
+  })
 }

@@ -9,7 +9,7 @@ import { Form, FormItem, FormMessage, FormSubmit } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { Button } from "~/components/ui/button"
-import { createSignInWithPasswordSchema } from "~/lib/validation/auth"
+import { createSignInWithPasswordSchema } from "~/lib/validation/forms"
 import { signInWithPassword } from "~/server/actions/auth"
 
 export default function SignInForm() {

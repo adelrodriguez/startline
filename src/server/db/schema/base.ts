@@ -1,5 +1,5 @@
 import { integer, primaryKey, text } from "drizzle-orm/sqlite-core"
-import { DEFAULT_LOCALE, LOCALES, MIME_TYPES } from "~/lib/consts"
+import { DEFAULT_LOCALE, LOCALES } from "~/lib/consts"
 import { CURRENT_TIMESTAMP, createTable } from "./helpers"
 
 export const user = createTable("user", {
@@ -206,7 +206,16 @@ export const asset = createTable("asset", {
   bucket: text("bucket"),
 
   name: text("name"),
-  mimeType: text("mime_type", { enum: MIME_TYPES }).notNull(),
+  mimeType: text("mime_type", {
+    enum: [
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/webp",
+      "text/plain",
+      "application/pdf",
+    ],
+  }).notNull(),
   filename: text("filename").notNull(),
   size: integer("size").notNull(),
 
@@ -216,4 +225,43 @@ export const asset = createTable("asset", {
     .default("pending"),
 
   userId: integer("user_id").references(() => user.id),
+})
+
+export const activityLog = createTable("activity_log", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .default(CURRENT_TIMESTAMP)
+    .notNull(),
+
+  type: text("action", {
+    enum: [
+      "accepted_organization_invitation",
+      "created_asset",
+      "created_organization",
+      "declined_organization_invitation",
+      "deleted_account",
+      "invited_member_to_organization",
+      "removed_organization_member",
+      "requested_email_verification",
+      "requested_password_reset",
+      "requested_sign_in_code",
+      "reset_password",
+      "marked_asset_as_uploaded",
+      "signed_in_with_code",
+      "signed_in_with_github",
+      "signed_in_with_google",
+      "signed_in_with_password",
+      "signed_out",
+      "signed_up_with_code",
+      "signed_up_with_github",
+      "signed_up_with_google",
+      "signed_up_with_password",
+      "verified_email",
+    ],
+  }).notNull(),
+
+  userId: integer("user_id").references(() => user.id),
+  organizationId: integer("organization_id").references(() => organization.id),
+
+  ipAddress: text("ip_address"),
 })

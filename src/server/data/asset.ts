@@ -1,9 +1,13 @@
+import "server-only"
+
 import { z } from "zod"
 import db, { asset, filters } from "~/server/db"
 import type { UserId } from "~/server/data/user"
 
 export type Asset = typeof asset.$inferSelect
 export type NewAsset = typeof asset.$inferInsert
+
+export type AssetMimeType = Asset["mimeType"]
 
 export const AssetId = z.number().brand<"AssetId">()
 export type AssetId = z.infer<typeof AssetId>

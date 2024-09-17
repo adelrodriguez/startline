@@ -33,7 +33,7 @@ import {
   createSignInWithCodeSchema,
   createSignInWithPasswordSchema,
   createSignUpSchema,
-} from "~/lib/validation"
+} from "~/lib/validation/forms"
 import { isProduction } from "~/lib/vars"
 import {
   createPassword,
@@ -53,6 +53,7 @@ import {
 import { PasswordResetError, RateLimitError } from "~/utils/error"
 import { getIpAddress } from "~/utils/headers"
 import { createOrganization } from "~/server/data/organization"
+import { logActivity } from "../data/activity-log"
 
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
@@ -89,13 +90,17 @@ export async function signUp(_: unknown, formData: FormData) {
 
   const userId = UserId.parse(newUser.id)
 
-  await createProfile(userId)
-  await createOrganization(
-    { name: DEFAULT_ORGANIZATION_NAME },
-    { ownerId: userId },
-  )
-  await createPassword(userId, submission.value.password)
-  await sendEmailVerificationCode(userId, newUser.email)
+  await Promise.all([
+    createProfile(userId),
+    createOrganization(
+      { name: DEFAULT_ORGANIZATION_NAME },
+      { ownerId: userId },
+    ),
+    createPassword(userId, submission.value.password),
+    sendEmailVerificationCode(userId, newUser.email),
+    logActivity("signed_up_with_password", { userId }),
+  ])
+
   await setSession(userId, { ipAddress })
 
   redirect(AUTHORIZED_URL)
@@ -143,6 +148,7 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
     })
   }
 
+  await logActivity("signed_in_with_password", { userId })
   await setSession(userId, { ipAddress })
 
   redirect(AUTHORIZED_URL)
@@ -167,7 +173,10 @@ export async function signInWithCode(_: unknown, formData: FormData) {
     throw new RateLimitError("Too many requests")
   }
 
-  await sendSignInCode(submission.value.email)
+  await Promise.all([
+    sendSignInCode(submission.value.email),
+    logActivity("requested_sign_in_code"),
+  ])
 
   cookies().set(VERIFICATION_EMAIL_COOKIE_NAME, submission.value.email, {
     httpOnly: true,
@@ -217,20 +226,26 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
   cookies().set(VERIFICATION_EMAIL_COOKIE_NAME, "")
 
   let user = await findUserByEmail(email)
+  let userId: UserId
 
   if (!user) {
     user = await createUser({ email })
 
-    const userId = UserId.parse(user.id)
+    userId = UserId.parse(user.id)
 
-    await createProfile(userId)
-    await createOrganization(
-      { name: DEFAULT_ORGANIZATION_NAME },
-      { ownerId: userId },
-    )
+    await Promise.all([
+      createProfile(userId),
+      createOrganization(
+        { name: DEFAULT_ORGANIZATION_NAME },
+        { ownerId: userId },
+      ),
+      logActivity("signed_up_with_code", { userId }),
+    ])
+  } else {
+    userId = UserId.parse(user.id)
+
+    await logActivity("signed_in_with_code", { userId })
   }
-
-  const userId = UserId.parse(user.id)
 
   await setSession(userId, { ipAddress })
 
@@ -274,7 +289,9 @@ export async function checkEmailVerificationCode(
     })
   }
 
-  await redirect(AUTHORIZED_URL)
+  await logActivity("verified_email", { userId })
+
+  redirect(AUTHORIZED_URL)
 }
 
 export async function requestPasswordReset(_: unknown, formData: FormData) {
@@ -291,9 +308,6 @@ export async function requestPasswordReset(_: unknown, formData: FormData) {
   const limit = await rateLimiter.unknown.limit(ipAddress)
 
   if (!limit.success) {
-    return submission.reply({
-      formErrors: ["Too many requests"],
-    })
   }
 
   const existingUser = await findUserByEmail(submission.value.email)
@@ -301,7 +315,10 @@ export async function requestPasswordReset(_: unknown, formData: FormData) {
   if (existingUser) {
     const userId = UserId.parse(existingUser.id)
 
-    await sendPasswordResetToken(userId, existingUser.email)
+    await Promise.all([
+      sendPasswordResetToken(userId, existingUser.email),
+      logActivity("requested_password_reset", { userId }),
+    ])
   }
 
   redirect(`${RESET_PASSWORD_URL}/confirm?to=${submission.value.email}`)
@@ -321,9 +338,7 @@ export async function resetPassword(_: unknown, formData: FormData) {
   const limit = await rateLimiter.unknown.limit(ipAddress)
 
   if (!limit.success) {
-    return submission.reply({
-      formErrors: ["Too many requests"],
-    })
+    throw new RateLimitError("Too many requests")
   }
 
   const passwordResetToken = await findValidPasswordResetToken(
@@ -339,28 +354,40 @@ export async function resetPassword(_: unknown, formData: FormData) {
   // Log the user out of all sessions
   await invalidateAllSessions(userId)
 
-  await createPassword(userId, submission.value.password)
-  await markPasswordResetTokenAsUsed(userId)
+  await Promise.all([
+    createPassword(userId, submission.value.password),
+    markPasswordResetTokenAsUsed(userId),
+    logActivity("reset_password", { userId }),
+  ])
 
   await setSession(userId, { ipAddress })
 
   redirect(AUTHORIZED_URL, RedirectType.replace)
 }
 
-export const signOut = authActionClient.action(async ({ ctx }) => {
-  await invalidateSession(ctx.session)
-
-  redirect(UNAUTHORIZED_URL)
-})
+export const signOut = authActionClient
+  .use(withUserId)
+  .action(async ({ ctx }) => {
+    await logActivity("signed_out", { userId: ctx.userId })
+    await invalidateSession(ctx.session)
+  })
 
 export const resendSignInCode = actionClient
   .use(withRateLimitByIp)
   .schema(z.object({ email: z.string().email() }))
   .action(async ({ parsedInput }) => {
-    await sendSignInCode(parsedInput.email)
+    await Promise.all([
+      sendSignInCode(parsedInput.email),
+      logActivity("requested_sign_in_code"),
+    ])
   })
 
 export const resendEmailVerificationCode = authActionClient
   .use(withUserId)
   .use(withRateLimitByIp)
-  .action(({ ctx }) => sendEmailVerificationCode(ctx.userId, ctx.user.email))
+  .action(async ({ ctx }) => {
+    await Promise.all([
+      sendEmailVerificationCode(ctx.userId, ctx.user.email),
+      logActivity("requested_email_verification", { userId: ctx.userId }),
+    ])
+  })

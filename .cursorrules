@@ -6,6 +6,8 @@ Code Style and Structure:
 - Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError)
 - Use descriptive function names with auxiliary verbs (e.g., getUserSettings, setUserSettings, checkIsMobile)
 - Structure files: exported component, subcomponents, helpers, static content, types
+- Use the `~/` alias for imports
+- Avoid circular imports
 
 Naming Conventions:
 

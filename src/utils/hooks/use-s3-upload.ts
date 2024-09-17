@@ -2,24 +2,23 @@ import ky from "ky"
 import { useCallback } from "react"
 import { confirmUpload, uploadFile } from "~/server/actions/upload"
 import { UploadError } from "~/utils/error"
-import type { MimeType } from "~/lib/consts"
+import type { AssetMimeType } from "~/server/data/asset"
 import { throwUnless } from "../assert"
 
 export default function useS3Upload(
   action = uploadFile,
-  mimeTypes: MimeType[] = [],
+  mimeTypes: AssetMimeType[] = [],
 ) {
   const upload = useCallback(
     async (file: File) => {
-      throwUnless(
-        mimeTypes.includes(file.type as MimeType),
-        "Invalid file type",
-      )
+      const mimeType = file.type as AssetMimeType
+
+      throwUnless(mimeTypes.includes(mimeType), "Invalid file type")
 
       const actionResult = await action({
         filename: file.name,
-        mimeType: file.type as MimeType,
         size: file.size,
+        mimeType,
       })
 
       if (!actionResult?.data) {

@@ -22,16 +22,6 @@ export const STORAGE_BUCKETS = [
   StorageBuckets.IMAGES,
 ] as const
 
-export const MIME_TYPES = [
-  "image/png",
-  "image/jpeg",
-  "image/jpg",
-  "image/webp",
-  "text/plain",
-  "application/pdf",
-] as const
-export type MimeType = (typeof MIME_TYPES)[number]
-
 // i18n
 export const Locales = {
   EN: "en",
