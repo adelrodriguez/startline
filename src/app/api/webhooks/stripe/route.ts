@@ -2,7 +2,11 @@ import { StatusCodes } from "http-status-codes"
 import { type NextRequest, NextResponse } from "next/server"
 import env from "~/lib/env.server"
 import { enqueueJob } from "~/lib/jobs"
-import { createWebhookEvent, findWebhookEventByExternalId } from "~/server/data"
+import {
+  createWebhookEvent,
+  findWebhookEventByExternalId,
+  WebhookEventId,
+} from "~/server/data/webhook-event"
 import stripe from "~/services/stripe"
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
@@ -45,7 +49,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   })
 
   await enqueueJob("stripe/process-webhook-event", {
-    eventId: newWebhookEvent.id,
+    webhookEventId: WebhookEventId.parse(newWebhookEvent.id),
     stripeEvent: event,
   })
 

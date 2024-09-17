@@ -1,12 +1,14 @@
 import "server-only"
 
-import db, {
-  filters,
-  type WebhookEvent,
-  webhookEvent,
-  helpers,
-} from "~/server/db"
+import { z } from "zod"
+import db, { filters, webhookEvent, helpers } from "~/server/db"
 import type { StrictOmit } from "~/utils/type"
+
+export type WebhookEvent = typeof webhookEvent.$inferSelect
+export type NewWebhookEvent = typeof webhookEvent.$inferInsert
+
+export const WebhookEventId = z.number().brand<"WebhookEventId">()
+export type WebhookEventId = z.infer<typeof WebhookEventId>
 
 export async function findWebhookEventByExternalId(
   externalId: WebhookEvent["externalId"],
@@ -19,7 +21,7 @@ export async function findWebhookEventByExternalId(
 }
 
 export async function createWebhookEvent(
-  values: StrictOmit<typeof webhookEvent.$inferInsert, "id" | "payload"> & {
+  values: StrictOmit<NewWebhookEvent, "id" | "payload"> & {
     payload: unknown
   },
 ) {
@@ -37,7 +39,7 @@ export async function createWebhookEvent(
     .get()
 }
 
-export async function markWebhookEventAsProcessed(id: WebhookEvent["id"]) {
+export async function markWebhookEventAsProcessed(id: WebhookEventId) {
   return db
     .update(webhookEvent)
     .set({ processedAt: new Date() })

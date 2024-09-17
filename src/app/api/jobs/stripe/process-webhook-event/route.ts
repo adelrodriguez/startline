@@ -6,12 +6,12 @@ import { markWebhookEventAsProcessed } from "~/server/data"
 import { StripeError } from "~/utils/error"
 
 async function handler(request: NextRequest) {
-  const { stripeEvent, eventId } = await parseJobRequest(
+  const { stripeEvent, webhookEventId } = await parseJobRequest(
     "stripe/process-webhook-event",
     request,
   )
 
-  console.log("Received webhook event", eventId, stripeEvent)
+  console.log("Received webhook event", webhookEventId, stripeEvent)
 
   switch (stripeEvent.type) {
     case "customer.subscription.created":
@@ -21,7 +21,7 @@ async function handler(request: NextRequest) {
       throw new StripeError(`Unhandled event type: ${stripeEvent.type}`)
   }
 
-  await markWebhookEventAsProcessed(eventId)
+  await markWebhookEventAsProcessed(webhookEventId)
 
   return NextResponse.json({ success: true })
 }

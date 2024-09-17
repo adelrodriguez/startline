@@ -5,7 +5,7 @@ import { parseWithZod } from "@conform-to/zod"
 import { Loader2Icon } from "lucide-react"
 import { useFormState } from "react-dom"
 import { Form, FormItem, FormSubmit, Input, Label } from "~/components/ui"
-import { createSignInWithCodeSchema } from "~/lib/validation"
+import { createSignInWithCodeSchema } from "~/lib/validation/auth"
 import { signInWithCode } from "~/server/actions/auth"
 
 export default function SignInWithCodeForm() {

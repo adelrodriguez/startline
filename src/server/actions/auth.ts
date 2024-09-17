@@ -15,6 +15,7 @@ import {
   FALLBACK_IP,
   RESET_PASSWORD_URL,
   UNAUTHORIZED_URL,
+  DEFAULT_ORGANIZATION_NAME,
 } from "~/lib/consts"
 import env from "~/lib/env.server"
 import rateLimiter from "~/lib/rate-limit"
@@ -37,8 +38,7 @@ import { isProduction } from "~/lib/vars"
 import {
   createPassword,
   createUser,
-  createUserId,
-  findOrCreateUserFromCode,
+  createProfile,
   findUserByEmail,
   findValidPasswordResetToken,
   markPasswordResetTokenAsUsed,
@@ -48,9 +48,11 @@ import {
   verifyEmailVerificationCode,
   verifyPassword,
   verifySignInCode,
-} from "~/server/data"
+  UserId,
+} from "~/server/data/user"
 import { PasswordResetError, RateLimitError } from "~/utils/error"
 import { getIpAddress } from "~/utils/headers"
+import { createOrganization } from "~/server/data/organization"
 
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
@@ -83,16 +85,18 @@ export async function signUp(_: unknown, formData: FormData) {
     return submission.reply()
   }
 
-  const newUser = await createUser(
-    { email: submission.value.email },
-    { organization: true },
+  const newUser = await createUser({ email: submission.value.email })
+
+  const userId = UserId.parse(newUser.id)
+
+  await createProfile(userId)
+  await createOrganization(
+    { name: DEFAULT_ORGANIZATION_NAME },
+    { ownerId: userId },
   )
-
-  const userId = createUserId(newUser.id)
-
   await createPassword(userId, submission.value.password)
-
-  await setSession(newUser.id, { ipAddress })
+  await sendEmailVerificationCode(userId, newUser.email)
+  await setSession(userId, { ipAddress })
 
   redirect(AUTHORIZED_URL)
 }
@@ -126,8 +130,10 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
     })
   }
 
+  const userId = UserId.parse(existingUser.id)
+
   const isValidPassword = await verifyPassword(
-    createUserId(existingUser.id),
+    userId,
     submission.value.password,
   )
 
@@ -137,7 +143,7 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
     })
   }
 
-  await setSession(existingUser.id, { ipAddress })
+  await setSession(userId, { ipAddress })
 
   redirect(AUTHORIZED_URL)
 }
@@ -210,10 +216,23 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
 
   cookies().set(VERIFICATION_EMAIL_COOKIE_NAME, "")
 
-  // If the user already exists, we just update their emailVerifiedAt
-  const user = await findOrCreateUserFromCode({ email }, { organization: true })
+  let user = await findUserByEmail(email)
 
-  await setSession(user.id, { ipAddress })
+  if (!user) {
+    user = await createUser({ email })
+
+    const userId = UserId.parse(user.id)
+
+    await createProfile(userId)
+    await createOrganization(
+      { name: DEFAULT_ORGANIZATION_NAME },
+      { ownerId: userId },
+    )
+  }
+
+  const userId = UserId.parse(user.id)
+
+  await setSession(userId, { ipAddress })
 
   redirect(AUTHORIZED_URL)
 }
@@ -242,8 +261,10 @@ export async function checkEmailVerificationCode(
     throw new RateLimitError("Too many requests")
   }
 
+  const userId = UserId.parse(user.id)
+
   const isValidCode = await verifyEmailVerificationCode(
-    createUserId(user.id),
+    userId,
     submission.value.code,
   )
 
@@ -278,10 +299,9 @@ export async function requestPasswordReset(_: unknown, formData: FormData) {
   const existingUser = await findUserByEmail(submission.value.email)
 
   if (existingUser) {
-    await sendPasswordResetToken(
-      createUserId(existingUser.id),
-      existingUser.email,
-    )
+    const userId = UserId.parse(existingUser.id)
+
+    await sendPasswordResetToken(userId, existingUser.email)
   }
 
   redirect(`${RESET_PASSWORD_URL}/confirm?to=${submission.value.email}`)
@@ -314,7 +334,7 @@ export async function resetPassword(_: unknown, formData: FormData) {
     throw new PasswordResetError("Your token has expired or is invalid")
   }
 
-  const userId = createUserId(passwordResetToken.userId)
+  const userId = UserId.parse(passwordResetToken.userId)
 
   // Log the user out of all sessions
   await invalidateAllSessions(userId)

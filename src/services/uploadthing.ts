@@ -7,8 +7,9 @@ import { UTApi } from "uploadthing/server"
 import { validateRequest } from "~/lib/auth"
 import rateLimiter from "~/lib/rate-limit"
 import { createAsset } from "~/server/data/asset"
-import { createUserId } from "~/server/data/user"
+import { UserId } from "~/server/data/user"
 import { RateLimitError } from "~/utils/error"
+import type { MimeType } from "~/lib/consts"
 
 export const utapi = new UTApi()
 
@@ -28,12 +29,12 @@ export const fileRouter = {
         throw new RateLimitError("Rate limit exceeded")
       }
 
-      return { userId: createUserId(user.id) }
+      return { userId: UserId.parse(user.id) }
     })
     .onUploadComplete(async ({ metadata, file }) => {
       await createAsset(metadata.userId, {
         service: "uploadthing",
-        mimeType: file.type,
+        mimeType: file.type as MimeType,
         filename: file.name,
         size: file.size,
         url: file.url,

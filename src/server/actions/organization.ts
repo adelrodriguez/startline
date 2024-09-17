@@ -5,10 +5,10 @@ import { validateRequest } from "~/lib/auth"
 import { InviteMemberSchema } from "~/lib/validation"
 import {
   assertIsOrganizationMember,
-  createOrganizationId,
   createOrganizationInvitation,
-  createUserId,
-} from "~/server/data"
+  OrganizationId,
+} from "~/server/data/organization"
+import { UserId } from "~/server/data/user"
 import { AuthError } from "~/utils/error"
 
 export async function inviteMember(_: unknown, formData: FormData) {
@@ -26,8 +26,8 @@ export async function inviteMember(_: unknown, formData: FormData) {
     throw new AuthError("User not found")
   }
 
-  const organizationId = createOrganizationId(submission.value.organizationId)
-  const userId = createUserId(user.id)
+  const organizationId = OrganizationId.parse(submission.value.organizationId)
+  const userId = UserId.parse(user.id)
 
   await assertIsOrganizationMember(organizationId, userId)
 

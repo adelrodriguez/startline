@@ -1,7 +1,7 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { type StorageBucket, StorageBuckets } from "~/lib/consts"
-import type { UserId } from "~/server/db"
+import type { UserId } from "~/server/data/user"
 import s3 from "~/services/s3"
 import { obfuscate } from "~/utils/obfuscator"
 

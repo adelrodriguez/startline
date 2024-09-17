@@ -3,9 +3,16 @@ import { StatusCodes } from "http-status-codes"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 import { google, setSession } from "~/lib/auth"
-import { AUTHORIZED_URL } from "~/lib/consts"
-import { GoogleUserSchema } from "~/lib/validation"
-import { createUserFromGoogle, findUserByGoogleId } from "~/server/data"
+import { AUTHORIZED_URL, DEFAULT_ORGANIZATION_NAME } from "~/lib/consts"
+import { GoogleUserSchema } from "~/lib/validation/auth"
+import { createOrganization } from "~/server/data"
+import {
+  createProfile,
+  createUserFromGoogle,
+  findUserByGoogleId,
+  markUserAsEmailVerified,
+  UserId,
+} from "~/server/data/user"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url)
@@ -53,7 +60,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const existingUser = await findUserByGoogleId(googleUser.sub)
 
     if (existingUser) {
-      await setSession(existingUser.id)
+      const userId = UserId.parse(existingUser.id)
+
+      if (!existingUser.emailVerifiedAt && googleUser.email_verified) {
+        await markUserAsEmailVerified(userId)
+      }
+
+      await setSession(userId)
 
       return new NextResponse(null, {
         status: StatusCodes.MOVED_TEMPORARILY,
@@ -71,22 +84,25 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       })
     }
 
-    const user = await createUserFromGoogle(
-      {
-        googleId: googleUser.sub,
-        email: googleUser.email,
-      },
-      {
-        profile: {
-          name: googleUser.name,
-          avatarUrl: googleUser.picture,
-          preferredLocale: googleUser.locale,
-        },
-        organization: true,
-      },
+    const user = await createUserFromGoogle({
+      googleId: googleUser.sub,
+      email: googleUser.email,
+    })
+
+    const userId = UserId.parse(user.id)
+
+    await createProfile(userId, {
+      name: googleUser.name,
+      avatarUrl: googleUser.picture,
+      preferredLocale: googleUser.locale,
+    })
+
+    await createOrganization(
+      { name: DEFAULT_ORGANIZATION_NAME },
+      { ownerId: userId },
     )
 
-    await setSession(user.id)
+    await setSession(userId)
 
     return new NextResponse(null, {
       status: StatusCodes.MOVED_TEMPORARILY,

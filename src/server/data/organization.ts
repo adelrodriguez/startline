@@ -5,11 +5,6 @@ import { alphabet, generateRandomString } from "oslo/crypto"
 import { OrganizationInvitationEmail } from "~/components/emails"
 import { sendEmail } from "~/lib/emails"
 import db, {
-  type Account,
-  type Organization,
-  type OrganizationId,
-  type OrganizationInvitation,
-  type UserId,
   account,
   filters,
   organization,
@@ -18,13 +13,25 @@ import db, {
 } from "~/server/db"
 import { OrganizationError } from "~/utils/error"
 import type { StrictOmit } from "~/utils/type"
+import { z } from "zod"
+import type { UserId } from "./user"
 
-export function createOrganizationId(id: Organization["id"]) {
-  return id as OrganizationId
-}
+export type Organization = typeof organization.$inferSelect
+export type NewOrganization = typeof organization.$inferInsert
+
+export const OrganizationId = z.number().brand<"OrganizationId">()
+export type OrganizationId = z.infer<typeof OrganizationId>
+
+export type Account = typeof account.$inferSelect
+export type AccountRole = Account["role"]
+export type NewAccount = typeof account.$inferInsert
+
+export type OrganizationInvitation = typeof organizationInvitation.$inferSelect
+export type NewOrganizationInvitation =
+  typeof organizationInvitation.$inferInsert
 
 export async function createOrganization(
-  values: StrictOmit<typeof organization.$inferInsert, "id"> = {
+  values: StrictOmit<NewOrganization, "id"> = {
     name: "Personal Workspace",
   },
   options?: { ownerId?: UserId },
@@ -38,7 +45,7 @@ export async function createOrganization(
   if (options?.ownerId) {
     await createAccount(
       options.ownerId,
-      createOrganizationId(newOrganization.id),
+      newOrganization.id as OrganizationId,
       "owner",
     )
   }
@@ -202,7 +209,7 @@ async function sendOrganizationInvitationEmail(
   invitation: OrganizationInvitation,
 ): Promise<void> {
   const organization = await findOrganizationById(
-    createOrganizationId(invitation.organizationId),
+    invitation.organizationId as OrganizationId,
   )
 
   if (!organization) {

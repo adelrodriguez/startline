@@ -5,7 +5,7 @@ import { parseWithZod } from "@conform-to/zod"
 import { Loader2Icon } from "lucide-react"
 import { useFormState } from "react-dom"
 import { Form, FormItem, FormSubmit, Input, Label } from "~/components/ui"
-import { RequestPasswordResetSchema } from "~/lib/validation"
+import { RequestPasswordResetSchema } from "~/lib/validation/auth"
 import { requestPasswordReset } from "~/server/actions/auth"
 
 export default function ResetPasswordForm() {

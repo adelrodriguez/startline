@@ -1,14 +1,12 @@
-import db, {
-  asset,
-  type Asset,
-  filters,
-  type AssetId,
-  type UserId,
-} from "~/server/db"
+import { z } from "zod"
+import db, { asset, filters } from "~/server/db"
+import type { UserId } from "~/server/data/user"
 
-export function createAssetId(id: number): AssetId {
-  return id as AssetId
-}
+export type Asset = typeof asset.$inferSelect
+export type NewAsset = typeof asset.$inferInsert
+
+export const AssetId = z.number().brand<"AssetId">()
+export type AssetId = z.infer<typeof AssetId>
 
 export async function findAssetById(id: AssetId) {
   return db.select().from(asset).where(filters.eq(asset.id, id))
@@ -16,7 +14,7 @@ export async function findAssetById(id: AssetId) {
 
 export async function createAsset(
   userId: UserId,
-  values: typeof asset.$inferInsert,
+  values: NewAsset,
 ): Promise<Asset> {
   return db
     .insert(asset)

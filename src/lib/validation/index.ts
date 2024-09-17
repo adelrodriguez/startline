@@ -1,29 +1,19 @@
 import { z } from "zod"
+import { OrganizationId } from "~/server/data/organization"
+import { MIME_TYPES } from "~/lib/consts"
 
 export * from "./auth"
+export * from "./jobs"
 
 export const InviteMemberSchema = z.object({
   email: z.string().email(),
   role: z.enum(["member", "admin"]),
-  organizationId: z.number(),
+  organizationId: OrganizationId,
 })
 
 export const UploadFileRequestSchema = z.object({
   filename: z.string(),
-  mimeType: z
-    .string()
-    .refine(
-      (mimeType) =>
-        [
-          "image/png",
-          "image/jpeg",
-          "image/jpg",
-          "image/webp",
-          "text/plain",
-          "application/pdf",
-        ].includes(mimeType),
-      { message: "Invalid file type" },
-    ),
+  mimeType: z.enum(MIME_TYPES, { message: "Invalid file type" }),
   size: z.number(),
 })
 

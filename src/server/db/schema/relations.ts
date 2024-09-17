@@ -1,7 +1,13 @@
 import { relations } from "drizzle-orm"
-import { asset } from "./misc"
-import { account, organization, organizationInvitation } from "./organization"
-import { password, profile, user } from "./user"
+import {
+  account,
+  organization,
+  organizationInvitation,
+  asset,
+  password,
+  profile,
+  user,
+} from "./base"
 
 export const userRelations = relations(user, ({ many, one }) => ({
   password: one(password, {

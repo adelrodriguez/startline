@@ -3,27 +3,19 @@ import "server-only"
 import type { PublishRequest } from "@upstash/qstash"
 import ky from "ky"
 import type { NextRequest } from "next/server"
-import type Stripe from "stripe"
+import type { z } from "zod"
 import env from "~/lib/env.server"
 import qstash from "~/services/qstash"
 import { throwUnless } from "~/utils/assert"
 import { buildUrl } from "~/utils/url"
+import { StripeProcessWebhookEventPayloadSchema } from "~/lib/validation/jobs"
 
-type JobSchemaMap = {
-  "stripe/process-webhook-event": {
-    /**
-     * The webhook event payload.
-     */
-    stripeEvent: Stripe.Event
-    /**
-     * The webhook event ID. Use it to mark the event as processed.
-     */
-    eventId: number
-  }
-}
+const JobSchemaMap = {
+  "stripe/process-webhook-event": StripeProcessWebhookEventPayloadSchema,
+} as const
 
-type JobType = keyof JobSchemaMap
-type JobPayload<T extends JobType> = JobSchemaMap[T]
+type JobType = keyof typeof JobSchemaMap
+type JobPayload<T extends JobType> = z.infer<(typeof JobSchemaMap)[T]>
 
 /**
  * This is a wrapper around the `qstash.publishJSON` function that allows you to
@@ -77,10 +69,12 @@ export function buildJobRequest<T extends JobType>(
 }
 
 export async function parseJobRequest<T extends JobType>(
-  _: T,
+  type: T,
   request: Request | NextRequest,
 ): Promise<JobPayload<T>> {
   const payload = await request.json()
 
-  return payload
+  const parsedPayload = JobSchemaMap[type].parse(payload)
+
+  return parsedPayload
 }

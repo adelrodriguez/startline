@@ -9,6 +9,7 @@ import {
 } from "~/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { TypographySmall } from "~/components/ui/typography"
+import { OrganizationId } from "~/server/data/organization"
 import { getCurrentUser, getFirstOrganization } from "~/server/loader"
 import InviteMemberForm from "./_components/invite-member-form"
 import SignOutButton from "./_components/sign-out-button"
@@ -16,6 +17,7 @@ import SignOutButton from "./_components/sign-out-button"
 export default async function Page() {
   const user = await getCurrentUser()
   const organization = await getFirstOrganization()
+  const organizationId = OrganizationId.parse(organization.id)
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-12 sm:px-8">
@@ -39,7 +41,7 @@ export default async function Page() {
               </div>
             </div>
             <div>
-              <InviteMemberForm organizationId={organization.id} />
+              <InviteMemberForm organizationId={organizationId} />
             </div>
           </CardContent>
           <CardFooter className="flex gap-2">

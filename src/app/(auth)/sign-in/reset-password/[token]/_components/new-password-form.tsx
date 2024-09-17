@@ -12,7 +12,7 @@ import {
   Input,
   Label,
 } from "~/components/ui"
-import { createNewPasswordSchema } from "~/lib/validation"
+import { createNewPasswordSchema } from "~/lib/validation/auth"
 import { resetPassword } from "~/server/actions/auth"
 
 export default function NewPasswordForm({ token }: { token: string }) {

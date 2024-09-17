@@ -1,6 +1,8 @@
 export const APP_NAME = "Startline"
 export const APP_ID = "startline"
 
+export const DEFAULT_ORGANIZATION_NAME = "Personal Workspace"
+
 export const FALLBACK_IP = "127.0.0.1"
 
 // Auth
@@ -19,6 +21,16 @@ export const STORAGE_BUCKETS = [
   StorageBuckets.MAIN,
   StorageBuckets.IMAGES,
 ] as const
+
+export const MIME_TYPES = [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+  "text/plain",
+  "application/pdf",
+] as const
+export type MimeType = (typeof MIME_TYPES)[number]
 
 // i18n
 export const Locales = {

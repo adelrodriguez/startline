@@ -6,10 +6,11 @@ import { useFormState } from "react-dom"
 import { Form, FormItem, FormSubmit, Input, Label } from "~/components/ui"
 import { InviteMemberSchema } from "~/lib/validation"
 import { inviteMember } from "~/server/actions/organization"
+import type { OrganizationId } from "~/server/data/organization"
 
 export default function InviteMemberForm({
   organizationId,
-}: { organizationId: number }) {
+}: { organizationId: OrganizationId }) {
   const [lastResult, action] = useFormState(inviteMember, undefined)
   const [form, fields] = useForm({
     lastResult,

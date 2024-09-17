@@ -1,7 +1,11 @@
 "use server"
 
 import { StorageBuckets } from "~/lib/consts"
-import { authActionClient, withRateLimitByUser } from "~/lib/safe-action"
+import {
+  authActionClient,
+  withRateLimitByUser,
+  withUserId,
+} from "~/lib/safe-action"
 import {
   generateKey,
   getBucketFromMimeType,
@@ -13,18 +17,17 @@ import {
 } from "~/lib/validation"
 import {
   createAsset,
-  createAssetId,
   markAssetAsUploaded,
+  type AssetId,
 } from "~/server/data/asset"
-import { createUserId } from "~/server/data/user"
 import { buildAssetUrl } from "~/utils/url"
 
 export const uploadFile = authActionClient
   .schema(UploadFileRequestSchema)
   .use(withRateLimitByUser)
+  .use(withUserId)
   .action(
-    async ({ parsedInput: { filename, mimeType, size }, ctx: { user } }) => {
-      const userId = createUserId(user.id)
+    async ({ parsedInput: { filename, mimeType, size }, ctx: { userId } }) => {
       const key = generateKey(userId, filename)
 
       const url = await getSignedPutUrl({
@@ -44,18 +47,16 @@ export const uploadFile = authActionClient
 
       return {
         presignedUrl: url,
-        assetId: createAssetId(pendingAsset.id),
+        assetId: pendingAsset.id as AssetId,
       }
     },
   )
 
 export const confirmUpload = authActionClient
   .schema(ConfirmUploadRequestSchema)
-  .action(async ({ parsedInput: { assetId }, ctx: { user } }) => {
-    const uploadedAsset = await markAssetAsUploaded(
-      createAssetId(assetId),
-      createUserId(user.id),
-    )
+  .use(withUserId)
+  .action(async ({ parsedInput: { assetId }, ctx: { userId } }) => {
+    const uploadedAsset = await markAssetAsUploaded(assetId as AssetId, userId)
 
     return { url: uploadedAsset.url }
   })

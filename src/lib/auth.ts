@@ -10,9 +10,9 @@ import { type NextRequest, NextResponse } from "next/server"
 import { cache } from "react"
 import env from "~/lib/env.server"
 import { isProduction } from "~/lib/vars"
-import db, { type User, type UserRole } from "~/server/db"
-import { session, user } from "~/server/db"
+import db, { session, user } from "~/server/db"
 import { buildUrl } from "~/utils/url"
+import type { UserId, UserRole, NewSession } from "~/server/data/user"
 
 const adapter = new DrizzleSQLiteAdapter(db, session, user)
 
@@ -42,8 +42,8 @@ declare module "lucia" {
 }
 
 export async function setSession(
-  userId: User["id"],
-  { ipAddress }: Pick<typeof session.$inferInsert, "ipAddress"> = {},
+  userId: UserId,
+  { ipAddress }: Pick<NewSession, "ipAddress"> = {},
 ) {
   const session = await lucia.createSession(userId, { ipAddress })
   const sessionCookie = await lucia.createSessionCookie(session.id)

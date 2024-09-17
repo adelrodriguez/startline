@@ -2,14 +2,13 @@ import { redirect } from "next/navigation"
 import { cache } from "react"
 import { validateRequest } from "~/lib/auth"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
+import { findUserById, UserId } from "~/server/data/user"
 import {
-  createOrganizationId,
-  createUserId,
   findAccountsByUserId,
   findOrganizationById,
   findOrganizationInvitationByToken,
-  findUserById,
-} from "~/server/data"
+  OrganizationId,
+} from "~/server/data/organization"
 import { throwUnless } from "~/utils/assert"
 import { OrganizationError, OrganizationInvitationError } from "~/utils/error"
 
@@ -20,7 +19,7 @@ export const getCurrentUser = cache(async () => {
     return redirect(UNAUTHORIZED_URL)
   }
 
-  const user = await findUserById(createUserId(authUser.id))
+  const user = await findUserById(UserId.parse(authUser.id))
 
   throwUnless(user !== null, "User does not exist")
 
@@ -30,7 +29,7 @@ export const getCurrentUser = cache(async () => {
 export const getFirstOrganization = cache(async () => {
   const user = await getCurrentUser()
 
-  const accounts = await findAccountsByUserId(createUserId(user.id))
+  const accounts = await findAccountsByUserId(user.id as UserId)
   const firstAccount = accounts[0]
 
   if (!firstAccount) {
@@ -38,7 +37,7 @@ export const getFirstOrganization = cache(async () => {
   }
 
   const organization = await findOrganizationById(
-    createOrganizationId(firstAccount.organizationId),
+    OrganizationId.parse(firstAccount.organizationId),
   )
 
   throwUnless(organization !== null, "Organization does not exist")
@@ -54,7 +53,7 @@ export const getOrganizationFromInvitation = cache(async (token: string) => {
   }
 
   const organization = await findOrganizationById(
-    createOrganizationId(invitation.organizationId),
+    OrganizationId.parse(invitation.organizationId),
   )
 
   throwUnless(organization !== null, "Organization does not exist")

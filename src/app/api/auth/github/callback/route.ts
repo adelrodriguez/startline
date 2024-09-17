@@ -3,9 +3,16 @@ import { StatusCodes } from "http-status-codes"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 import { github, setSession } from "~/lib/auth"
-import { AUTHORIZED_URL } from "~/lib/consts"
-import { GitHubUserSchema } from "~/lib/validation"
-import { createUserFromGitHub, findUserByGitHubId } from "~/server/data"
+import { AUTHORIZED_URL, DEFAULT_ORGANIZATION_NAME } from "~/lib/consts"
+import { GitHubUserSchema } from "~/lib/validation/auth"
+import { createOrganization } from "~/server/data/organization"
+import {
+  createProfile,
+  createUserFromGitHub,
+  findUserByGitHubId,
+  markUserAsEmailVerified,
+  UserId,
+} from "~/server/data/user"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url)
@@ -43,7 +50,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const existingUser = await findUserByGitHubId(githubUser.id)
 
     if (existingUser) {
-      await setSession(existingUser.id)
+      const userId = UserId.parse(existingUser.id)
+
+      if (!existingUser.emailVerifiedAt) {
+        await markUserAsEmailVerified(userId)
+      }
+
+      await setSession(userId)
 
       return new NextResponse(null, {
         status: StatusCodes.MOVED_TEMPORARILY,
@@ -53,14 +66,21 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       })
     }
 
-    // TODO(adelrodriguez): Only create the user if the email is verified
+    const user = await createUserFromGitHub({
+      githubId: githubUser.id,
+      email: githubUser.email,
+    })
 
-    const user = await createUserFromGitHub(
-      { githubId: githubUser.id, email: githubUser.email },
-      { organization: true },
+    const userId = UserId.parse(user.id)
+
+    await createProfile(userId, { name: githubUser.name })
+
+    await createOrganization(
+      { name: DEFAULT_ORGANIZATION_NAME },
+      { ownerId: userId },
     )
 
-    await setSession(user.id)
+    await setSession(userId)
 
     return new NextResponse(null, {
       status: StatusCodes.MOVED_TEMPORARILY,
