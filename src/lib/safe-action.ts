@@ -14,7 +14,7 @@ import { redirect } from "next/navigation"
 import { type AuthUser, validateRequest } from "~/lib/auth"
 import { FALLBACK_IP, UNAUTHORIZED_URL } from "~/lib/consts"
 import rateLimiter from "~/lib/rate-limit"
-import type { UserId } from "~/server/data/user"
+import { UserId } from "~/server/data/user"
 import { AuthError, RateLimitError } from "~/utils/error"
 import { getIpAddress } from "~/utils/headers"
 
@@ -73,5 +73,5 @@ export const withRateLimitByUser = createMiddleware<{
 export const withUserId = createMiddleware<{
   ctx: { user: AuthUser }
 }>().define(async ({ next, ctx }) =>
-  next({ ctx: { userId: ctx.user.id as UserId } }),
+  next({ ctx: { userId: UserId.parse(ctx.user.id) } }),
 )

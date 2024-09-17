@@ -29,7 +29,7 @@ export const getCurrentUser = cache(async () => {
 export const getFirstOrganization = cache(async () => {
   const user = await getCurrentUser()
 
-  const accounts = await findAccountsByUserId(user.id as UserId)
+  const accounts = await findAccountsByUserId(UserId.parse(user.id))
   const firstAccount = accounts[0]
 
   if (!firstAccount) {

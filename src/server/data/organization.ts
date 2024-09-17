@@ -45,7 +45,7 @@ export async function createOrganization(
   if (options?.ownerId) {
     await createAccount(
       options.ownerId,
-      newOrganization.id as OrganizationId,
+      OrganizationId.parse(newOrganization.id),
       "owner",
     )
   }
@@ -209,7 +209,7 @@ async function sendOrganizationInvitationEmail(
   invitation: OrganizationInvitation,
 ): Promise<void> {
   const organization = await findOrganizationById(
-    invitation.organizationId as OrganizationId,
+    OrganizationId.parse(invitation.organizationId),
   )
 
   if (!organization) {
