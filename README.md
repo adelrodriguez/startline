@@ -45,11 +45,10 @@ Startline is an opinionated, batteries-included starter template to build SaaS a
 
 ### ...plus some other stuff to make development a breeze:
 
-- [Bun](https://bun.sh) for the package manager and shell for executing scripts
+- [Bun](https://bun.sh) for the package manager, shell for executing scripts and running tests
 - [Drizzle Kit](https://drizzle.dev/kit) for migrations and studio
 - [Biome](https://biomejs.dev) for formatting and linting
 - [Taze](https://github.com/antfu/taze) for dependency management
-- [Vitest](https://vitest.dev) for testing
 - A Docker Compose file for local development (database and Redis)
 - GitHub Action to keep the template in sync with the latest version of Startline
 
