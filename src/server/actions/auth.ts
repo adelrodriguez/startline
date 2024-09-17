@@ -49,6 +49,7 @@ import {
   verifyPassword,
   verifySignInCode,
   UserId,
+  markUserAsEmailVerified,
 } from "~/server/data/user"
 import { PasswordResetError, RateLimitError } from "~/utils/error"
 import { getIpAddress } from "~/utils/headers"
@@ -240,14 +241,28 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
 
     await Promise.all([
       createProfile(userId),
-      createOrganization(
-        { name: DEFAULT_ORGANIZATION_NAME },
-        { ownerId: userId },
-      ),
       logActivity("signed_up_with_code", { userId }),
+    ])
+
+    const organization = await createOrganization(
+      { name: DEFAULT_ORGANIZATION_NAME },
+      { ownerId: userId },
+    )
+
+    const organizationId = OrganizationId.parse(organization.id)
+
+    await Promise.all([
+      logActivity("created_organization", { userId, organizationId }),
+    ])
+
+    await Promise.all([
+      markUserAsEmailVerified(userId),
+      logActivity("marked_email_as_verified", { userId }),
     ])
   } else {
     userId = UserId.parse(user.id)
+
+    await markUserAsEmailVerified(userId)
 
     await logActivity("signed_in_with_code", { userId })
   }

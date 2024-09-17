@@ -3,8 +3,11 @@
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
+import { toast } from "sonner"
 import { type ElementRef, useRef } from "react"
+import { useAction } from "next-safe-action/hooks"
 import { useFormState } from "react-dom"
+
 import {
   Button,
   Form,
@@ -63,14 +66,32 @@ export default function CheckEmailVerificationCodeForm() {
           </InputOTPGroup>
         </InputOTP>
       </FormItem>
-      <Button onClick={() => resendEmailVerificationCode()} variant="link">
-        Resend code
-      </Button>
+      <ResendCodeButton />
       <FormMessage id={fields.code.errorId}>{form.errors?.[0]}</FormMessage>
 
       <FormSubmit className="w-full" renderLoading={<>Sending...</>}>
         Verify
       </FormSubmit>
     </Form>
+  )
+}
+
+function ResendCodeButton() {
+  const { execute } = useAction(resendEmailVerificationCode, {
+    onExecute() {
+      toast.loading("Sending code...", { id: "resend-code" })
+    },
+    onSuccess() {
+      toast.success("Code sent", { id: "resend-code" })
+    },
+    onError(error) {
+      toast.error(error.error.serverError)
+    },
+  })
+
+  return (
+    <Button onClick={() => execute()} variant="link">
+      Resend code
+    </Button>
   )
 }

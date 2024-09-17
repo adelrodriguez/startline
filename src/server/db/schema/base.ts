@@ -247,6 +247,7 @@ export const activityLog = createTable("activity_log", {
       "requested_sign_in_code",
       "reset_password",
       "marked_asset_as_uploaded",
+      "marked_email_as_verified",
       "signed_in_with_code",
       "signed_in_with_github",
       "signed_in_with_google",
