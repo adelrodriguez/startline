@@ -5,7 +5,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { github, setSession } from "~/lib/auth"
 import { AUTHORIZED_URL, DEFAULT_ORGANIZATION_NAME } from "~/lib/consts"
 import { GitHubUserSchema } from "~/lib/validation/external"
-import { createOrganization } from "~/server/data/organization"
+import { createOrganization, OrganizationId } from "~/server/data/organization"
 import {
   createProfile,
   createUserFromGitHub,
@@ -13,6 +13,7 @@ import {
   markUserAsEmailVerified,
   UserId,
 } from "~/server/data/user"
+import { logActivity } from "~/lib/logger"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url)
@@ -53,8 +54,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const userId = UserId.parse(existingUser.id)
 
       if (!existingUser.emailVerifiedAt) {
-        await markUserAsEmailVerified(userId)
+        await Promise.all([
+          markUserAsEmailVerified(userId),
+          logActivity("verified_email", { userId }),
+        ])
       }
+
+      await logActivity("signed_in_with_github", { userId })
 
       await setSession(userId)
 
@@ -73,12 +79,19 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const userId = UserId.parse(user.id)
 
-    await createProfile(userId, { name: githubUser.name })
+    await Promise.all([
+      createProfile(userId, { name: githubUser.name }),
+      logActivity("signed_up_with_github", { userId }),
+    ])
 
-    await createOrganization(
+    const newOrganization = await createOrganization(
       { name: DEFAULT_ORGANIZATION_NAME },
       { ownerId: userId },
     )
+
+    const organizationId = OrganizationId.parse(newOrganization.id)
+
+    await logActivity("created_organization", { userId, organizationId })
 
     await setSession(userId)
 

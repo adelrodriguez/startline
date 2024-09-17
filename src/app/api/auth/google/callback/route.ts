@@ -5,7 +5,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { google, setSession } from "~/lib/auth"
 import { AUTHORIZED_URL, DEFAULT_ORGANIZATION_NAME } from "~/lib/consts"
 import { GoogleUserSchema } from "~/lib/validation/external"
-import { createOrganization } from "~/server/data"
+import { createOrganization, OrganizationId } from "~/server/data/organization"
 import {
   createProfile,
   createUserFromGoogle,
@@ -13,6 +13,7 @@ import {
   markUserAsEmailVerified,
   UserId,
 } from "~/server/data/user"
+import { logActivity } from "~/lib/logger"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url)
@@ -63,8 +64,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const userId = UserId.parse(existingUser.id)
 
       if (!existingUser.emailVerifiedAt && googleUser.email_verified) {
-        await markUserAsEmailVerified(userId)
+        await Promise.all([
+          markUserAsEmailVerified(userId),
+          logActivity("verified_email", { userId }),
+        ])
       }
+
+      await logActivity("signed_in_with_google", { userId })
 
       await setSession(userId)
 
@@ -87,20 +93,28 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const user = await createUserFromGoogle({
       googleId: googleUser.sub,
       email: googleUser.email,
+      emailVerifiedAt: new Date(),
     })
 
     const userId = UserId.parse(user.id)
 
-    await createProfile(userId, {
-      name: googleUser.name,
-      avatarUrl: googleUser.picture,
-      preferredLocale: googleUser.locale,
-    })
+    await Promise.all([
+      createProfile(userId, {
+        name: googleUser.name,
+        avatarUrl: googleUser.picture,
+        preferredLocale: googleUser.locale,
+      }),
+      logActivity("signed_up_with_google", { userId }),
+    ])
 
-    await createOrganization(
+    const newOrganization = await createOrganization(
       { name: DEFAULT_ORGANIZATION_NAME },
       { ownerId: userId },
     )
+
+    const organizationId = OrganizationId.parse(newOrganization.id)
+
+    await logActivity("created_organization", { userId, organizationId })
 
     await setSession(userId)
 

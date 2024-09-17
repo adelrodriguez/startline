@@ -52,8 +52,8 @@ import {
 } from "~/server/data/user"
 import { PasswordResetError, RateLimitError } from "~/utils/error"
 import { getIpAddress } from "~/utils/headers"
-import { createOrganization } from "~/server/data/organization"
-import { logActivity } from "../data/activity-log"
+import { createOrganization, OrganizationId } from "~/server/data/organization"
+import { logActivity } from "~/lib/logger"
 
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
@@ -92,14 +92,19 @@ export async function signUp(_: unknown, formData: FormData) {
 
   await Promise.all([
     createProfile(userId),
-    createOrganization(
-      { name: DEFAULT_ORGANIZATION_NAME },
-      { ownerId: userId },
-    ),
     createPassword(userId, submission.value.password),
     sendEmailVerificationCode(userId, newUser.email),
     logActivity("signed_up_with_password", { userId }),
   ])
+
+  const organization = await createOrganization(
+    { name: DEFAULT_ORGANIZATION_NAME },
+    { ownerId: userId },
+  )
+
+  const organizationId = OrganizationId.parse(organization.id)
+
+  await logActivity("created_organization", { userId, organizationId })
 
   await setSession(userId, { ipAddress })
 

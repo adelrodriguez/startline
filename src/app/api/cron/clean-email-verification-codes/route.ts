@@ -2,7 +2,7 @@ import { verifySignatureAppRouter } from "@upstash/qstash/nextjs"
 import { StatusCodes } from "http-status-codes"
 import { NextResponse } from "next/server"
 import env from "~/lib/env.server"
-import { cleanExpiredEmailVerificationCodes } from "~/server/data"
+import { cleanExpiredEmailVerificationCodes } from "~/server/data/user"
 
 async function handler() {
   const rows = await cleanExpiredEmailVerificationCodes()

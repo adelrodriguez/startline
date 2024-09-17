@@ -22,7 +22,7 @@ import {
   type AssetMimeType,
 } from "~/server/data/asset"
 import { buildAssetUrl } from "~/utils/url"
-import { logActivity } from "../data/activity-log"
+import { logActivity } from "~/lib/logger"
 
 export const uploadFile = authActionClient
   .schema(UploadFileRequestSchema)

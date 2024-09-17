@@ -9,7 +9,7 @@ import {
   OrganizationId,
 } from "~/server/data/organization"
 import { UserId } from "~/server/data/user"
-import { logActivity } from "~/server/data/activity-log"
+import { logActivity } from "~/lib/logger"
 import { AuthError } from "~/utils/error"
 
 export async function inviteMember(_: unknown, formData: FormData) {

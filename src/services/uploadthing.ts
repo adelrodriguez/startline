@@ -10,7 +10,7 @@ import { createAsset } from "~/server/data/asset"
 import { UserId } from "~/server/data/user"
 import { RateLimitError } from "~/utils/error"
 import type { AssetMimeType } from "~/server/data/asset"
-import { logActivity } from "~/server/data/activity-log"
+import { logActivity } from "~/lib/logger"
 
 export const utapi = new UTApi()
 
