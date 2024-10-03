@@ -12,11 +12,10 @@ import {
 } from "next-safe-action"
 import { redirect } from "next/navigation"
 import { type AuthUser, validateRequest } from "~/lib/auth"
-import { FALLBACK_IP, UNAUTHORIZED_URL } from "~/lib/consts"
-import rateLimiter from "~/lib/rate-limit"
+import { UNAUTHORIZED_URL } from "~/lib/consts"
+import { rateLimitByIp, rateLimitByUser } from "~/lib/rate-limit"
 import { UserId } from "~/server/data/user"
 import { AuthError, RateLimitError } from "~/utils/error"
-import { getIpAddress } from "~/utils/headers"
 
 export const actionClient = createSafeActionClient({
   handleServerError(e) {
@@ -46,13 +45,7 @@ export const authActionClient = actionClient.use(async ({ next }) => {
 
 export const withRateLimitByIp = createMiddleware().define(
   async ({ next, ctx }) => {
-    const ipAddress = getIpAddress() ?? FALLBACK_IP
-
-    const limit = await rateLimiter.unknown.limit(ipAddress)
-
-    if (!limit.success) {
-      throw new RateLimitError("Too many requests")
-    }
+    await rateLimitByIp()
 
     return next({ ctx })
   },
@@ -61,11 +54,7 @@ export const withRateLimitByIp = createMiddleware().define(
 export const withRateLimitByUser = createMiddleware<{
   ctx: { user: AuthUser }
 }>().define(async ({ next, ctx }) => {
-  const limit = await rateLimiter.user.limit(ctx.user.email)
-
-  if (!limit.success) {
-    throw new RateLimitError("Rate limit exceeded")
-  }
+  await rateLimitByUser(ctx.user.email)
 
   return next({ ctx })
 })

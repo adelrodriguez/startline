@@ -1,16 +1,18 @@
 import { headers } from "next/headers"
 
-export function getIpAddress(): string | null {
+const FALLBACK_IP = "127.0.0.1"
+
+export function getIpAddress(): string {
   const forwardedFor = headers().get("x-forwarded-for")
   const realIp = headers().get("x-real-ip")
 
-  if (forwardedFor) {
-    return forwardedFor.split(",")[0]?.trim() ?? null
-  }
+  const forwardedForIp = forwardedFor?.split(",")[0]?.trim()
 
-  if (realIp) {
-    return realIp.trim()
-  }
+  if (forwardedForIp) return forwardedForIp
 
-  return null
+  if (realIp) return realIp.trim()
+
+  console.warn("No IP address found, using fallback")
+
+  return FALLBACK_IP
 }

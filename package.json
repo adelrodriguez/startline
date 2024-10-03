@@ -62,6 +62,7 @@
     "@upstash/qstash": "^2.7.8",
     "@upstash/ratelimit": "2.0.2",
     "@upstash/redis": "1.34.0",
+    "@vercel/functions": "^1.4.1",
     "arctic": "1.9.2",
     "class-variance-authority": "0.7.0",
     "clsx": "2.1.1",
@@ -113,8 +114,5 @@
     "typescript": "5.6.2"
   },
   "type": "module",
-  "trustedDependencies": [
-    "@biomejs/biome",
-    "@sentry/cli"
-  ]
+  "trustedDependencies": ["@biomejs/biome", "@sentry/cli"]
 }

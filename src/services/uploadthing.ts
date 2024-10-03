@@ -5,10 +5,9 @@ import {
 import { UploadThingError } from "uploadthing/server"
 import { UTApi } from "uploadthing/server"
 import { validateRequest } from "~/lib/auth"
-import rateLimiter from "~/lib/rate-limit"
+import { rateLimitByUser } from "~/lib/rate-limit"
 import { createAsset } from "~/server/data/asset"
 import { UserId } from "~/server/data/user"
-import { RateLimitError } from "~/utils/error"
 import type { AssetMimeType } from "~/server/data/asset"
 import { logActivity } from "~/lib/logger"
 
@@ -23,11 +22,7 @@ export const fileRouter = {
 
       if (!user) throw new UploadThingError("Unauthorized")
 
-      const limit = await rateLimiter.user.limit(user.email)
-
-      if (!limit.success) {
-        throw new RateLimitError("Rate limit exceeded")
-      }
+      await rateLimitByUser(user.email)
 
       return { userId: UserId.parse(user.id) }
     })

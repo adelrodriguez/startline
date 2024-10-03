@@ -12,13 +12,12 @@ import {
 } from "~/lib/auth"
 import {
   AUTHORIZED_URL,
-  FALLBACK_IP,
   RESET_PASSWORD_URL,
   UNAUTHORIZED_URL,
   DEFAULT_ORGANIZATION_NAME,
 } from "~/lib/consts"
 import env from "~/lib/env.server"
-import rateLimiter from "~/lib/rate-limit"
+import { rateLimitByIp, rateLimitByUser } from "~/lib/rate-limit"
 import {
   actionClient,
   authActionClient,
@@ -51,7 +50,7 @@ import {
   UserId,
   markUserAsEmailVerified,
 } from "~/server/data/user"
-import { PasswordResetError, RateLimitError } from "~/utils/error"
+import { PasswordResetError } from "~/utils/error"
 import { getIpAddress } from "~/utils/headers"
 import { createOrganization, OrganizationId } from "~/server/data/organization"
 import { logActivity } from "~/lib/logger"
@@ -63,13 +62,7 @@ export async function signUp(_: unknown, formData: FormData) {
     throw new Error("Password authentication is disabled")
   }
 
-  const ipAddress = getIpAddress() ?? FALLBACK_IP
-
-  const limit = await rateLimiter.unknown.limit(ipAddress)
-
-  if (!limit.success) {
-    throw new RateLimitError("Too many requests")
-  }
+  await rateLimitByIp()
 
   const submission = await parseWithZod(formData, {
     schema: (intent) =>
@@ -107,7 +100,7 @@ export async function signUp(_: unknown, formData: FormData) {
 
   await logActivity("created_organization", { userId, organizationId })
 
-  await setSession(userId, { ipAddress })
+  await setSession(userId, { ipAddress: getIpAddress() })
 
   redirect(AUTHORIZED_URL)
 }
@@ -125,13 +118,7 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
     return submission.reply()
   }
 
-  const ipAddress = getIpAddress() ?? FALLBACK_IP
-
-  const limit = await rateLimiter.unknown.limit(ipAddress)
-
-  if (!limit.success) {
-    throw new RateLimitError("Too many requests")
-  }
+  await rateLimitByIp()
 
   const existingUser = await findUserByEmail(submission.value.email)
 
@@ -155,7 +142,7 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
   }
 
   await logActivity("signed_in_with_password", { userId })
-  await setSession(userId, { ipAddress })
+  await setSession(userId, { ipAddress: getIpAddress() })
 
   redirect(AUTHORIZED_URL)
 }
@@ -173,11 +160,7 @@ export async function signInWithCode(_: unknown, formData: FormData) {
     return submission.reply()
   }
 
-  const limit = await rateLimiter.unknown.limit(submission.value.email)
-
-  if (!limit.success) {
-    throw new RateLimitError("Too many requests")
-  }
+  await rateLimitByIp()
 
   await Promise.all([
     sendSignInCode(submission.value.email),
@@ -213,13 +196,7 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
     return submission.reply()
   }
 
-  const ipAddress = getIpAddress() ?? FALLBACK_IP
-
-  const limit = await rateLimiter.unknown.limit(ipAddress)
-
-  if (!limit.success) {
-    throw new RateLimitError("Too many requests")
-  }
+  await rateLimitByIp()
 
   const isValidCode = await verifySignInCode(email, submission.value.code)
 
@@ -251,9 +228,7 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
 
     const organizationId = OrganizationId.parse(organization.id)
 
-    await Promise.all([
-      logActivity("created_organization", { userId, organizationId }),
-    ])
+    await logActivity("created_organization", { userId, organizationId })
 
     await Promise.all([
       markUserAsEmailVerified(userId),
@@ -262,12 +237,14 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
   } else {
     userId = UserId.parse(user.id)
 
-    await markUserAsEmailVerified(userId)
-
-    await logActivity("signed_in_with_code", { userId })
+    await Promise.all([
+      markUserAsEmailVerified(userId),
+      logActivity("marked_email_as_verified", { userId }),
+      logActivity("signed_in_with_code", { userId }),
+    ])
   }
 
-  await setSession(userId, { ipAddress })
+  await setSession(userId, { ipAddress: getIpAddress() })
 
   redirect(AUTHORIZED_URL)
 }
@@ -290,11 +267,7 @@ export async function checkEmailVerificationCode(
     return submission.reply()
   }
 
-  const limit = await rateLimiter.user.limit(user.email)
-
-  if (!limit.success) {
-    throw new RateLimitError("Too many requests")
-  }
+  await rateLimitByUser(user.email)
 
   const userId = UserId.parse(user.id)
 
@@ -323,12 +296,7 @@ export async function requestPasswordReset(_: unknown, formData: FormData) {
     return submission.reply()
   }
 
-  const ipAddress = getIpAddress() ?? FALLBACK_IP
-
-  const limit = await rateLimiter.unknown.limit(ipAddress)
-
-  if (!limit.success) {
-  }
+  await rateLimitByIp()
 
   const existingUser = await findUserByEmail(submission.value.email)
 
@@ -353,13 +321,7 @@ export async function resetPassword(_: unknown, formData: FormData) {
     return submission.reply()
   }
 
-  const ipAddress = getIpAddress() ?? FALLBACK_IP
-
-  const limit = await rateLimiter.unknown.limit(ipAddress)
-
-  if (!limit.success) {
-    throw new RateLimitError("Too many requests")
-  }
+  await rateLimitByIp()
 
   const passwordResetToken = await findValidPasswordResetToken(
     submission.value.token,
@@ -380,7 +342,7 @@ export async function resetPassword(_: unknown, formData: FormData) {
     logActivity("reset_password", { userId }),
   ])
 
-  await setSession(userId, { ipAddress })
+  await setSession(userId, { ipAddress: getIpAddress() })
 
   redirect(AUTHORIZED_URL, RedirectType.replace)
 }
