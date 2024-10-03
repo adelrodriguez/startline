@@ -9,7 +9,6 @@ import {
   OrganizationId,
 } from "~/server/data/organization"
 import { UserId } from "~/server/data/user"
-import { logActivity } from "~/lib/logger"
 import { AuthError } from "~/utils/error"
 
 export async function inviteMember(_: unknown, formData: FormData) {
@@ -32,14 +31,8 @@ export async function inviteMember(_: unknown, formData: FormData) {
 
   await assertIsOrganizationMember(organizationId, userId)
 
-  await createOrganizationInvitation(
-    organizationId,
-    submission.value.email,
-    submission.value.role,
-  )
-
-  await logActivity("invited_member_to_organization", {
-    userId,
-    organizationId,
+  await createOrganizationInvitation(organizationId, userId, {
+    email: submission.value.email,
+    role: submission.value.role,
   })
 }

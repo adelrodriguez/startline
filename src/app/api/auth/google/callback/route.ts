@@ -4,8 +4,9 @@ import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 import { google, setSession } from "~/lib/auth"
 import { AUTHORIZED_URL, DEFAULT_ORGANIZATION_NAME } from "~/lib/consts"
+import { logActivity } from "~/lib/logger"
 import { GoogleUserSchema } from "~/lib/validation/external"
-import { createOrganization, OrganizationId } from "~/server/data/organization"
+import { createOrganization } from "~/server/data/organization"
 import {
   createProfile,
   createUserFromGoogle,
@@ -13,7 +14,6 @@ import {
   markUserAsEmailVerified,
   UserId,
 } from "~/server/data/user"
-import { logActivity } from "~/lib/logger"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url)
@@ -64,10 +64,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const userId = UserId.parse(existingUser.id)
 
       if (!existingUser.emailVerifiedAt && googleUser.email_verified) {
-        await Promise.all([
-          markUserAsEmailVerified(userId),
-          logActivity("verified_email", { userId }),
-        ])
+        await markUserAsEmailVerified(userId)
       }
 
       await logActivity("signed_in_with_google", { userId })
@@ -98,23 +95,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const userId = UserId.parse(user.id)
 
-    await Promise.all([
-      createProfile(userId, {
-        name: googleUser.name,
-        avatarUrl: googleUser.picture,
-        preferredLocale: googleUser.locale,
-      }),
-      logActivity("signed_up_with_google", { userId }),
-    ])
+    await createProfile(userId, {
+      name: googleUser.name,
+      avatarUrl: googleUser.picture,
+      preferredLocale: googleUser.locale,
+    })
 
-    const newOrganization = await createOrganization(
+    await createOrganization(
       { name: DEFAULT_ORGANIZATION_NAME },
       { ownerId: userId },
     )
-
-    const organizationId = OrganizationId.parse(newOrganization.id)
-
-    await logActivity("created_organization", { userId, organizationId })
 
     await setSession(userId)
 

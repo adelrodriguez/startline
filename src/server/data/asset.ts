@@ -1,8 +1,9 @@
 import "server-only"
 
 import { z } from "zod"
-import db, { asset, filters } from "~/server/db"
+import { logActivity } from "~/lib/logger"
 import type { UserId } from "~/server/data/user"
+import db, { asset, filters } from "~/server/db"
 
 export type Asset = typeof asset.$inferSelect
 export type NewAsset = typeof asset.$inferInsert
@@ -20,18 +21,22 @@ export async function createAsset(
   userId: UserId,
   values: NewAsset,
 ): Promise<Asset> {
-  return db
+  const newAsset = await db
     .insert(asset)
     .values({ ...values, userId })
     .returning()
     .get()
+
+  await logActivity("created_asset", { userId })
+
+  return newAsset
 }
 
 export async function markAssetAsUploaded(
   assetId: AssetId,
   userId: UserId,
 ): Promise<Asset> {
-  return db
+  const uploadedAsset = await db
     .update(asset)
     .set({ status: "uploaded" })
     .where(
@@ -43,4 +48,8 @@ export async function markAssetAsUploaded(
     )
     .returning()
     .get()
+
+  await logActivity("marked_asset_as_uploaded", { userId })
+
+  return uploadedAsset
 }

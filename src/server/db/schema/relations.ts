@@ -1,4 +1,5 @@
 import { relations } from "drizzle-orm"
+
 import {
   account,
   organization,
@@ -8,7 +9,7 @@ import {
   profile,
   user,
   activityLog,
-} from "./base"
+} from "~/server/db/schema/base"
 
 export const userRelations = relations(user, ({ many, one }) => ({
   password: one(password, {
@@ -40,6 +41,10 @@ export const organizationInvitationRelations = relations(
     organization: one(organization, {
       fields: [organizationInvitation.organizationId],
       references: [organization.id],
+    }),
+    inviter: one(user, {
+      fields: [organizationInvitation.inviterId],
+      references: [user.id],
     }),
   }),
 )

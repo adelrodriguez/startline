@@ -12,11 +12,12 @@ import {
 } from "~/lib/auth"
 import {
   AUTHORIZED_URL,
+  DEFAULT_ORGANIZATION_NAME,
   RESET_PASSWORD_URL,
   UNAUTHORIZED_URL,
-  DEFAULT_ORGANIZATION_NAME,
 } from "~/lib/consts"
 import env from "~/lib/env.server"
+import { logActivity } from "~/lib/logger"
 import { rateLimitByIp, rateLimitByUser } from "~/lib/rate-limit"
 import {
   actionClient,
@@ -34,26 +35,25 @@ import {
   createSignUpSchema,
 } from "~/lib/validation/forms"
 import { isProduction } from "~/lib/vars"
+import { createOrganization } from "~/server/data/organization"
 import {
+  UserId,
   createPassword,
-  createUser,
   createProfile,
+  createUser,
   findUserByEmail,
   findValidPasswordResetToken,
   markPasswordResetTokenAsUsed,
+  markUserAsEmailVerified,
   sendEmailVerificationCode,
   sendPasswordResetToken,
   sendSignInCode,
   verifyEmailVerificationCode,
   verifyPassword,
   verifySignInCode,
-  UserId,
-  markUserAsEmailVerified,
 } from "~/server/data/user"
 import { PasswordResetError } from "~/utils/error"
 import { getIpAddress } from "~/utils/headers"
-import { createOrganization, OrganizationId } from "~/server/data/organization"
-import { logActivity } from "~/lib/logger"
 
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
@@ -84,21 +84,16 @@ export async function signUp(_: unknown, formData: FormData) {
 
   const userId = UserId.parse(newUser.id)
 
-  await Promise.all([
-    createProfile(userId),
-    createPassword(userId, submission.value.password),
-    sendEmailVerificationCode(userId, newUser.email),
-    logActivity("signed_up_with_password", { userId }),
-  ])
+  await createProfile(userId)
+  await createPassword(userId, submission.value.password)
+  await sendEmailVerificationCode(userId, newUser.email)
 
-  const organization = await createOrganization(
+  await logActivity("signed_up_with_password", { userId })
+
+  await createOrganization(
     { name: DEFAULT_ORGANIZATION_NAME },
     { ownerId: userId },
   )
-
-  const organizationId = OrganizationId.parse(organization.id)
-
-  await logActivity("created_organization", { userId, organizationId })
 
   await setSession(userId, { ipAddress: getIpAddress() })
 
@@ -142,6 +137,7 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
   }
 
   await logActivity("signed_in_with_password", { userId })
+
   await setSession(userId, { ipAddress: getIpAddress() })
 
   redirect(AUTHORIZED_URL)
@@ -162,10 +158,7 @@ export async function signInWithCode(_: unknown, formData: FormData) {
 
   await rateLimitByIp()
 
-  await Promise.all([
-    sendSignInCode(submission.value.email),
-    logActivity("requested_sign_in_code"),
-  ])
+  await sendSignInCode(submission.value.email)
 
   cookies().set(VERIFICATION_EMAIL_COOKIE_NAME, submission.value.email, {
     httpOnly: true,
@@ -216,32 +209,22 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
 
     userId = UserId.parse(user.id)
 
-    await Promise.all([
-      createProfile(userId),
-      logActivity("signed_up_with_code", { userId }),
-    ])
+    await createProfile(userId)
 
-    const organization = await createOrganization(
+    await logActivity("signed_up_with_code", { userId })
+
+    await createOrganization(
       { name: DEFAULT_ORGANIZATION_NAME },
       { ownerId: userId },
     )
 
-    const organizationId = OrganizationId.parse(organization.id)
-
-    await logActivity("created_organization", { userId, organizationId })
-
-    await Promise.all([
-      markUserAsEmailVerified(userId),
-      logActivity("marked_email_as_verified", { userId }),
-    ])
+    await markUserAsEmailVerified(userId)
   } else {
     userId = UserId.parse(user.id)
 
-    await Promise.all([
-      markUserAsEmailVerified(userId),
-      logActivity("marked_email_as_verified", { userId }),
-      logActivity("signed_in_with_code", { userId }),
-    ])
+    await markUserAsEmailVerified(userId)
+
+    await logActivity("signed_in_with_code", { userId })
   }
 
   await setSession(userId, { ipAddress: getIpAddress() })
@@ -282,8 +265,6 @@ export async function checkEmailVerificationCode(
     })
   }
 
-  await logActivity("verified_email", { userId })
-
   redirect(AUTHORIZED_URL)
 }
 
@@ -303,10 +284,7 @@ export async function requestPasswordReset(_: unknown, formData: FormData) {
   if (existingUser) {
     const userId = UserId.parse(existingUser.id)
 
-    await Promise.all([
-      sendPasswordResetToken(userId, existingUser.email),
-      logActivity("requested_password_reset", { userId }),
-    ])
+    await sendPasswordResetToken(userId, existingUser.email)
   }
 
   redirect(`${RESET_PASSWORD_URL}/confirm?to=${submission.value.email}`)
@@ -339,7 +317,6 @@ export async function resetPassword(_: unknown, formData: FormData) {
   await Promise.all([
     createPassword(userId, submission.value.password),
     markPasswordResetTokenAsUsed(userId),
-    logActivity("reset_password", { userId }),
   ])
 
   await setSession(userId, { ipAddress: getIpAddress() })
@@ -358,18 +335,12 @@ export const resendSignInCode = actionClient
   .use(withRateLimitByIp)
   .schema(z.object({ email: z.string().email() }))
   .action(async ({ parsedInput }) => {
-    await Promise.all([
-      sendSignInCode(parsedInput.email),
-      logActivity("requested_sign_in_code"),
-    ])
+    await sendSignInCode(parsedInput.email)
   })
 
 export const resendEmailVerificationCode = authActionClient
   .use(withUserId)
   .use(withRateLimitByIp)
   .action(async ({ ctx }) => {
-    await Promise.all([
-      sendEmailVerificationCode(ctx.userId, ctx.user.email),
-      logActivity("requested_email_verification", { userId: ctx.userId }),
-    ])
+    await sendEmailVerificationCode(ctx.userId, ctx.user.email)
   })

@@ -22,7 +22,6 @@ import {
   type AssetMimeType,
 } from "~/server/data/asset"
 import { buildAssetUrl } from "~/utils/url"
-import { logActivity } from "~/lib/logger"
 
 export const uploadFile = authActionClient
   .schema(UploadFileRequestSchema)
@@ -47,8 +46,6 @@ export const uploadFile = authActionClient
         url: buildAssetUrl(key),
       })
 
-      await logActivity("created_asset", { userId })
-
       return {
         presignedUrl: url,
         assetId: AssetId.parse(pendingAsset.id),
@@ -64,8 +61,6 @@ export const confirmUpload = authActionClient
       AssetId.parse(assetId),
       userId,
     )
-
-    await logActivity("marked_asset_as_uploaded", { userId })
 
     return { url: uploadedAsset.url }
   })

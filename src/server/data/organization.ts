@@ -2,8 +2,12 @@ import "server-only"
 
 import { TimeSpan, createDate } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
+import { z } from "zod"
+
 import { OrganizationInvitationEmail } from "~/components/emails"
 import { sendEmail } from "~/lib/emails"
+import { logActivity } from "~/lib/logger"
+import type { UserId } from "~/server/data/user"
 import db, {
   account,
   filters,
@@ -13,8 +17,6 @@ import db, {
 } from "~/server/db"
 import { OrganizationError } from "~/utils/error"
 import type { StrictOmit } from "~/utils/type"
-import { z } from "zod"
-import type { UserId } from "./user"
 
 export type Organization = typeof organization.$inferSelect
 export type NewOrganization = typeof organization.$inferInsert
@@ -49,6 +51,11 @@ export async function createOrganization(
       "owner",
     )
   }
+
+  await logActivity("created_organization", {
+    userId: options?.ownerId,
+    organizationId: OrganizationId.parse(newOrganization.id),
+  })
 
   return newOrganization
 }
@@ -148,8 +155,11 @@ export async function assertIsOrganizationMember(
 
 export async function createOrganizationInvitation(
   organizationId: OrganizationId,
-  email: string,
-  role: OrganizationInvitation["role"],
+  inviterId: UserId,
+  payload: {
+    email: string
+    role: OrganizationInvitation["role"]
+  },
 ): Promise<OrganizationInvitation> {
   // Check if the user is already a member of the organization
   const existingAccount = await db.query.account.findFirst({
@@ -161,7 +171,7 @@ export async function createOrganizationInvitation(
           db
             .select({ id: user.id })
             .from(user)
-            .where(eq(user.email, email))
+            .where(eq(user.email, payload.email))
             .limit(1),
         ),
       ),
@@ -176,7 +186,7 @@ export async function createOrganizationInvitation(
     where: (inv, { eq, and, gt }) =>
       and(
         eq(inv.organizationId, organizationId),
-        eq(inv.email, email),
+        eq(inv.email, payload.email),
         gt(inv.expiresAt, new Date()),
       ),
   })
@@ -192,8 +202,9 @@ export async function createOrganizationInvitation(
     .insert(organizationInvitation)
     .values({
       organizationId,
-      email,
-      role,
+      email: payload.email,
+      role: payload.role,
+      inviterId,
       token,
       expiresAt,
     })
@@ -201,6 +212,11 @@ export async function createOrganizationInvitation(
     .get()
 
   await sendOrganizationInvitationEmail(invitation)
+
+  await logActivity("invited_member_to_organization", {
+    userId: inviterId,
+    organizationId,
+  })
 
   return invitation
 }

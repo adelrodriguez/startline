@@ -3,23 +3,25 @@ import "server-only"
 import { generateIdFromEntropySize } from "lucia"
 import { createDate, TimeSpan } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
-import db, {
-  filters,
-  profile,
-  user,
-  emailVerificationCode,
-  type session,
-  passwordResetToken,
-  password,
-  signInCode,
-} from "~/server/db"
 import { z } from "zod"
+
 import {
   EmailVerificationCodeEmail,
   PasswordResetTokenEmail,
   SignInCodeEmail,
 } from "~/components/emails"
 import { sendEmail } from "~/lib/emails"
+import { logActivity } from "~/lib/logger"
+import db, {
+  emailVerificationCode,
+  filters,
+  password,
+  passwordResetToken,
+  profile,
+  signInCode,
+  user,
+  type session,
+} from "~/server/db"
 import { argon2, sha } from "~/utils/hash"
 import type { StrictOmit } from "~/utils/type"
 
@@ -79,7 +81,7 @@ export function createUser(values: StrictOmit<NewUser, "id" | "role">) {
 export async function createUserFromGoogle(
   values: Pick<NewUser, "email" | "googleId" | "emailVerifiedAt">,
 ) {
-  return db
+  const newUser = await db
     .insert(user)
     .values({ ...values, role: "user", emailVerifiedAt: new Date() })
     .onConflictDoUpdate({
@@ -88,12 +90,18 @@ export async function createUserFromGoogle(
     })
     .returning()
     .get()
+
+  await logActivity("signed_up_with_google", {
+    userId: UserId.parse(newUser.id),
+  })
+
+  return newUser
 }
 
 export async function createUserFromGitHub(
   values: Pick<NewUser, "email" | "githubId">,
 ) {
-  return db
+  const newUser = await db
     .insert(user)
     .values({ ...values, role: "user", emailVerifiedAt: new Date() })
     .onConflictDoUpdate({
@@ -102,6 +110,12 @@ export async function createUserFromGitHub(
     })
     .returning()
     .get()
+
+  await logActivity("signed_up_with_github", {
+    userId: UserId.parse(newUser.id),
+  })
+
+  return newUser
 }
 
 export function findOrCreateUser(values: Pick<NewUser, "email">) {
@@ -113,8 +127,8 @@ export function findOrCreateUser(values: Pick<NewUser, "email">) {
     .get()
 }
 
-export function markUserAsEmailVerified(userId: UserId) {
-  return db
+export async function markUserAsEmailVerified(userId: UserId) {
+  await db
     .update(user)
     .set({ emailVerifiedAt: new Date() })
     .where(
@@ -124,6 +138,8 @@ export function markUserAsEmailVerified(userId: UserId) {
       ),
     )
     .returning()
+
+  await logActivity("marked_email_as_verified", { userId })
 }
 
 export function checkIsAdmin(user: User) {
@@ -175,6 +191,8 @@ export async function sendEmailVerificationCode(userId: UserId, email: string) {
     "Verify your email",
     EmailVerificationCodeEmail({ code }),
   )
+
+  await logActivity("requested_email_verification", { userId })
 }
 
 export async function verifyEmailVerificationCode(
@@ -190,10 +208,8 @@ export async function verifyEmailVerificationCode(
 
   if (!isValidCode) return false
 
-  await db.batch([
-    deleteEmailVerificationCodes(userId),
-    markUserAsEmailVerified(userId),
-  ])
+  await deleteEmailVerificationCodes(userId)
+  await markUserAsEmailVerified(userId)
 
   return true
 }
@@ -240,15 +256,18 @@ export async function sendPasswordResetToken(userId: UserId, email: string) {
     "Reset your password",
     PasswordResetTokenEmail({ token }),
   )
+
+  await logActivity("requested_password_reset", { userId })
 }
 
 export async function markPasswordResetTokenAsUsed(userId: UserId) {
-  await db.batch([
-    deletePasswordResetTokens(userId),
-    // If the user received received the password reset token and it was
-    // verified, we can mark the user as verified.
-    markUserAsEmailVerified(userId),
-  ])
+  await deletePasswordResetTokens(userId)
+
+  await logActivity("reset_password", { userId })
+
+  // If the user received received the password reset token and it was verified,
+  // we can mark the user as verified.
+  await markUserAsEmailVerified(userId)
 }
 
 export function deletePasswordResetTokens(userId: UserId) {
@@ -311,6 +330,8 @@ export async function sendSignInCode(email: string) {
   })
 
   await sendEmail(email, "Sign in code", SignInCodeEmail({ code }))
+
+  await logActivity("requested_sign_in_code")
 }
 
 export async function verifySignInCode(email: string, code: string) {

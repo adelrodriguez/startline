@@ -1,6 +1,7 @@
 import { integer, primaryKey, text } from "drizzle-orm/sqlite-core"
+
 import { DEFAULT_LOCALE, LOCALES } from "~/lib/consts"
-import { CURRENT_TIMESTAMP, createTable } from "./helpers"
+import { CURRENT_TIMESTAMP, createTable } from "~/server/db/schema/helpers"
 
 export const user = createTable("user", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -169,6 +170,12 @@ export const organizationInvitation = createTable("organization_invitation", {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
+  inviterId: integer("inviter_id")
+    .notNull()
+    .references(() => user.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
   email: text("email").notNull(),
   role: text("role", { enum: ["admin", "member"] })
     .notNull()
@@ -241,13 +248,13 @@ export const activityLog = createTable("activity_log", {
       "declined_organization_invitation",
       "deleted_account",
       "invited_member_to_organization",
+      "marked_asset_as_uploaded",
+      "marked_email_as_verified",
       "removed_organization_member",
       "requested_email_verification",
       "requested_password_reset",
       "requested_sign_in_code",
       "reset_password",
-      "marked_asset_as_uploaded",
-      "marked_email_as_verified",
       "signed_in_with_code",
       "signed_in_with_github",
       "signed_in_with_google",
@@ -257,7 +264,6 @@ export const activityLog = createTable("activity_log", {
       "signed_up_with_github",
       "signed_up_with_google",
       "signed_up_with_password",
-      "verified_email",
     ],
   }).notNull(),
 
