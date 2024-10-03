@@ -20,7 +20,7 @@ import {
   SignInCodeEmail,
 } from "~/components/emails"
 import { sendEmail } from "~/lib/emails"
-import { argon2, sha256 } from "~/utils/hash"
+import { argon2, sha } from "~/utils/hash"
 import type { StrictOmit } from "~/utils/type"
 
 export type User = typeof user.$inferSelect
@@ -164,7 +164,7 @@ export async function sendEmailVerificationCode(userId: UserId, email: string) {
   await db
     .insert(emailVerificationCode)
     .values({
-      hash: await sha256.hash(code),
+      hash: await sha.sha256.hash(code),
       userId,
       expiresAt: createDate(new TimeSpan(24, "h")),
     })
@@ -186,7 +186,7 @@ export async function verifyEmailVerificationCode(
 
   if (!emailVerificationCode) return false
 
-  const isValidCode = await sha256.verify(emailVerificationCode.hash, code)
+  const isValidCode = await sha.sha256.verify(emailVerificationCode.hash, code)
 
   if (!isValidCode) return false
 
@@ -214,7 +214,7 @@ export async function cleanExpiredEmailVerificationCodes() {
 }
 
 export async function findValidPasswordResetToken(input: string) {
-  const hashed = await sha256.hash(input)
+  const hashed = await sha.sha256.hash(input)
 
   const token = await db.query.passwordResetToken.findFirst({
     where: (model, { eq, and, gte }) =>
@@ -231,7 +231,7 @@ export async function sendPasswordResetToken(userId: UserId, email: string) {
 
   await db.insert(passwordResetToken).values({
     userId,
-    hash: await sha256.hash(token),
+    hash: await sha.sha256.hash(token),
     expiresAt: createDate(new TimeSpan(24, "h")),
   })
 
@@ -306,7 +306,7 @@ export async function sendSignInCode(email: string) {
 
   await db.insert(signInCode).values({
     email,
-    hash: await sha256.hash(code),
+    hash: await sha.sha256.hash(code),
     expiresAt: createDate(new TimeSpan(15, "m")),
   })
 
@@ -321,7 +321,7 @@ export async function verifySignInCode(email: string, code: string) {
 
   if (!signInCode) return false
 
-  const isValidCode = await sha256.verify(signInCode.hash, code)
+  const isValidCode = await sha.sha256.verify(signInCode.hash, code)
 
   if (!isValidCode) return false
 
