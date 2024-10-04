@@ -8,11 +8,11 @@ import { logActivity } from "~/lib/logger"
 import { GitHubUserSchema } from "~/lib/validation/external"
 import { createOrganization } from "~/server/data/organization"
 import {
+  UserId,
   createProfile,
   createUserFromGitHub,
   findUserByGitHubId,
   markUserAsEmailVerified,
-  UserId,
 } from "~/server/data/user"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {

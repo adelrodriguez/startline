@@ -2,13 +2,13 @@ import { redirect } from "next/navigation"
 import { cache } from "react"
 import { validateRequest } from "~/lib/auth"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
-import { findUserById, UserId } from "~/server/data/user"
 import {
+  OrganizationId,
   findAccountsByUserId,
   findOrganizationById,
   findOrganizationInvitationByToken,
-  OrganizationId,
 } from "~/server/data/organization"
+import { UserId, findUserById } from "~/server/data/user"
 import { throwUnless } from "~/utils/assert"
 import { OrganizationError, OrganizationInvitationError } from "~/utils/error"
 

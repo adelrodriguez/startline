@@ -1,9 +1,9 @@
 import ky from "ky"
 import { useCallback } from "react"
 import { confirmUpload, uploadFile } from "~/server/actions/upload"
-import { UploadError } from "~/utils/error"
 import type { AssetMimeType } from "~/server/data/asset"
-import { throwUnless } from "../assert"
+import { UploadError } from "~/utils/error"
+import { throwUnless } from "~/utils/assert"
 
 export default function useS3Upload(
   action = uploadFile,

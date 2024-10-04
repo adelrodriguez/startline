@@ -4,11 +4,11 @@ import {
   eq,
   gte,
   inArray,
+  isNull,
   like,
   lt,
   lte,
   or,
-  isNull,
 } from "drizzle-orm"
 import client from "./client"
 

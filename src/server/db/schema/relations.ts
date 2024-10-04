@@ -2,13 +2,13 @@ import { relations } from "drizzle-orm"
 
 import {
   account,
+  activityLog,
+  asset,
   organization,
   organizationInvitation,
-  asset,
   password,
   profile,
   user,
-  activityLog,
 } from "~/server/db/schema/base"
 
 export const userRelations = relations(user, ({ many, one }) => ({

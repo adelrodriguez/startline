@@ -1,4 +1,5 @@
 import { AdminOnly } from "~/components/auth/roles"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import {
   Card,
   CardContent,
@@ -7,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { TypographySmall } from "~/components/ui/typography"
 import { OrganizationId } from "~/server/data/organization"
 import { getCurrentUser, getFirstOrganization } from "~/server/loader"

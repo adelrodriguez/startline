@@ -17,9 +17,9 @@ import {
 } from "~/lib/validation/upload"
 import {
   AssetId,
+  type AssetMimeType,
   createAsset,
   markAssetAsUploaded,
-  type AssetMimeType,
 } from "~/server/data/asset"
 import { buildAssetUrl } from "~/utils/url"
 

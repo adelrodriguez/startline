@@ -73,7 +73,7 @@ const FormSubmit = React.forwardRef<
       aria-disabled={pending}
       {...props}
     >
-      {pending ? renderLoading ?? children : children}
+      {pending ? (renderLoading ?? children) : children}
     </Button>
   )
 })

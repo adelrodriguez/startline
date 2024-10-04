@@ -1,10 +1,10 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { type StorageBucket, StorageBuckets } from "~/lib/consts"
+import type { AssetMimeType } from "~/server/data/asset"
 import type { UserId } from "~/server/data/user"
 import s3 from "~/services/s3"
 import { obfuscate } from "~/utils/obfuscator"
-import type { AssetMimeType } from "~/server/data/asset"
 
 export function generateKey(userId: UserId, filename: string): string {
   return `${obfuscate(userId)}/${sanitizeKey(filename)}`

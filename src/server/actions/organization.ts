@@ -4,9 +4,9 @@ import { parseWithZod } from "@conform-to/zod"
 import { validateRequest } from "~/lib/auth"
 import { InviteMemberSchema } from "~/lib/validation/forms"
 import {
+  OrganizationId,
   assertIsOrganizationMember,
   createOrganizationInvitation,
-  OrganizationId,
 } from "~/server/data/organization"
 import { UserId } from "~/server/data/user"
 import { AuthError } from "~/utils/error"

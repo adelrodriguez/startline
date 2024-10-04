@@ -1,12 +1,12 @@
 import "server-only"
 
-import { getIpAddress } from "~/utils/headers"
-import type { UserId } from "~/server/data/user"
-import type { OrganizationId } from "~/server/data/organization"
 import {
   type ActivityType,
   createActivityLog,
 } from "~/server/data/activity-log"
+import type { OrganizationId } from "~/server/data/organization"
+import type { UserId } from "~/server/data/user"
+import { getIpAddress } from "~/utils/headers"
 
 export function logActivity(
   type: ActivityType,

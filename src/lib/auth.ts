@@ -10,9 +10,9 @@ import { type NextRequest, NextResponse } from "next/server"
 import { cache } from "react"
 import env from "~/lib/env.server"
 import { isProduction } from "~/lib/vars"
+import type { NewSession, UserId, UserRole } from "~/server/data/user"
 import db, { session, user } from "~/server/db"
 import { buildUrl } from "~/utils/url"
-import type { UserId, UserRole, NewSession } from "~/server/data/user"
 
 const adapter = new DrizzleSQLiteAdapter(db, session, user)
 
