@@ -1,13 +1,16 @@
+import { defineConfig } from "drizzle-kit"
 import env from "~/lib/env.server"
-import type { Config } from "drizzle-kit"
 
-export default {
+export default defineConfig({
   schema: "./src/server/db/schema/index.ts",
   out: "./migrations",
-  driver: "turso",
+  breakpoints: true,
+  verbose: true,
+  strict: true,
   dbCredentials: {
     url: env.DATABASE_URL,
     authToken: env.DATABASE_AUTH_TOKEN,
   },
-  dialect: "sqlite",
-} satisfies Config
+  dialect: "turso",
+  casing: "snake_case",
+})

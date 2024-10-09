@@ -35,19 +35,16 @@ export const organizationRelations = relations(organization, ({ many }) => ({
   activityLogs: many(activityLog),
 }))
 
-export const organizationInvitationRelations = relations(
-  organizationInvitation,
-  ({ one }) => ({
-    organization: one(organization, {
-      fields: [organizationInvitation.organizationId],
-      references: [organization.id],
-    }),
-    inviter: one(user, {
-      fields: [organizationInvitation.inviterId],
-      references: [user.id],
-    }),
+export const organizationInvitationRelations = relations(organizationInvitation, ({ one }) => ({
+  organization: one(organization, {
+    fields: [organizationInvitation.organizationId],
+    references: [organization.id],
   }),
-)
+  inviter: one(user, {
+    fields: [organizationInvitation.inviterId],
+    references: [user.id],
+  }),
+}))
 
 export const accountRelations = relations(account, ({ one }) => ({
   user: one(user, {
