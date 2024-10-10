@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url"
 import bundleAnalyzer from "@next/bundle-analyzer"
 import { withSentryConfig } from "@sentry/nextjs"
-import createJiti from "jiti"
+import { createJiti } from "jiti"
 import createNextIntlPlugin from "next-intl/plugin"
 import { withPlausibleProxy } from "next-plausible"
 
@@ -12,8 +12,8 @@ const withNextIntl = createNextIntlPlugin("./src/lib/i18n.ts")
 
 const jiti = createJiti(fileURLToPath(import.meta.url))
 
-jiti("./src/lib/env.server.ts")
-jiti("./src/lib/env.client.ts")
+void jiti.import("./src/lib/env.server.ts")
+void jiti.import("./src/lib/env.client.ts")
 
 /** @type {import('next').NextConfig} */
 let nextConfig = {
@@ -21,8 +21,6 @@ let nextConfig = {
     serverComponentsExternalPackages: ["@node-rs/argon2"],
     typedRoutes: true,
   },
-
-  transpilePackages: ["lucide-react"],
 
   async rewrites() {
     return [
