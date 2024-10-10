@@ -5,7 +5,10 @@ import { CURRENT_TIMESTAMP, createTable } from "~/server/db/schema/helpers"
 
 export const user = createTable("user", (t) => ({
   id: t.integer().primaryKey({ autoIncrement: true }),
-  createdAt: t.integer({ mode: "timestamp" }).default(CURRENT_TIMESTAMP).notNull(),
+  createdAt: t
+    .integer({ mode: "timestamp" })
+    .default(CURRENT_TIMESTAMP)
+    .notNull(),
   updatedAt: t
     .integer({ mode: "timestamp" })
     .$onUpdateFn(() => new Date())
@@ -43,7 +46,10 @@ export const profile = createTable(
     name: t.text(),
     avatarUrl: t.text(),
     phoneNumber: t.text(),
-    preferredLocale: t.text({ enum: LOCALES }).notNull().default(DEFAULT_LOCALE),
+    preferredLocale: t
+      .text({ enum: LOCALES })
+      .notNull()
+      .default(DEFAULT_LOCALE),
   }),
   (table) => ({
     primaryKey: primaryKey({ columns: [table.userId] }),
@@ -59,25 +65,37 @@ export const password = createTable("password", (t) => ({
     .unique(),
 }))
 export const signInCode = createTable("sign_in_code", (t) => ({
-  createdAt: t.integer({ mode: "timestamp" }).default(CURRENT_TIMESTAMP).notNull(),
+  createdAt: t
+    .integer({ mode: "timestamp" })
+    .default(CURRENT_TIMESTAMP)
+    .notNull(),
   expiresAt: t.integer({ mode: "timestamp" }).notNull(),
   email: t.text().notNull().unique(),
   hash: t.text().notNull(),
 }))
 
-export const emailVerificationCode = createTable("email_verification_code", (t) => ({
-  createdAt: t.integer({ mode: "timestamp" }).default(CURRENT_TIMESTAMP).notNull(),
-  expiresAt: t.integer({ mode: "timestamp" }).notNull(),
-  userId: t
-    .integer()
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" })
-    .unique(),
-  hash: t.text().notNull(),
-}))
+export const emailVerificationCode = createTable(
+  "email_verification_code",
+  (t) => ({
+    createdAt: t
+      .integer({ mode: "timestamp" })
+      .default(CURRENT_TIMESTAMP)
+      .notNull(),
+    expiresAt: t.integer({ mode: "timestamp" }).notNull(),
+    userId: t
+      .integer()
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" })
+      .unique(),
+    hash: t.text().notNull(),
+  }),
+)
 
 export const passwordResetToken = createTable("password_reset_token", (t) => ({
-  createdAt: t.integer({ mode: "timestamp" }).default(CURRENT_TIMESTAMP).notNull(),
+  createdAt: t
+    .integer({ mode: "timestamp" })
+    .default(CURRENT_TIMESTAMP)
+    .notNull(),
   expiresAt: t.integer({ mode: "timestamp" }).notNull(),
   userId: t
     .integer()
@@ -89,7 +107,10 @@ export const passwordResetToken = createTable("password_reset_token", (t) => ({
 
 export const session = createTable("session", (t) => ({
   id: t.text().primaryKey(),
-  createdAt: t.integer({ mode: "timestamp" }).default(CURRENT_TIMESTAMP).notNull(),
+  createdAt: t
+    .integer({ mode: "timestamp" })
+    .default(CURRENT_TIMESTAMP)
+    .notNull(),
   expiresAt: t.integer().notNull(),
   userId: t
     .integer()
@@ -100,7 +121,10 @@ export const session = createTable("session", (t) => ({
 
 export const organization = createTable("organization", (t) => ({
   id: t.integer().primaryKey({ autoIncrement: true }),
-  createdAt: t.integer({ mode: "timestamp" }).default(CURRENT_TIMESTAMP).notNull(),
+  createdAt: t
+    .integer({ mode: "timestamp" })
+    .default(CURRENT_TIMESTAMP)
+    .notNull(),
   updatedAt: t
     .integer({ mode: "timestamp" })
     .$onUpdateFn(() => new Date())
@@ -112,7 +136,10 @@ export const organization = createTable("organization", (t) => ({
 export const account = createTable(
   "account",
   (t) => ({
-    createdAt: t.integer({ mode: "timestamp" }).default(CURRENT_TIMESTAMP).notNull(),
+    createdAt: t
+      .integer({ mode: "timestamp" })
+      .default(CURRENT_TIMESTAMP)
+      .notNull(),
     updatedAt: t
       .integer({ mode: "timestamp" })
       .$onUpdateFn(() => new Date())
@@ -139,40 +166,49 @@ export const account = createTable(
   }),
 )
 
-export const organizationInvitation = createTable("organization_invitation", (t) => ({
-  id: t.integer().primaryKey({ autoIncrement: true }),
-  createdAt: t.integer({ mode: "timestamp" }).default(CURRENT_TIMESTAMP).notNull(),
-  updatedAt: t
-    .integer({ mode: "timestamp" })
-    .$onUpdateFn(() => new Date())
-    .default(CURRENT_TIMESTAMP)
-    .notNull(),
-  organizationId: t
-    .integer()
-    .notNull()
-    .references(() => organization.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  inviterId: t
-    .integer()
-    .notNull()
-    .references(() => user.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  email: t.text().notNull(),
-  role: t
-    .text({ enum: ["admin", "member"] })
-    .notNull()
-    .default("member"),
-  token: t.text().notNull().unique(),
-  expiresAt: t.integer({ mode: "timestamp" }).notNull(),
-}))
+export const organizationInvitation = createTable(
+  "organization_invitation",
+  (t) => ({
+    id: t.integer().primaryKey({ autoIncrement: true }),
+    createdAt: t
+      .integer({ mode: "timestamp" })
+      .default(CURRENT_TIMESTAMP)
+      .notNull(),
+    updatedAt: t
+      .integer({ mode: "timestamp" })
+      .$onUpdateFn(() => new Date())
+      .default(CURRENT_TIMESTAMP)
+      .notNull(),
+    organizationId: t
+      .integer()
+      .notNull()
+      .references(() => organization.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    inviterId: t
+      .integer()
+      .notNull()
+      .references(() => user.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    email: t.text().notNull(),
+    role: t
+      .text({ enum: ["admin", "member"] })
+      .notNull()
+      .default("member"),
+    token: t.text().notNull().unique(),
+    expiresAt: t.integer({ mode: "timestamp" }).notNull(),
+  }),
+)
 
 export const webhookEvent = createTable("webhook_event", (t) => ({
   id: t.integer().primaryKey({ autoIncrement: true }),
-  createdAt: t.integer({ mode: "timestamp" }).default(CURRENT_TIMESTAMP).notNull(),
+  createdAt: t
+    .integer({ mode: "timestamp" })
+    .default(CURRENT_TIMESTAMP)
+    .notNull(),
   processedAt: t.integer({ mode: "timestamp" }),
   event: t.text().notNull(),
   externalId: t.text().notNull().unique(),
@@ -183,7 +219,10 @@ export const webhookEvent = createTable("webhook_event", (t) => ({
 
 export const asset = createTable("asset", (t) => ({
   id: t.integer().primaryKey({ autoIncrement: true }),
-  createdAt: t.integer({ mode: "timestamp" }).default(CURRENT_TIMESTAMP).notNull(),
+  createdAt: t
+    .integer({ mode: "timestamp" })
+    .default(CURRENT_TIMESTAMP)
+    .notNull(),
   updatedAt: t
     .integer({ mode: "timestamp" })
     .$onUpdateFn(() => new Date())
@@ -194,7 +233,14 @@ export const asset = createTable("asset", (t) => ({
   name: t.text(),
   mimeType: t
     .text({
-      enum: ["image/png", "image/jpeg", "image/jpg", "image/webp", "text/plain", "application/pdf"],
+      enum: [
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/webp",
+        "text/plain",
+        "application/pdf",
+      ],
     })
     .notNull(),
   filename: t.text().notNull(),
@@ -209,7 +255,10 @@ export const asset = createTable("asset", (t) => ({
 
 export const activityLog = createTable("activity_log", (t) => ({
   id: t.integer().primaryKey({ autoIncrement: true }),
-  createdAt: t.integer({ mode: "timestamp" }).default(CURRENT_TIMESTAMP).notNull(),
+  createdAt: t
+    .integer({ mode: "timestamp" })
+    .default(CURRENT_TIMESTAMP)
+    .notNull(),
   type: t
     .text({
       enum: [

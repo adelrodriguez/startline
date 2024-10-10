@@ -20,7 +20,9 @@ export default createEnv({
     MOCK_QSTASH: z.preprocess((v) => v === "true", z.boolean().default(false)),
 
     // Node
-    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+    NODE_ENV: z
+      .enum(["development", "test", "production"])
+      .default("development"),
 
     // QStash
     QSTASH_URL: z.string(),
@@ -47,7 +49,8 @@ export default createEnv({
     STRIPE_SECRET_KEY: z
       .string()
       .refine(
-        (v) => (isProduction ? v.startsWith("sk_live") : v.startsWith("sk_test")),
+        (v) =>
+          isProduction ? v.startsWith("sk_live") : v.startsWith("sk_test"),
         `Must start with ${isProduction ? "sk_live" : "sk_test"} in ${environment}`,
       ),
     STRIPE_WEBHOOK_SECRET: z.string(),
@@ -64,13 +67,20 @@ export default createEnv({
     UPLOADTHING_TOKEN: z.string(),
 
     // Authentication methods
-    AUTH_PASSWORD: z.preprocess((v) => v === "true", z.boolean().default(false)),
-    AUTH_SIGN_IN_CODES: z.preprocess((v) => v === "true", z.boolean().default(false)),
+    AUTH_PASSWORD: z.preprocess(
+      (v) => v === "true",
+      z.boolean().default(false),
+    ),
+    AUTH_SIGN_IN_CODES: z.preprocess(
+      (v) => v === "true",
+      z.boolean().default(false),
+    ),
     AUTH_OAUTH: z.preprocess((v) => v === "true", z.boolean().default(false)),
   },
   experimental__runtimeEnv: process.env,
 
-  skipValidation: process.env.SKIP_ENV_VALIDATION === "true" || process.env.CI === "true",
+  skipValidation:
+    process.env.SKIP_ENV_VALIDATION === "true" || process.env.CI === "true",
 
   emptyStringAsUndefined: process.env.NODE_ENV === "production",
   extends: [vercel()],
