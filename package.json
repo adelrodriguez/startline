@@ -24,6 +24,7 @@
     "deps:update": "taze -lw",
     "dev:email": "bun template:email && email dev --dir src/components/emails --port 3001",
     "dev": "next dev",
+    "dev:turbo": "next dev --turbo",
     "docker:down": "docker-compose down",
     "docker:up": "docker-compose up -d",
     "format": "biome format --write src",
@@ -114,8 +115,5 @@
     "typescript": "5.6.3"
   },
   "type": "module",
-  "trustedDependencies": [
-    "@biomejs/biome",
-    "@sentry/cli"
-  ]
+  "trustedDependencies": ["@biomejs/biome", "@sentry/cli"]
 }
