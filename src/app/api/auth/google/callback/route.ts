@@ -1,5 +1,6 @@
 import { OAuth2RequestError } from "arctic"
 import { StatusCodes } from "http-status-codes"
+import ky from "ky"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 import { google } from "~/lib/auth/oauth"
@@ -38,18 +39,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const tokens = await google.validateAuthorizationCode(code, codeVerifier)
 
-    const response = await fetch(
-      "https://openidconnect.googleapis.com/v1/userinfo",
-      {
+    const data = await ky
+      .get("https://openidconnect.googleapis.com/v1/userinfo", {
         headers: {
           Authorization: `Bearer ${tokens.accessToken}`,
         },
-      },
-    )
+      })
+      .json()
 
-    const data = await response.json()
-
-    const result = await GoogleUserSchema.safeParse(data)
+    const result = GoogleUserSchema.safeParse(data)
 
     if (!result.success) {
       return new NextResponse(null, {

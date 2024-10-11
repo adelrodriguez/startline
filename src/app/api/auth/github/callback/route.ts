@@ -1,5 +1,6 @@
 import { OAuth2RequestError } from "arctic"
 import { StatusCodes } from "http-status-codes"
+import ky from "ky"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 import { github } from "~/lib/auth/oauth"
@@ -31,15 +32,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const tokens = await github.validateAuthorizationCode(code)
 
-    const response = await fetch("https://api.github.com/user", {
-      headers: {
-        Authorization: `Bearer ${tokens.accessToken}`,
-      },
-    })
+    const data = await ky
+      .get("https://api.github.com/user", {
+        headers: {
+          Authorization: `Bearer ${tokens.accessToken}`,
+        },
+      })
+      .json()
 
-    const data = await response.json()
-
-    const result = await GitHubUserSchema.safeParse(data)
+    const result = GitHubUserSchema.safeParse(data)
 
     if (!result.success) {
       return new NextResponse(null, {
@@ -77,7 +78,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const userId = UserId.parse(user.id)
 
-    await createProfile(userId, { name: githubUser.name })
+    await createProfile(userId, {
+      name: githubUser.name,
+      avatarUrl: githubUser.avatar_url,
+    })
 
     await createOrganization(
       { name: DEFAULT_ORGANIZATION_NAME },
