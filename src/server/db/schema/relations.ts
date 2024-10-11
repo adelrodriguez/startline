@@ -8,6 +8,7 @@ import {
   organizationInvitation,
   password,
   profile,
+  session,
   user,
 } from "~/server/db/schema/base"
 
@@ -25,6 +26,13 @@ export const userRelations = relations(user, ({ many, one }) => ({
 export const profileRelations = relations(profile, ({ one }) => ({
   user: one(user, {
     fields: [profile.userId],
+    references: [user.id],
+  }),
+}))
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
     references: [user.id],
   }),
 }))

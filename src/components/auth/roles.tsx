@@ -1,9 +1,9 @@
-import { validateRequest } from "~/lib/auth"
+import { getCurrentSession } from "~/lib/auth/session"
 
 export async function AdminOnly({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { user } = await validateRequest()
+  const { user } = await getCurrentSession()
 
   if (user?.role !== "admin") {
     return null
@@ -15,7 +15,7 @@ export async function AdminOnly({
 export async function UserOnly({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { user } = await validateRequest()
+  const { user } = await getCurrentSession()
 
   if (user?.role !== "user") {
     return null

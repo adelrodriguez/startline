@@ -2,7 +2,7 @@ import { generateState } from "arctic"
 import { StatusCodes } from "http-status-codes"
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
-import { github } from "~/lib/auth"
+import { github } from "~/lib/auth/oauth"
 import env from "~/lib/env.server"
 
 export async function GET(): Promise<NextResponse> {

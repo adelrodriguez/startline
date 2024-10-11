@@ -2,9 +2,9 @@
 
 import { usePostHog } from "posthog-js/react"
 import { useEffect } from "react"
-import type { AuthUser } from "~/lib/auth"
+import type { User } from "~/server/data/user"
 
-export default function PostHogIdentifyUser({ user }: { user: AuthUser }) {
+export default function PostHogIdentifyUser({ user }: { user: User }) {
   const posthog = usePostHog()
 
   useEffect(() => {

@@ -5,11 +5,11 @@ import { cookies } from "next/headers"
 import { RedirectType, redirect } from "next/navigation"
 import { z } from "zod"
 import {
+  getCurrentSession,
   invalidateAllSessions,
   invalidateSession,
   setSession,
-  validateRequest,
-} from "~/lib/auth"
+} from "~/lib/auth/session"
 import {
   AUTHORIZED_URL,
   DEFAULT_ORGANIZATION_NAME,
@@ -37,6 +37,7 @@ import {
 import { isProduction } from "~/lib/vars"
 import { createOrganization } from "~/server/data/organization"
 import {
+  SessionId,
   UserId,
   createPassword,
   createProfile,
@@ -236,7 +237,7 @@ export async function checkEmailVerificationCode(
   _: unknown,
   formData: FormData,
 ) {
-  const { user } = await validateRequest()
+  const { user } = await getCurrentSession()
 
   if (!user) {
     return redirect(UNAUTHORIZED_URL)
@@ -328,7 +329,8 @@ export const signOut = authActionClient
   .use(withUserId)
   .action(async ({ ctx }) => {
     await logActivity("signed_out", { userId: ctx.userId })
-    await invalidateSession(ctx.session)
+    await invalidateSession(SessionId.parse(ctx.session.id))
+    redirect(UNAUTHORIZED_URL)
   })
 
 export const resendSignInCode = actionClient

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { validateRequest } from "~/lib/auth"
+import { getCurrentSession } from "~/lib/auth/session"
 import { AUTHORIZED_URL } from "~/lib/consts"
 
 export default async function Layout({
@@ -7,7 +7,7 @@ export default async function Layout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const { user } = await validateRequest()
+  const { user } = await getCurrentSession()
 
   if (user) {
     return redirect(AUTHORIZED_URL)

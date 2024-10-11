@@ -1,7 +1,7 @@
 import "server-only"
 
+import { addDays, addHours, addMinutes } from "date-fns"
 import { generateIdFromEntropySize } from "lucia"
-import { TimeSpan, createDate } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
 import { z } from "zod"
 
@@ -10,6 +10,7 @@ import {
   PasswordResetTokenEmail,
   SignInCodeEmail,
 } from "~/components/emails"
+import { SESSION_LENGTH_IN_DAYS } from "~/lib/consts"
 import { sendEmail } from "~/lib/emails"
 import { logActivity } from "~/lib/logger"
 import db, {
@@ -18,9 +19,9 @@ import db, {
   password,
   passwordResetToken,
   profile,
+  session,
   signInCode,
   user,
-  type session,
 } from "~/server/db"
 import { argon2, sha } from "~/utils/hash"
 import type { StrictOmit } from "~/utils/type"
@@ -37,6 +38,9 @@ export type NewProfile = typeof profile.$inferInsert
 
 export type Session = typeof session.$inferSelect
 export type NewSession = typeof session.$inferInsert
+
+export const SessionId = z.string().brand<"SessionId">()
+export type SessionId = z.infer<typeof SessionId>
 
 export async function findUserByEmail(email: User["email"]) {
   const existingUser = await db.query.user.findFirst({
@@ -182,7 +186,7 @@ export async function sendEmailVerificationCode(userId: UserId, email: string) {
     .values({
       hash: await sha.sha256.hash(code),
       userId,
-      expiresAt: createDate(new TimeSpan(24, "h")),
+      expiresAt: addHours(new Date(), 24),
     })
     .returning()
 
@@ -248,7 +252,7 @@ export async function sendPasswordResetToken(userId: UserId, email: string) {
   await db.insert(passwordResetToken).values({
     userId,
     hash: await sha.sha256.hash(token),
-    expiresAt: createDate(new TimeSpan(24, "h")),
+    expiresAt: addHours(new Date(), 24),
   })
 
   await sendEmail(
@@ -326,7 +330,7 @@ export async function sendSignInCode(email: string) {
   await db.insert(signInCode).values({
     email,
     hash: await sha.sha256.hash(code),
-    expiresAt: createDate(new TimeSpan(15, "m")),
+    expiresAt: addMinutes(new Date(), 15),
   })
 
   await sendEmail(email, "Sign in code", SignInCodeEmail({ code }))
@@ -365,4 +369,47 @@ export async function cleanExpiredSignInCodes() {
     .where(filters.lt(signInCode.expiresAt, new Date()))
 
   return result.rowsAffected
+}
+
+export function createSession(
+  token: string,
+  userId: UserId,
+  values: Omit<NewSession, "id" | "userId" | "expiresAt">,
+) {
+  return db
+    .insert(session)
+    .values({
+      ...values,
+      userId,
+      id: SessionId.parse(sha.sha256.hash(token)),
+      expiresAt: addDays(new Date(), SESSION_LENGTH_IN_DAYS),
+    })
+    .returning()
+    .get()
+}
+
+export async function findSessionById(sessionId: SessionId) {
+  const existingSession = await db.query.session.findFirst({
+    where: filters.eq(session.id, sessionId),
+    with: {
+      user: true,
+    },
+  })
+
+  return existingSession ?? null
+}
+
+export async function deleteSession(sessionId: SessionId) {
+  await db.delete(session).where(filters.eq(session.id, sessionId))
+}
+
+export async function deleteSessions(userId: UserId) {
+  await db.delete(session).where(filters.eq(session.userId, userId))
+}
+
+export async function updateSession(
+  sessionId: SessionId,
+  values: Partial<Omit<NewSession, "id" | "userId">>,
+) {
+  await db.update(session).set(values).where(filters.eq(session.id, sessionId))
 }

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { cache } from "react"
-import { validateRequest } from "~/lib/auth"
+import { getCurrentSession } from "~/lib/auth/session"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
 import {
   OrganizationId,
@@ -8,20 +8,16 @@ import {
   findOrganizationById,
   findOrganizationInvitationByToken,
 } from "~/server/data/organization"
-import { UserId, findUserById } from "~/server/data/user"
+import { UserId } from "~/server/data/user"
 import { throwUnless } from "~/utils/assert"
 import { OrganizationError, OrganizationInvitationError } from "~/utils/error"
 
 export const getCurrentUser = cache(async () => {
-  const { user: authUser } = await validateRequest()
+  const { user } = await getCurrentSession()
 
-  if (!authUser) {
-    return redirect(UNAUTHORIZED_URL)
+  if (!user) {
+    redirect(UNAUTHORIZED_URL)
   }
-
-  const user = await findUserById(UserId.parse(authUser.id))
-
-  throwUnless(user !== null, "User does not exist")
 
   return user
 })

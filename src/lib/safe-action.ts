@@ -11,10 +11,10 @@ import {
   createSafeActionClient,
 } from "next-safe-action"
 import { redirect } from "next/navigation"
-import { type AuthUser, validateRequest } from "~/lib/auth"
+import { getCurrentSession } from "~/lib/auth/session"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
 import { rateLimitByIp, rateLimitByUser } from "~/lib/rate-limit"
-import { UserId } from "~/server/data/user"
+import { type User, UserId } from "~/server/data/user"
 import { AuthError, RateLimitError } from "~/utils/error"
 
 export const actionClient = createSafeActionClient({
@@ -34,7 +34,7 @@ export const actionClient = createSafeActionClient({
 })
 
 export const authActionClient = actionClient.use(async ({ next }) => {
-  const { session, user } = await validateRequest()
+  const { session, user } = await getCurrentSession()
 
   if (!session) {
     throw new AuthError("Session not found")
@@ -52,7 +52,7 @@ export const withRateLimitByIp = createMiddleware().define(
 )
 
 export const withRateLimitByUser = createMiddleware<{
-  ctx: { user: AuthUser }
+  ctx: { user: User }
 }>().define(async ({ next, ctx }) => {
   await rateLimitByUser(ctx.user.email)
 
@@ -60,7 +60,7 @@ export const withRateLimitByUser = createMiddleware<{
 })
 
 export const withUserId = createMiddleware<{
-  ctx: { user: AuthUser }
+  ctx: { user: User }
 }>().define(async ({ next, ctx }) =>
   next({ ctx: { userId: UserId.parse(ctx.user.id) } }),
 )

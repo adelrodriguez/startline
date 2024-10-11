@@ -1,7 +1,7 @@
-import { validateRequest } from "~/lib/auth"
+import { getCurrentSession } from "~/lib/auth/session"
 
 export async function SignedIn({ children }: { children: React.ReactNode }) {
-  const { user } = await validateRequest()
+  const { user } = await getCurrentSession()
 
   if (!user) return null
 
@@ -9,7 +9,7 @@ export async function SignedIn({ children }: { children: React.ReactNode }) {
 }
 
 export async function SignedOut({ children }: { children: React.ReactNode }) {
-  const { user } = await validateRequest()
+  const { user } = await getCurrentSession()
 
   if (user) return null
 

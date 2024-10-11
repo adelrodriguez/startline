@@ -8,6 +8,8 @@ export const AUTHORIZED_URL = "/my"
 export const UNAUTHORIZED_URL = "/sign-in"
 export const RESET_PASSWORD_URL = "/sign-in/reset-password"
 export const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
+export const SESSION_LENGTH_IN_DAYS = 30
+export const SESSION_COOKIE_NAME = "auth-session"
 
 // Storage
 export const StorageBuckets = {

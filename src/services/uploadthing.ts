@@ -4,7 +4,7 @@ import {
 } from "uploadthing/next"
 import { UTApi, UploadThingError } from "uploadthing/server"
 
-import { validateRequest } from "~/lib/auth"
+import { getCurrentSession } from "~/lib/auth/session"
 import { rateLimitByUser } from "~/lib/rate-limit"
 import type { AssetMimeType } from "~/server/data/asset"
 import { createAsset } from "~/server/data/asset"
@@ -17,7 +17,7 @@ const router = createUploadthing()
 export const fileRouter = {
   imageUploader: router({ image: { maxFileSize: "4MB" } })
     .middleware(async ({ req }) => {
-      const { user } = await validateRequest()
+      const { user } = await getCurrentSession()
 
       if (!user) throw new UploadThingError("Unauthorized")
 

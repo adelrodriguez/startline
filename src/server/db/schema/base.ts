@@ -111,7 +111,7 @@ export const session = createTable("session", (t) => ({
     .integer({ mode: "timestamp" })
     .default(CURRENT_TIMESTAMP)
     .notNull(),
-  expiresAt: t.integer().notNull(),
+  expiresAt: t.integer({ mode: "timestamp" }).notNull(),
   userId: t
     .integer()
     .notNull()

@@ -14,7 +14,7 @@ Startline is an opinionated, batteries-included starter template to build SaaS a
 
 - Internationalization
 - Error tracking
-- Authentication
+- Authentication with database-backed sessions
 - Background jobs
 - Rate limiting
 - Email delivery
@@ -29,7 +29,6 @@ Startline is an opinionated, batteries-included starter template to build SaaS a
 - [Next.js](https://nextjs.org) as our React framework
 - [Drizzle ORM](https://drizzle.dev) as our ORM
 - [LibSQL](https://libsql.org) as the database (deployed to [Turso](https://turso.tech))
-- [Lucia](https://lucia-auth.com) for authentication
 - [Conform](https://conform.guide) for form handling
 - [Tailwind CSS](https://tailwindcss.com) for styling
 - [ShadcnUI](https://ui.shadcn.com) as the component library
