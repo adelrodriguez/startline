@@ -46,8 +46,11 @@ async function validateSessionToken(
     return { session: null, user: null }
   }
 
-  // If the session is expiring in the next 15 days, refresh it
-  if (Date.now() >= subDays(session.expiresAt, 15).getTime()) {
+  // If the session is expiring before the halfway point, refresh it
+  if (
+    Date.now() >=
+    subDays(session.expiresAt, SESSION_LENGTH_IN_DAYS / 2).getTime()
+  ) {
     await updateSession(sessionId, {
       expiresAt: addDays(new Date(), SESSION_LENGTH_IN_DAYS),
     })
