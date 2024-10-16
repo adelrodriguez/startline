@@ -8,7 +8,6 @@ import { cache } from "react"
 import { SESSION_COOKIE_NAME, SESSION_LENGTH_IN_DAYS } from "~/lib/consts"
 import { isProduction } from "~/lib/vars"
 import {
-  type NewSession,
   type Session,
   SessionId,
   type User,
@@ -20,6 +19,7 @@ import {
   updateSession,
 } from "~/server/data/user"
 import { sha } from "~/utils/hash"
+import { getGeolocation, getIpAddress } from "~/utils/headers"
 
 function generateSessionToken(): string {
   const bytes = new Uint8Array(20)
@@ -79,12 +79,17 @@ export function deleteSessionTokenCookie(): void {
   })
 }
 
-export async function setSession(
-  userId: UserId,
-  { ipAddress }: Pick<NewSession, "ipAddress"> = {},
-) {
+export async function setSession(userId: UserId, request?: Request) {
   const token = generateSessionToken()
-  const session = await createSession(token, userId, { ipAddress })
+  const ipAddress = getIpAddress(request)
+  const geolocation = getGeolocation(request)
+
+  const session = await createSession(token, userId, {
+    ipAddress,
+    country: geolocation?.country,
+    region: geolocation?.region,
+    city: geolocation?.city,
+  })
 
   setSessionTokenCookie(token, session.expiresAt)
 

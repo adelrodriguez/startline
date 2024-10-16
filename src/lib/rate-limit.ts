@@ -30,9 +30,9 @@ type RateLimitOptions = Parameters<(typeof Ratelimit)["prototype"]["limit"]>[1]
 export async function rateLimitByIp(options?: RateLimitOptions) {
   const ipAddress = getIpAddress()
 
-  const limit = await rateLimit.unknown.limit(ipAddress, {
+  const limit = await rateLimit.unknown.limit(ipAddress ?? "unknown", {
     ...options,
-    ip: ipAddress,
+    ip: ipAddress ?? undefined,
   })
 
   if (!limit.success) {
@@ -50,7 +50,7 @@ export async function rateLimitByUser(
 
   const limit = await rateLimit.user.limit(email, {
     ...options,
-    ip: ipAddress,
+    ip: ipAddress ?? undefined,
   })
 
   if (!limit.success) {

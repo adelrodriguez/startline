@@ -54,7 +54,6 @@ import {
   verifySignInCode,
 } from "~/server/data/user"
 import { PasswordResetError } from "~/utils/error"
-import { getIpAddress } from "~/utils/headers"
 
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
@@ -96,7 +95,7 @@ export async function signUp(_: unknown, formData: FormData) {
     { ownerId: userId },
   )
 
-  await setSession(userId, { ipAddress: getIpAddress() })
+  await setSession(userId)
 
   redirect(AUTHORIZED_URL)
 }
@@ -139,7 +138,7 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
 
   await logActivity("signed_in_with_password", { userId })
 
-  await setSession(userId, { ipAddress: getIpAddress() })
+  await setSession(userId)
 
   redirect(AUTHORIZED_URL)
 }
@@ -228,7 +227,7 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
     await logActivity("signed_in_with_code", { userId })
   }
 
-  await setSession(userId, { ipAddress: getIpAddress() })
+  await setSession(userId)
 
   redirect(AUTHORIZED_URL)
 }
@@ -320,7 +319,7 @@ export async function resetPassword(_: unknown, formData: FormData) {
     markPasswordResetTokenAsUsed(userId),
   ])
 
-  await setSession(userId, { ipAddress: getIpAddress() })
+  await setSession(userId)
 
   redirect(AUTHORIZED_URL, RedirectType.replace)
 }

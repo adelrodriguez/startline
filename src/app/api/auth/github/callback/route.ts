@@ -61,7 +61,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
       await logActivity("signed_in_with_github", { userId })
 
-      await setSession(userId)
+      await setSession(userId, request)
 
       return new NextResponse(null, {
         status: StatusCodes.MOVED_TEMPORARILY,
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       { ownerId: userId },
     )
 
-    await setSession(userId)
+    await setSession(userId, request)
 
     return new NextResponse(null, {
       status: StatusCodes.MOVED_TEMPORARILY,

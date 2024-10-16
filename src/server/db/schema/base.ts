@@ -102,7 +102,12 @@ export const session = createTable("session", (t) => ({
     .bigint({ mode: "bigint" })
     .notNull()
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+
+  // Additional information
   ipAddress: t.text(),
+  country: t.text(),
+  region: t.text(),
+  city: t.text(),
 }))
 
 export const organization = createTable("organization", (t) => ({
