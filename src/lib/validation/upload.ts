@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { AssetPublicId } from "~/server/data/asset"
 
 export const UploadFileRequestSchema = z.object({
   filename: z.string(),
@@ -11,5 +12,5 @@ export const UploadFileRequestSchema = z.object({
 })
 
 export const ConfirmUploadRequestSchema = z.object({
-  assetId: z.string(),
+  publicId: AssetPublicId,
 })

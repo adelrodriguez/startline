@@ -34,6 +34,9 @@ export type NewUser = typeof user.$inferInsert
 export const UserId = z.bigint().brand<"UserId">()
 export type UserId = z.infer<typeof UserId>
 
+export const UserPublicId = z.string().brand<"UserPublicId">()
+export type UserPublicId = z.infer<typeof UserPublicId>
+
 export type Password = typeof password.$inferSelect
 export type NewPassword = typeof password.$inferInsert
 
@@ -48,6 +51,9 @@ export type NewSession = typeof session.$inferInsert
 
 export const SessionId = z.string().brand<"SessionId">()
 export type SessionId = z.infer<typeof SessionId>
+
+export const SessionPublicId = z.string().brand<"SessionPublicId">()
+export type SessionPublicId = z.infer<typeof SessionPublicId>
 
 export type EmailVerificationCode = typeof emailVerificationCode.$inferSelect
 export type NewEmailVerificationCode = typeof emailVerificationCode.$inferInsert

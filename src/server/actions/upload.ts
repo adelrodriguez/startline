@@ -18,9 +18,12 @@ import {
 import {
   AssetId,
   type AssetMimeType,
+  AssetPublicId,
   createAsset,
+  findAssetByPublicId,
   markAssetAsUploaded,
 } from "~/server/data/asset"
+import { UploadError } from "~/utils/error"
 import { buildAssetUrl } from "~/utils/url"
 
 export const uploadFile = authActionClient
@@ -48,7 +51,7 @@ export const uploadFile = authActionClient
 
       return {
         presignedUrl: url,
-        assetId: AssetId.parse(pendingAsset.id),
+        publicId: AssetPublicId.parse(pendingAsset.publicId),
       }
     },
   )
@@ -56,9 +59,15 @@ export const uploadFile = authActionClient
 export const confirmUpload = authActionClient
   .schema(ConfirmUploadRequestSchema)
   .use(withUserId)
-  .action(async ({ parsedInput: { assetId }, ctx: { userId } }) => {
+  .action(async ({ parsedInput: { publicId }, ctx: { userId } }) => {
+    const asset = await findAssetByPublicId(publicId)
+
+    if (!asset) {
+      throw new UploadError("Asset not found")
+    }
+
     const uploadedAsset = await markAssetAsUploaded(
-      AssetId.parse(assetId),
+      AssetId.parse(asset.id),
       userId,
     )
 

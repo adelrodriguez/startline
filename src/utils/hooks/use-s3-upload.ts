@@ -26,7 +26,7 @@ export default function useS3Upload(
         throw new UploadError("Failed to create upload URL")
       }
 
-      const { presignedUrl, assetId } = actionResult.data
+      const { presignedUrl, publicId } = actionResult.data
 
       await ky.put(presignedUrl, {
         body: file,
@@ -35,7 +35,7 @@ export default function useS3Upload(
         },
       })
 
-      const confirmResult = await confirmUpload({ assetId: assetId.toString() })
+      const confirmResult = await confirmUpload({ publicId })
 
       if (!confirmResult?.data) {
         throw new UploadError("Failed to confirm upload")

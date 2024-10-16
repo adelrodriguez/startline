@@ -14,9 +14,22 @@ export type AssetMimeType = Asset["mimeType"]
 export const AssetId = z.bigint().brand<"AssetId">()
 export type AssetId = z.infer<typeof AssetId>
 
+export const AssetPublicId = z.string().brand<"AssetPublicId">()
+export type AssetPublicId = z.infer<typeof AssetPublicId>
+
 export async function findAssetById(id: AssetId): Promise<Asset | null> {
   const existingAsset = await db.query.asset.findFirst({
     where: (model, { eq }) => eq(model.id, id),
+  })
+
+  return existingAsset ?? null
+}
+
+export async function findAssetByPublicId(
+  publicId: AssetPublicId,
+): Promise<Asset | null> {
+  const existingAsset = await db.query.asset.findFirst({
+    where: (model, { eq }) => eq(model.publicId, publicId),
   })
 
   return existingAsset ?? null
