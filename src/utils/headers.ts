@@ -49,5 +49,9 @@ export function getGeolocation(request?: Request): {
   const country = headers().get("X-Vercel-IP-Country")
   const city = headers().get("X-Vercel-IP-City")
 
-  return { country, region, city }
+  return {
+    country: country ? decodeURIComponent(country) : null,
+    region: region ? decodeURIComponent(region) : null,
+    city: city ? decodeURIComponent(city) : null,
+  }
 }
