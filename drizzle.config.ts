@@ -1,6 +1,10 @@
 import { defineConfig } from "drizzle-kit"
 import env from "~/lib/env.server"
 
+// For drizzle-kit to work locally, we use have installed `pg` so it'll be used as the
+// driver. Otherwise, it will use try to use `@neondatabase/serverless`, which
+// won't work locally since it won't be configured to use the websocket proxy.
+
 export default defineConfig({
   schema: "./src/server/db/schema/index.ts",
   out: "./migrations",
@@ -9,8 +13,7 @@ export default defineConfig({
   strict: true,
   dbCredentials: {
     url: env.DATABASE_URL,
-    authToken: env.DATABASE_AUTH_TOKEN,
   },
-  dialect: "turso",
+  dialect: "postgresql",
   casing: "snake_case",
 })

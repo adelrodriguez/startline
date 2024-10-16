@@ -7,6 +7,6 @@ export type NewActivityLog = typeof activityLog.$inferInsert
 
 export type ActivityType = ActivityLog["type"]
 
-export function createActivityLog(values: NewActivityLog) {
-  return db.insert(activityLog).values(values)
+export async function createActivityLog(values: NewActivityLog) {
+  await db.insert(activityLog).values(values)
 }

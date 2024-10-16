@@ -28,7 +28,7 @@ Startline is an opinionated, batteries-included starter template to build SaaS a
 
 - [Next.js](https://nextjs.org) as our React framework
 - [Drizzle ORM](https://drizzle.dev) as our ORM
-- [LibSQL](https://libsql.org) as the database (deployed to [Turso](https://turso.tech))
+- [Neon](https://neon.tech) as our serverless Postgres database
 - [Conform](https://conform.guide) for form handling
 - [Tailwind CSS](https://tailwindcss.com) for styling
 - [ShadcnUI](https://ui.shadcn.com) as the component library
@@ -55,33 +55,13 @@ Startline is an opinionated, batteries-included starter template to build SaaS a
 
 TODO
 
-## How much does this cost to run?
+## Decisions
 
-All the services used in this stack have generous free tiers:
+### Neon
 
-- Vercel: 100 GB of bandwidth and 100,000 function invocations per month
-- Turso: 500 databases, 9GB total storage, 1 billion row reads per month
-- Resend: 100 emails/day
-- Upstash Redis: 10,000 commands/day
-- Upstash QStash: 500 messages/day
-- Sentry: 5,000 errors/month
-- PostHog: 1 million events/month
-- UploadThing: 2GB of storage
+WIP. Basically I'm planning on using Postgres for all the `startline` projects. That will mean Supabase for `startline-mobile` and Neon for `startline-web`. Basically eliminating the need to keep track of multiple database technologies as I switch between projects.
 
-This can get you very far, but what you really want to know is how much it actually costs to run this stack for a real-world application.
+## TODOs
 
-We're going to assume you'll be paying the basic "Professional" tier for each service (not counting usage-based pricing):
-
-- Vercel: $20/month
-- Turso: $24.92/month
-- Resend: $20/month
-- Sentry: $26/month
-- UploadThing: $10/month
-
-Total: $100.92/month
-
-Not taking into account usage-based pricing, this is $1,211.04/year. This can get you _very_ far, since you can share the services between all your projects.
-
-But it is expensive. You can run a VPS for much cheaper. Maybe you like to self-host your own services and hate all the SaaS-glue. Maybe you just don't like serverless. That's fine. This stack isn't for you. I wouldn't recommend this stack unless you are actually aiming to build a SaaS where usage correlates with paying customers. If you build something for free and traffic spikes, if you don't have spend limits set... then yeah, you'll get rekt'd.
-
-I am planning on building a cheaper, more traditional, VPS-based stack in the future which can be used to host fun experiments and side projects without worrying about serverless tax. I'll add it here when it's ready.
+- [ ] Move this to be modular: we don't need to have everything installed from the get-go. Each part of the starter could be installed using the setup script.
+- [ ] Add information to the README about why we chose certain technologies over others.

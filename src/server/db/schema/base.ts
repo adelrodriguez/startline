@@ -1,44 +1,44 @@
-import { primaryKey } from "drizzle-orm/sqlite-core"
-
+import { pgEnum, primaryKey } from "drizzle-orm/pg-core"
 import { DEFAULT_LOCALE, LOCALES } from "~/lib/consts"
-import { CURRENT_TIMESTAMP, createTable } from "~/server/db/schema/helpers"
+import { createTable } from "~/server/db/schema/helpers"
+
+export const userRoleEnum = pgEnum("user_role", ["admin", "user"])
 
 export const user = createTable("user", (t) => ({
-  id: t.integer().primaryKey({ autoIncrement: true }),
-  createdAt: t
-    .integer({ mode: "timestamp" })
-    .default(CURRENT_TIMESTAMP)
-    .notNull(),
+  id: t
+    .bigint({ mode: "bigint" })
+    .generatedAlwaysAsIdentity({ startWith: 1 })
+    .primaryKey(),
+  createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
   updatedAt: t
-    .integer({ mode: "timestamp" })
+    .timestamp({ mode: "date" })
     .$onUpdateFn(() => new Date())
-    .default(CURRENT_TIMESTAMP)
+    .defaultNow()
     .notNull(),
 
-  role: t
-    .text({ enum: ["admin", "user"] })
-    .notNull()
-    .default("user"),
+  role: userRoleEnum().notNull().default("user"),
 
   email: t.text().notNull().unique(),
-  emailVerifiedAt: t.integer({ mode: "timestamp" }),
+  emailVerifiedAt: t.timestamp({ mode: "date" }),
 
   // OAuth accounts
   googleId: t.text().unique(),
   githubId: t.text().unique(),
 }))
 
+export const localeEnum = pgEnum("locale", LOCALES)
+
 export const profile = createTable(
   "profile",
   (t) => ({
     updatedAt: t
-      .integer({ mode: "timestamp" })
+      .timestamp({ mode: "date" })
       .$onUpdateFn(() => new Date())
-      .default(CURRENT_TIMESTAMP)
+      .defaultNow()
       .notNull(),
 
     userId: t
-      .integer()
+      .bigint({ mode: "bigint" })
       .notNull()
       .unique()
       .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -46,10 +46,7 @@ export const profile = createTable(
     name: t.text(),
     avatarUrl: t.text(),
     phoneNumber: t.text(),
-    preferredLocale: t
-      .text({ enum: LOCALES })
-      .notNull()
-      .default(DEFAULT_LOCALE),
+    preferredLocale: localeEnum().notNull().default(DEFAULT_LOCALE),
   }),
   (table) => ({
     primaryKey: primaryKey({ columns: [table.userId] }),
@@ -59,17 +56,15 @@ export const profile = createTable(
 export const password = createTable("password", (t) => ({
   hash: t.text().notNull(),
   userId: t
-    .integer()
+    .bigint({ mode: "bigint" })
     .notNull()
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" })
     .unique(),
 }))
+
 export const signInCode = createTable("sign_in_code", (t) => ({
-  createdAt: t
-    .integer({ mode: "timestamp" })
-    .default(CURRENT_TIMESTAMP)
-    .notNull(),
-  expiresAt: t.integer({ mode: "timestamp" }).notNull(),
+  createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
+  expiresAt: t.timestamp({ mode: "date" }).notNull(),
   email: t.text().notNull().unique(),
   hash: t.text().notNull(),
 }))
@@ -77,13 +72,10 @@ export const signInCode = createTable("sign_in_code", (t) => ({
 export const emailVerificationCode = createTable(
   "email_verification_code",
   (t) => ({
-    createdAt: t
-      .integer({ mode: "timestamp" })
-      .default(CURRENT_TIMESTAMP)
-      .notNull(),
-    expiresAt: t.integer({ mode: "timestamp" }).notNull(),
+    createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
+    expiresAt: t.timestamp({ mode: "date" }).notNull(),
     userId: t
-      .integer()
+      .bigint({ mode: "bigint" })
       .notNull()
       .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" })
       .unique(),
@@ -92,13 +84,10 @@ export const emailVerificationCode = createTable(
 )
 
 export const passwordResetToken = createTable("password_reset_token", (t) => ({
-  createdAt: t
-    .integer({ mode: "timestamp" })
-    .default(CURRENT_TIMESTAMP)
-    .notNull(),
-  expiresAt: t.integer({ mode: "timestamp" }).notNull(),
+  createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
+  expiresAt: t.timestamp({ mode: "date" }).notNull(),
   userId: t
-    .integer()
+    .bigint({ mode: "bigint" })
     .notNull()
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" })
     .unique(),
@@ -107,59 +96,56 @@ export const passwordResetToken = createTable("password_reset_token", (t) => ({
 
 export const session = createTable("session", (t) => ({
   id: t.text().primaryKey(),
-  createdAt: t
-    .integer({ mode: "timestamp" })
-    .default(CURRENT_TIMESTAMP)
-    .notNull(),
-  expiresAt: t.integer({ mode: "timestamp" }).notNull(),
+  createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
+  expiresAt: t.timestamp({ mode: "date" }).notNull(),
   userId: t
-    .integer()
+    .bigint({ mode: "bigint" })
     .notNull()
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
   ipAddress: t.text(),
 }))
 
 export const organization = createTable("organization", (t) => ({
-  id: t.integer().primaryKey({ autoIncrement: true }),
-  createdAt: t
-    .integer({ mode: "timestamp" })
-    .default(CURRENT_TIMESTAMP)
-    .notNull(),
+  id: t
+    .bigint({ mode: "bigint" })
+    .generatedAlwaysAsIdentity({ startWith: 1 })
+    .primaryKey(),
+  createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
   updatedAt: t
-    .integer({ mode: "timestamp" })
+    .timestamp({ mode: "date" })
     .$onUpdateFn(() => new Date())
-    .default(CURRENT_TIMESTAMP)
+    .defaultNow()
     .notNull(),
   name: t.text().notNull(),
 }))
 
+export const accountRoleEnum = pgEnum("account_role", [
+  "owner",
+  "admin",
+  "member",
+])
+
 export const account = createTable(
   "account",
   (t) => ({
-    createdAt: t
-      .integer({ mode: "timestamp" })
-      .default(CURRENT_TIMESTAMP)
-      .notNull(),
+    createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
     updatedAt: t
-      .integer({ mode: "timestamp" })
+      .timestamp({ mode: "date" })
       .$onUpdateFn(() => new Date())
-      .default(CURRENT_TIMESTAMP)
+      .defaultNow()
       .notNull(),
     userId: t
-      .integer()
+      .bigint({ mode: "bigint" })
       .notNull()
       .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
     organizationId: t
-      .integer()
+      .bigint({ mode: "bigint" })
       .notNull()
       .references(() => organization.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    role: t
-      .text({ enum: ["owner", "admin", "member"] })
-      .notNull()
-      .default("member"),
+    role: accountRoleEnum().notNull().default("member"),
   }),
   (table) => ({
     primaryKey: primaryKey({ columns: [table.userId, table.organizationId] }),
@@ -169,25 +155,25 @@ export const account = createTable(
 export const organizationInvitation = createTable(
   "organization_invitation",
   (t) => ({
-    id: t.integer().primaryKey({ autoIncrement: true }),
-    createdAt: t
-      .integer({ mode: "timestamp" })
-      .default(CURRENT_TIMESTAMP)
-      .notNull(),
+    id: t
+      .bigint({ mode: "bigint" })
+      .generatedAlwaysAsIdentity({ startWith: 1 })
+      .primaryKey(),
+    createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
     updatedAt: t
-      .integer({ mode: "timestamp" })
+      .timestamp({ mode: "date" })
       .$onUpdateFn(() => new Date())
-      .default(CURRENT_TIMESTAMP)
+      .defaultNow()
       .notNull(),
     organizationId: t
-      .integer()
+      .bigint({ mode: "bigint" })
       .notNull()
       .references(() => organization.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
     inviterId: t
-      .integer()
+      .bigint({ mode: "bigint" })
       .notNull()
       .references(() => user.id, {
         onDelete: "cascade",
@@ -199,17 +185,17 @@ export const organizationInvitation = createTable(
       .notNull()
       .default("member"),
     token: t.text().notNull().unique(),
-    expiresAt: t.integer({ mode: "timestamp" }).notNull(),
+    expiresAt: t.timestamp({ mode: "date" }).notNull(),
   }),
 )
 
 export const webhookEvent = createTable("webhook_event", (t) => ({
-  id: t.integer().primaryKey({ autoIncrement: true }),
-  createdAt: t
-    .integer({ mode: "timestamp" })
-    .default(CURRENT_TIMESTAMP)
-    .notNull(),
-  processedAt: t.integer({ mode: "timestamp" }),
+  id: t
+    .bigint({ mode: "bigint" })
+    .generatedAlwaysAsIdentity({ startWith: 1 })
+    .primaryKey(),
+  createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
+  processedAt: t.timestamp({ mode: "date" }),
   event: t.text().notNull(),
   externalId: t.text().notNull().unique(),
   payload: t.text(),
@@ -217,77 +203,73 @@ export const webhookEvent = createTable("webhook_event", (t) => ({
   retries: t.integer().notNull().default(0),
 }))
 
+export const assetStatusEnum = pgEnum("asset_status", ["pending", "uploaded"])
+export const mimeTypeEnum = pgEnum("mime_type", [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+  "text/plain",
+  "application/pdf",
+])
+
 export const asset = createTable("asset", (t) => ({
-  id: t.integer().primaryKey({ autoIncrement: true }),
-  createdAt: t
-    .integer({ mode: "timestamp" })
-    .default(CURRENT_TIMESTAMP)
-    .notNull(),
+  id: t
+    .bigint({ mode: "bigint" })
+    .generatedAlwaysAsIdentity({ startWith: 1 })
+    .primaryKey(),
+  createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
   updatedAt: t
-    .integer({ mode: "timestamp" })
+    .timestamp({ mode: "date" })
     .$onUpdateFn(() => new Date())
-    .default(CURRENT_TIMESTAMP)
+    .defaultNow()
     .notNull(),
   service: t.text({ enum: ["r2", "uploadthing"] }).notNull(),
   bucket: t.text(),
   name: t.text(),
-  mimeType: t
-    .text({
-      enum: [
-        "image/png",
-        "image/jpeg",
-        "image/jpg",
-        "image/webp",
-        "text/plain",
-        "application/pdf",
-      ],
-    })
-    .notNull(),
+  mimeType: mimeTypeEnum().notNull(),
   filename: t.text().notNull(),
   size: t.integer().notNull(),
   url: t.text().notNull(),
-  status: t
-    .text({ enum: ["pending", "uploaded"] })
-    .notNull()
-    .default("pending"),
-  userId: t.integer().references(() => user.id),
+  status: assetStatusEnum().notNull().default("pending"),
+  userId: t.bigint({ mode: "bigint" }).references(() => user.id),
 }))
 
+export const activityLogTypeEnum = pgEnum("activity_log_type", [
+  "accepted_organization_invitation",
+  "created_asset",
+  "created_organization",
+  "declined_organization_invitation",
+  "deleted_account",
+  "invited_member_to_organization",
+  "marked_asset_as_uploaded",
+  "marked_email_as_verified",
+  "removed_organization_member",
+  "requested_email_verification",
+  "requested_password_reset",
+  "requested_sign_in_code",
+  "reset_password",
+  "signed_in_with_code",
+  "signed_in_with_github",
+  "signed_in_with_google",
+  "signed_in_with_password",
+  "signed_out",
+  "signed_up_with_code",
+  "signed_up_with_github",
+  "signed_up_with_google",
+  "signed_up_with_password",
+])
+
 export const activityLog = createTable("activity_log", (t) => ({
-  id: t.integer().primaryKey({ autoIncrement: true }),
-  createdAt: t
-    .integer({ mode: "timestamp" })
-    .default(CURRENT_TIMESTAMP)
-    .notNull(),
-  type: t
-    .text({
-      enum: [
-        "accepted_organization_invitation",
-        "created_asset",
-        "created_organization",
-        "declined_organization_invitation",
-        "deleted_account",
-        "invited_member_to_organization",
-        "marked_asset_as_uploaded",
-        "marked_email_as_verified",
-        "removed_organization_member",
-        "requested_email_verification",
-        "requested_password_reset",
-        "requested_sign_in_code",
-        "reset_password",
-        "signed_in_with_code",
-        "signed_in_with_github",
-        "signed_in_with_google",
-        "signed_in_with_password",
-        "signed_out",
-        "signed_up_with_code",
-        "signed_up_with_github",
-        "signed_up_with_google",
-        "signed_up_with_password",
-      ],
-    })
-    .notNull(),
-  userId: t.integer().references(() => user.id),
-  organizationId: t.integer().references(() => organization.id),
+  id: t
+    .bigint({ mode: "bigint" })
+    .generatedAlwaysAsIdentity({ startWith: 1 })
+    .primaryKey(),
+  createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
+  type: activityLogTypeEnum().notNull(),
+  userId: t.bigint({ mode: "bigint" }).references(() => user.id),
+  organizationId: t
+    .bigint({ mode: "bigint" })
+    .references(() => organization.id),
   ipAddress: t.text(),
 }))

@@ -29,14 +29,16 @@ export default function Page() {
               <Link href="/my">Go to dashboard</Link>
             </Button>
           </SignedIn>
+
           <SignedOut>
             <Button variant="link" asChild>
               <Link href="/sign-in">Sign in</Link>
             </Button>
+            <Button variant="link" asChild>
+              <Link href="/sign-up">Sign up</Link>
+            </Button>
           </SignedOut>
-          <Button variant="link" asChild>
-            <Link href="/sign-up">Sign up</Link>
-          </Button>
+
           <ModeToggle />
         </nav>
       </header>

@@ -33,19 +33,19 @@ export default function RootLayout({
       <head>
         <PlausibleProvider domain={env.NEXT_PUBLIC_DOMAIN} />
       </head>
-      <Providers>
-        <NextSSRPlugin routerConfig={extractRouterConfig(fileRouter)} />
-        <body
-          className={cn(
-            "min-h-screen bg-background font-sans antialiased",
-            fonts.body.variable,
-          )}
-        >
+      <NextSSRPlugin routerConfig={extractRouterConfig(fileRouter)} />
+      <body
+        className={cn(
+          "min-h-screen bg-background font-sans antialiased",
+          fonts.body.variable,
+        )}
+      >
+        <Providers>
           <PostHogTrackPageview />
           <Toaster />
           {children}
-        </body>
-      </Providers>
+        </Providers>
+      </body>
     </html>
   )
 }

@@ -11,5 +11,5 @@ export const UploadFileRequestSchema = z.object({
 })
 
 export const ConfirmUploadRequestSchema = z.object({
-  assetId: z.number(),
+  assetId: z.string(),
 })

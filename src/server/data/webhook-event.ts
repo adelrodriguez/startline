@@ -2,12 +2,13 @@ import "server-only"
 
 import { z } from "zod"
 import db, { filters, webhookEvent, helpers } from "~/server/db"
+import { DatabaseError } from "~/utils/error"
 import type { StrictOmit } from "~/utils/type"
 
 export type WebhookEvent = typeof webhookEvent.$inferSelect
 export type NewWebhookEvent = typeof webhookEvent.$inferInsert
 
-export const WebhookEventId = z.number().brand<"WebhookEventId">()
+export const WebhookEventId = z.bigint().brand<"WebhookEventId">()
 export type WebhookEventId = z.infer<typeof WebhookEventId>
 
 export async function findWebhookEventByExternalId(
@@ -21,11 +22,11 @@ export async function findWebhookEventByExternalId(
 }
 
 export async function createWebhookEvent(
-  values: StrictOmit<NewWebhookEvent, "id" | "payload"> & {
+  values: StrictOmit<NewWebhookEvent, "payload"> & {
     payload: unknown
   },
-) {
-  return db
+): Promise<WebhookEvent> {
+  const [newWebhookEvent] = await db
     .insert(webhookEvent)
     .values({
       ...values,
@@ -36,14 +37,26 @@ export async function createWebhookEvent(
       set: { retries: helpers.increment(webhookEvent.retries) },
     })
     .returning()
-    .get()
+
+  if (!newWebhookEvent) {
+    throw new DatabaseError("Failed to create webhook event")
+  }
+
+  return newWebhookEvent
 }
 
-export async function markWebhookEventAsProcessed(id: WebhookEventId) {
-  return db
+export async function markWebhookEventAsProcessed(
+  id: WebhookEventId,
+): Promise<WebhookEvent> {
+  const [updatedWebhookEvent] = await db
     .update(webhookEvent)
     .set({ processedAt: new Date() })
     .where(filters.eq(webhookEvent.id, id))
     .returning()
-    .get()
+
+  if (!updatedWebhookEvent) {
+    throw new DatabaseError("Failed to mark webhook event as processed")
+  }
+
+  return updatedWebhookEvent
 }

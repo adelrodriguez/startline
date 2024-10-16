@@ -5,6 +5,8 @@ import { environment, isProduction } from "./vars"
 
 export default createEnv({
   server: {
+    DATABASE_URL: z.string(),
+
     EMAIL_FROM: z.string().email(),
 
     // GitHub
@@ -54,10 +56,6 @@ export default createEnv({
         `Must start with ${isProduction ? "sk_live" : "sk_test"} in ${environment}`,
       ),
     STRIPE_WEBHOOK_SECRET: z.string(),
-
-    // Turso
-    DATABASE_URL: z.string(),
-    DATABASE_AUTH_TOKEN: z.string(),
 
     // Upstash
     UPSTASH_REDIS_REST_URL: z.string(),

@@ -1,13 +1,21 @@
-import { createClient } from "@libsql/client"
-import { drizzle } from "drizzle-orm/libsql"
+import { Pool, neonConfig } from "@neondatabase/serverless"
+import { drizzle } from "drizzle-orm/neon-serverless"
+import ws from "ws"
 import env from "~/lib/env.server"
+import { isDevelopment } from "~/lib/vars"
 import * as schema from "./schema"
 
-const client = createClient({
-  url: env.DATABASE_URL,
-  authToken: env.DATABASE_AUTH_TOKEN,
-})
+neonConfig.webSocketConstructor = ws
 
-const db = drizzle(client, { schema, casing: "snake_case" })
+if (isDevelopment) {
+  neonConfig.wsProxy = (host) => `${host}:54330/v1`
+  // Disable all authentication and encryption
+  neonConfig.useSecureWebSocket = false
+  neonConfig.pipelineTLS = false
+  neonConfig.pipelineConnect = false
+}
+
+const pool = new Pool({ connectionString: env.DATABASE_URL })
+const db = drizzle(pool, { schema, casing: "snake_case" })
 
 export default db

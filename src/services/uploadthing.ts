@@ -23,10 +23,12 @@ export const fileRouter = {
 
       await rateLimitByUser(user.email)
 
-      return { userId: UserId.parse(user.id) }
+      return { userId: UserId.parse(user.id).toString() }
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      await createAsset(metadata.userId, {
+      const userId = UserId.parse(BigInt(metadata.userId))
+
+      await createAsset(userId, {
         service: "uploadthing",
         mimeType: file.type as AssetMimeType,
         filename: file.name,

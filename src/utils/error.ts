@@ -8,8 +8,8 @@ class CustomError extends Error {
 }
 
 export class AssertionError extends CustomError {
-  constructor(message?: string, cause?: Error) {
-    super("AssertionError", message || "Assertion failed", cause)
+  constructor(message: string, cause?: Error) {
+    super("AssertionError", message, cause)
   }
 }
 
@@ -25,8 +25,18 @@ export class ContextError extends CustomError {
   }
 }
 
+export class DatabaseError extends CustomError {
+  constructor(message: string, cause?: Error) {
+    super("DatabaseError", message, cause)
+  }
+}
+
 export class NotFoundError extends CustomError {
-  constructor(resource: string, id: string, cause?: Error) {
+  constructor(
+    resource: "organization" | "organization-invitation",
+    id: unknown,
+    cause?: Error,
+  ) {
     super("NotFoundError", `${resource} with id ${id} not found`, cause)
   }
 }
@@ -92,5 +102,11 @@ export class RateLimitError extends CustomError {
 export class UploadError extends CustomError {
   constructor(message: string, cause?: Error) {
     super("UploadError", message, cause)
+  }
+}
+
+export class UnauthorizedError extends CustomError {
+  constructor(message: string, cause?: Error) {
+    super("UnauthorizedError", message, cause)
   }
 }

@@ -7,7 +7,7 @@ import type { z } from "zod"
 import env from "~/lib/env.server"
 import { StripeProcessWebhookEventPayloadSchema } from "~/lib/validation/jobs"
 import qstash from "~/services/qstash"
-import { throwUnless } from "~/utils/assert"
+import { AssertionError } from "~/utils/error"
 import { buildUrl } from "~/utils/url"
 
 const JobSchemaMap = {
@@ -39,7 +39,9 @@ export async function enqueueJob<T extends JobType>(
 ) {
   const request = buildJobRequest(type, payload)
 
-  throwUnless(!!request.url, "request.url is required")
+  if (!request.url) {
+    throw new AssertionError("request.url is required")
+  }
 
   if (env.MOCK_QSTASH) {
     console.log("Mocking QStash request", request)

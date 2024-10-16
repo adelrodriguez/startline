@@ -3,16 +3,16 @@ import { cache } from "react"
 import { getCurrentSession } from "~/lib/auth/session"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
 import {
+  type Organization,
   OrganizationId,
   findAccountsByUserId,
   findOrganizationById,
   findOrganizationInvitationByToken,
 } from "~/server/data/organization"
-import { UserId } from "~/server/data/user"
-import { throwUnless } from "~/utils/assert"
+import { type User, UserId } from "~/server/data/user"
 import { OrganizationError, OrganizationInvitationError } from "~/utils/error"
 
-export const getCurrentUser = cache(async () => {
+export const getCurrentUser = cache(async (): Promise<User> => {
   const { user } = await getCurrentSession()
 
   if (!user) {
@@ -22,7 +22,7 @@ export const getCurrentUser = cache(async () => {
   return user
 })
 
-export const getFirstOrganization = cache(async () => {
+export const getFirstOrganization = cache(async (): Promise<Organization> => {
   const user = await getCurrentUser()
 
   const accounts = await findAccountsByUserId(UserId.parse(user.id))
@@ -36,23 +36,29 @@ export const getFirstOrganization = cache(async () => {
     OrganizationId.parse(firstAccount.organizationId),
   )
 
-  throwUnless(organization !== null, "Organization does not exist")
-
-  return organization
-})
-
-export const getOrganizationFromInvitation = cache(async (token: string) => {
-  const invitation = await findOrganizationInvitationByToken(token)
-
-  if (!invitation) {
-    throw new OrganizationInvitationError("Invalid or expired invitation")
+  if (!organization) {
+    throw new OrganizationError("Organization does not exist")
   }
 
-  const organization = await findOrganizationById(
-    OrganizationId.parse(invitation.organizationId),
-  )
-
-  throwUnless(organization !== null, "Organization does not exist")
-
   return organization
 })
+
+export const getOrganizationFromInvitation = cache(
+  async (token: string): Promise<Organization> => {
+    const invitation = await findOrganizationInvitationByToken(token)
+
+    if (!invitation) {
+      throw new OrganizationInvitationError("Invalid or expired invitation")
+    }
+
+    const organization = await findOrganizationById(
+      OrganizationId.parse(invitation.organizationId),
+    )
+
+    if (!organization) {
+      throw new OrganizationError("Organization does not exist")
+    }
+
+    return organization
+  },
+)

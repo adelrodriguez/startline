@@ -4,28 +4,36 @@ import { z } from "zod"
 import { logActivity } from "~/lib/logger"
 import type { UserId } from "~/server/data/user"
 import db, { asset, filters } from "~/server/db"
+import { DatabaseError } from "~/utils/error"
 
 export type Asset = typeof asset.$inferSelect
 export type NewAsset = typeof asset.$inferInsert
 
 export type AssetMimeType = Asset["mimeType"]
 
-export const AssetId = z.number().brand<"AssetId">()
+export const AssetId = z.bigint().brand<"AssetId">()
 export type AssetId = z.infer<typeof AssetId>
 
-export async function findAssetById(id: AssetId) {
-  return db.select().from(asset).where(filters.eq(asset.id, id))
+export async function findAssetById(id: AssetId): Promise<Asset | null> {
+  const existingAsset = await db.query.asset.findFirst({
+    where: (model, { eq }) => eq(model.id, id),
+  })
+
+  return existingAsset ?? null
 }
 
 export async function createAsset(
   userId: UserId,
   values: NewAsset,
 ): Promise<Asset> {
-  const newAsset = await db
+  const [newAsset] = await db
     .insert(asset)
     .values({ ...values, userId })
     .returning()
-    .get()
+
+  if (!newAsset) {
+    throw new DatabaseError("Failed to create asset")
+  }
 
   await logActivity("created_asset", { userId })
 
@@ -36,7 +44,7 @@ export async function markAssetAsUploaded(
   assetId: AssetId,
   userId: UserId,
 ): Promise<Asset> {
-  const uploadedAsset = await db
+  const [uploadedAsset] = await db
     .update(asset)
     .set({ status: "uploaded" })
     .where(
@@ -47,7 +55,10 @@ export async function markAssetAsUploaded(
       ),
     )
     .returning()
-    .get()
+
+  if (!uploadedAsset) {
+    throw new DatabaseError("Failed to mark asset as uploaded")
+  }
 
   await logActivity("marked_asset_as_uploaded", { userId })
 

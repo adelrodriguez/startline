@@ -15,13 +15,17 @@ import db, {
   organizationInvitation,
   user,
 } from "~/server/db"
+import {
+  DatabaseError,
+  NotFoundError,
+  OrganizationInvitationError,
+} from "~/utils/error"
 import { OrganizationError } from "~/utils/error"
-import type { StrictOmit } from "~/utils/type"
 
 export type Organization = typeof organization.$inferSelect
 export type NewOrganization = typeof organization.$inferInsert
 
-export const OrganizationId = z.number().brand<"OrganizationId">()
+export const OrganizationId = z.bigint().brand<"OrganizationId">()
 export type OrganizationId = z.infer<typeof OrganizationId>
 
 export type Account = typeof account.$inferSelect
@@ -33,16 +37,19 @@ export type NewOrganizationInvitation =
   typeof organizationInvitation.$inferInsert
 
 export async function createOrganization(
-  values: StrictOmit<NewOrganization, "id"> = {
+  values: NewOrganization = {
     name: "Personal Workspace",
   },
   options?: { ownerId?: UserId },
 ): Promise<Organization> {
-  const newOrganization = await db
+  const [newOrganization] = await db
     .insert(organization)
     .values(values)
     .returning()
-    .get()
+
+  if (!newOrganization) {
+    throw new DatabaseError("Failed to create organization")
+  }
 
   if (options?.ownerId) {
     await createAccount(
@@ -81,11 +88,14 @@ export async function createAccount(
   organizationId: OrganizationId,
   role: Account["role"],
 ): Promise<Account> {
-  return db
+  const [existingAccount] = await db
     .insert(account)
     .values({ userId, organizationId, role })
     .returning()
-    .get()
+
+  if (!existingAccount) throw new DatabaseError("Failed to create account")
+
+  return existingAccount
 }
 
 export async function removeMemberFromOrganization(
@@ -130,11 +140,7 @@ export async function assertIsOrganizationOwner(
     },
   })
 
-  if (!existingAccount) {
-    throw new OrganizationError("User is not a member of the organization")
-  }
-
-  if (existingAccount.role !== "owner") {
+  if (!existingAccount || existingAccount.role !== "owner") {
     throw new OrganizationError("User is not an owner of the organization")
   }
 }
@@ -198,7 +204,7 @@ export async function createOrganizationInvitation(
   const token = await generateRandomString(32, alphabet("a-z", "A-Z", "0-9"))
   const expiresAt = createDate(new TimeSpan(7, "d"))
 
-  const invitation = await db
+  const [invitation] = await db
     .insert(organizationInvitation)
     .values({
       organizationId,
@@ -209,7 +215,10 @@ export async function createOrganizationInvitation(
       expiresAt,
     })
     .returning()
-    .get()
+
+  if (!invitation) {
+    throw new DatabaseError("Failed to create organization invitation")
+  }
 
   await sendOrganizationInvitationEmail(invitation)
 
@@ -224,12 +233,11 @@ export async function createOrganizationInvitation(
 async function sendOrganizationInvitationEmail(
   invitation: OrganizationInvitation,
 ): Promise<void> {
-  const organization = await findOrganizationById(
-    OrganizationId.parse(invitation.organizationId),
-  )
+  const organizationId = OrganizationId.parse(invitation.organizationId)
+  const organization = await findOrganizationById(organizationId)
 
   if (!organization) {
-    throw new OrganizationError("Organization not found")
+    throw new NotFoundError("organization", organizationId.toString())
   }
 
   await sendEmail(
@@ -244,13 +252,13 @@ async function sendOrganizationInvitationEmail(
 
 export async function findOrganizationInvitationByToken(
   token: string,
-): Promise<OrganizationInvitation | undefined> {
+): Promise<OrganizationInvitation | null> {
   const existingInvitation = await db.query.organizationInvitation.findFirst({
     where: (inv, { eq, and, gt }) =>
       and(eq(inv.token, token), gt(inv.expiresAt, new Date())),
   })
 
-  return existingInvitation ?? undefined
+  return existingInvitation ?? null
 }
 
 export async function acceptOrganizationInvitation(
@@ -260,31 +268,34 @@ export async function acceptOrganizationInvitation(
   const invitation = await findOrganizationInvitationByToken(token)
 
   if (!invitation) {
-    throw new OrganizationError("Invalid or expired invitation")
+    throw new OrganizationInvitationError("Invalid or expired invitation")
   }
 
-  await db.batch([
-    db.insert(account).values({
+  await db.transaction(async (tx) => {
+    await tx.insert(account).values({
       organizationId: invitation.organizationId,
       userId,
       role: invitation.role,
-    }),
-    deleteOrganizationInvitation(invitation.id),
-  ])
+    })
+
+    await tx
+      .delete(organizationInvitation)
+      .where(filters.eq(organizationInvitation.id, invitation.id))
+  })
 
   return invitation
 }
 
-export function deleteOrganizationInvitation(id: OrganizationInvitation["id"]) {
-  return db
+export async function deleteOrganizationInvitation(
+  id: OrganizationInvitation["id"],
+): Promise<void> {
+  await db
     .delete(organizationInvitation)
     .where(filters.eq(organizationInvitation.id, id))
 }
 
-export async function cleanExpiredOrganizationInvitations(): Promise<number> {
-  const result = await db
+export async function cleanExpiredOrganizationInvitations(): Promise<void> {
+  await db
     .delete(organizationInvitation)
     .where(filters.lt(organizationInvitation.expiresAt, new Date()))
-
-  return result.rowsAffected
 }

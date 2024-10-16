@@ -1,8 +1,5 @@
-import { sql } from "drizzle-orm"
-import { sqliteTableCreator } from "drizzle-orm/sqlite-core"
-
-export const CURRENT_TIMESTAMP = sql`(unixepoch())`
+import { pgTableCreator } from "drizzle-orm/pg-core"
 
 // You can add a prefix to table names to host multiple projects on the same
 // database
-export const createTable = sqliteTableCreator((name) => name)
+export const createTable = pgTableCreator((name) => name)

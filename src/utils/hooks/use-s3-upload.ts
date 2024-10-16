@@ -3,7 +3,6 @@ import { useCallback } from "react"
 import { confirmUpload, uploadFile } from "~/server/actions/upload"
 import type { AssetMimeType } from "~/server/data/asset"
 import { UploadError } from "~/utils/error"
-import { throwUnless } from "~/utils/assert"
 
 export default function useS3Upload(
   action = uploadFile,
@@ -13,7 +12,9 @@ export default function useS3Upload(
     async (file: File) => {
       const mimeType = file.type as AssetMimeType
 
-      throwUnless(mimeTypes.includes(mimeType), "Invalid file type")
+      if (!mimeTypes.includes(mimeType)) {
+        throw new UploadError("Invalid file type")
+      }
 
       const actionResult = await action({
         filename: file.name,
@@ -34,7 +35,7 @@ export default function useS3Upload(
         },
       })
 
-      const confirmResult = await confirmUpload({ assetId })
+      const confirmResult = await confirmUpload({ assetId: assetId.toString() })
 
       if (!confirmResult?.data) {
         throw new UploadError("Failed to confirm upload")

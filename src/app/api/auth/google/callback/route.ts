@@ -89,7 +89,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const user = await createUserFromGoogle({
       googleId: googleUser.sub,
       email: googleUser.email,
-      emailVerifiedAt: new Date(),
     })
 
     const userId = UserId.parse(user.id)

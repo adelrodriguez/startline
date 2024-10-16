@@ -23,6 +23,7 @@ import db, {
   signInCode,
   user,
 } from "~/server/db"
+import { DatabaseError, UnauthorizedError } from "~/utils/error"
 import { argon2, sha } from "~/utils/hash"
 import type { StrictOmit } from "~/utils/type"
 
@@ -30,8 +31,14 @@ export type User = typeof user.$inferSelect
 export type UserRole = User["role"]
 export type NewUser = typeof user.$inferInsert
 
-export const UserId = z.number().brand<"UserId">()
+export const UserId = z.bigint().brand<"UserId">()
 export type UserId = z.infer<typeof UserId>
+
+export type Password = typeof password.$inferSelect
+export type NewPassword = typeof password.$inferInsert
+
+export type PasswordResetToken = typeof passwordResetToken.$inferSelect
+export type NewPasswordResetToken = typeof passwordResetToken.$inferInsert
 
 export type Profile = typeof profile.$inferSelect
 export type NewProfile = typeof profile.$inferInsert
@@ -42,7 +49,17 @@ export type NewSession = typeof session.$inferInsert
 export const SessionId = z.string().brand<"SessionId">()
 export type SessionId = z.infer<typeof SessionId>
 
-export async function findUserByEmail(email: User["email"]) {
+export type EmailVerificationCode = typeof emailVerificationCode.$inferSelect
+export type NewEmailVerificationCode = typeof emailVerificationCode.$inferInsert
+
+export const EmailVerificationCodeId = z
+  .string()
+  .brand<"EmailVerificationCodeId">()
+export type EmailVerificationCodeId = z.infer<typeof EmailVerificationCodeId>
+
+export async function findUserByEmail(
+  email: User["email"],
+): Promise<User | null> {
   const existingUser = await db.query.user.findFirst({
     where: (model, { eq }) => eq(model.email, email),
   })
@@ -50,7 +67,9 @@ export async function findUserByEmail(email: User["email"]) {
   return existingUser ?? null
 }
 
-export async function findUserByGoogleId(googleId: string) {
+export async function findUserByGoogleId(
+  googleId: string,
+): Promise<User | null> {
   const existingUser = await db.query.user.findFirst({
     where: (model, { eq }) => eq(model.googleId, googleId),
   })
@@ -58,7 +77,9 @@ export async function findUserByGoogleId(googleId: string) {
   return existingUser ?? null
 }
 
-export async function findUserByGitHubId(githubId: string) {
+export async function findUserByGitHubId(
+  githubId: string,
+): Promise<User | null> {
   const existingUser = await db.query.user.findFirst({
     where: (model, { eq }) => eq(model.githubId, githubId),
   })
@@ -66,7 +87,7 @@ export async function findUserByGitHubId(githubId: string) {
   return existingUser ?? null
 }
 
-export async function findUserById(userId: UserId) {
+export async function findUserById(userId: UserId): Promise<User | null> {
   const user = await db.query.user.findFirst({
     where: (model, { eq }) => eq(model.id, userId),
   })
@@ -74,18 +95,23 @@ export async function findUserById(userId: UserId) {
   return user ?? null
 }
 
-export function createUser(values: StrictOmit<NewUser, "id" | "role">) {
-  return db
+export async function createUser(values: NewUser): Promise<User> {
+  const [newUser] = await db
     .insert(user)
     .values({ ...values, role: "user" })
     .returning()
-    .get()
+
+  if (!newUser) {
+    throw new DatabaseError("Failed to create user")
+  }
+
+  return newUser
 }
 
 export async function createUserFromGoogle(
-  values: Pick<NewUser, "email" | "googleId" | "emailVerifiedAt">,
-) {
-  const newUser = await db
+  values: Pick<NewUser, "email" | "googleId">,
+): Promise<User> {
+  const [newUser] = await db
     .insert(user)
     .values({ ...values, role: "user", emailVerifiedAt: new Date() })
     .onConflictDoUpdate({
@@ -93,7 +119,10 @@ export async function createUserFromGoogle(
       set: { emailVerifiedAt: new Date(), googleId: values.googleId },
     })
     .returning()
-    .get()
+
+  if (!newUser) {
+    throw new DatabaseError("Failed to create user from Google")
+  }
 
   await logActivity("signed_up_with_google", {
     userId: UserId.parse(newUser.id),
@@ -104,8 +133,8 @@ export async function createUserFromGoogle(
 
 export async function createUserFromGitHub(
   values: Pick<NewUser, "email" | "githubId">,
-) {
-  const newUser = await db
+): Promise<User> {
+  const [newUser] = await db
     .insert(user)
     .values({ ...values, role: "user", emailVerifiedAt: new Date() })
     .onConflictDoUpdate({
@@ -113,7 +142,10 @@ export async function createUserFromGitHub(
       set: { emailVerifiedAt: new Date(), githubId: values.githubId },
     })
     .returning()
-    .get()
+
+  if (!newUser) {
+    throw new DatabaseError("Failed to create user from GitHub")
+  }
 
   await logActivity("signed_up_with_github", {
     userId: UserId.parse(newUser.id),
@@ -122,16 +154,23 @@ export async function createUserFromGitHub(
   return newUser
 }
 
-export function findOrCreateUser(values: Pick<NewUser, "email">) {
-  return db
+export async function findOrCreateUser(
+  values: Pick<NewUser, "email">,
+): Promise<User> {
+  const [newUser] = await db
     .insert(user)
     .values({ ...values, role: "user" })
     .onConflictDoNothing()
     .returning()
-    .get()
+
+  if (!newUser) {
+    throw new DatabaseError("Failed to find or create user")
+  }
+
+  return newUser
 }
 
-export async function markUserAsEmailVerified(userId: UserId) {
+export async function markUserAsEmailVerified(userId: UserId): Promise<void> {
   await db
     .update(user)
     .set({ emailVerifiedAt: new Date() })
@@ -141,32 +180,46 @@ export async function markUserAsEmailVerified(userId: UserId) {
         filters.isNull(user.emailVerifiedAt),
       ),
     )
-    .returning()
 
   await logActivity("marked_email_as_verified", { userId })
 }
 
-export function checkIsAdmin(user: User) {
-  return user.role === "admin"
+export function assertUserIsAdmin(
+  user: User,
+): asserts user is User & { role: "admin" } {
+  if (user.role !== "admin") {
+    throw new UnauthorizedError("User is not an admin")
+  }
 }
 
-export function checkIsUser(user: User) {
-  return user.role === "user"
+export function assertUserIsUser(
+  user: User,
+): asserts user is User & { role: "user" } {
+  if (user.role !== "user") {
+    throw new UnauthorizedError("User is not a user")
+  }
 }
 
 export async function createProfile(
   userId: UserId,
   values: StrictOmit<NewProfile, "userId"> = {},
-) {
-  return db
+): Promise<Profile> {
+  const [newProfile] = await db
     .insert(profile)
     .values({ ...values, userId })
     .onConflictDoNothing()
     .returning()
-    .get()
+
+  if (!newProfile) {
+    throw new DatabaseError("Failed to create profile")
+  }
+
+  return newProfile
 }
 
-export async function findValidEmailVerificationCodeByUserId(userId: UserId) {
+export async function findValidEmailVerificationCodeByUserId(
+  userId: UserId,
+): Promise<EmailVerificationCode | null> {
   const code = await db.query.emailVerificationCode.findFirst({
     where: (model, { eq, and, gte }) =>
       and(eq(model.userId, userId), gte(model.expiresAt, new Date())),
@@ -175,7 +228,10 @@ export async function findValidEmailVerificationCodeByUserId(userId: UserId) {
   return code ?? null
 }
 
-export async function sendEmailVerificationCode(userId: UserId, email: string) {
+export async function sendEmailVerificationCode(
+  userId: UserId,
+  email: string,
+): Promise<void> {
   // Delete old codes
   await deleteEmailVerificationCodes(userId)
 
@@ -202,7 +258,7 @@ export async function sendEmailVerificationCode(userId: UserId, email: string) {
 export async function verifyEmailVerificationCode(
   userId: UserId,
   code: string,
-) {
+): Promise<boolean> {
   const emailVerificationCode =
     await findValidEmailVerificationCodeByUserId(userId)
 
@@ -218,22 +274,29 @@ export async function verifyEmailVerificationCode(
   return true
 }
 
-export function deleteEmailVerificationCodes(userId: UserId) {
-  return db
+export async function deleteEmailVerificationCodes(
+  userId: UserId,
+): Promise<number | null> {
+  const result = await db
     .delete(emailVerificationCode)
     .where(filters.eq(emailVerificationCode.userId, userId))
-    .returning()
+
+  return result.rowCount
 }
 
-export async function cleanExpiredEmailVerificationCodes() {
+export async function cleanExpiredEmailVerificationCodes(): Promise<
+  number | null
+> {
   const result = await db
     .delete(emailVerificationCode)
     .where(filters.lt(emailVerificationCode.expiresAt, new Date()))
 
-  return result.rowsAffected
+  return result.rowCount
 }
 
-export async function findValidPasswordResetToken(input: string) {
+export async function findValidPasswordResetToken(
+  input: string,
+): Promise<PasswordResetToken | null> {
   const hashed = await sha.sha256.hash(input)
 
   const token = await db.query.passwordResetToken.findFirst({
@@ -244,7 +307,10 @@ export async function findValidPasswordResetToken(input: string) {
   return token ?? null
 }
 
-export async function sendPasswordResetToken(userId: UserId, email: string) {
+export async function sendPasswordResetToken(
+  userId: UserId,
+  email: string,
+): Promise<void> {
   await deletePasswordResetTokens(userId)
 
   const token = generateIdFromEntropySize(25)
@@ -264,7 +330,9 @@ export async function sendPasswordResetToken(userId: UserId, email: string) {
   await logActivity("requested_password_reset", { userId })
 }
 
-export async function markPasswordResetTokenAsUsed(userId: UserId) {
+export async function markPasswordResetTokenAsUsed(
+  userId: UserId,
+): Promise<void> {
   await deletePasswordResetTokens(userId)
 
   await logActivity("reset_password", { userId })
@@ -274,25 +342,30 @@ export async function markPasswordResetTokenAsUsed(userId: UserId) {
   await markUserAsEmailVerified(userId)
 }
 
-export function deletePasswordResetTokens(userId: UserId) {
-  return db
+export async function deletePasswordResetTokens(userId: UserId): Promise<void> {
+  await db
     .delete(passwordResetToken)
     .where(filters.eq(passwordResetToken.userId, userId))
     .returning()
 }
 
-export async function cleanExpiredPasswordResetTokens() {
+export async function cleanExpiredPasswordResetTokens(): Promise<
+  number | null
+> {
   const result = await db
     .delete(passwordResetToken)
     .where(filters.lt(passwordResetToken.expiresAt, new Date()))
 
-  return result.rowsAffected
+  return result.rowCount
 }
 
-export async function createPassword(userId: UserId, input: string) {
+export async function createPassword(
+  userId: UserId,
+  input: string,
+): Promise<Password> {
   const hashedPassword = await argon2.hash(input)
 
-  return db
+  const [newPassword] = await db
     .insert(password)
     .values({ hash: hashedPassword, userId })
     .onConflictDoUpdate({
@@ -300,10 +373,15 @@ export async function createPassword(userId: UserId, input: string) {
       set: { hash: hashedPassword },
     })
     .returning()
-    .get()
+
+  if (!newPassword) {
+    throw new DatabaseError("Failed to create password")
+  }
+
+  return newPassword
 }
 
-export async function findPassword(userId: UserId) {
+export async function findPassword(userId: UserId): Promise<Password | null> {
   const password = await db.query.password.findFirst({
     where: (model, { eq }) => eq(model.userId, userId),
   })
@@ -311,7 +389,10 @@ export async function findPassword(userId: UserId) {
   return password ?? null
 }
 
-export async function verifyPassword(userId: UserId, input: string) {
+export async function verifyPassword(
+  userId: UserId,
+  input: string,
+): Promise<boolean> {
   const password = await findPassword(userId)
 
   if (!password) {
@@ -321,7 +402,7 @@ export async function verifyPassword(userId: UserId, input: string) {
   return argon2.verify(password.hash, input)
 }
 
-export async function sendSignInCode(email: string) {
+export async function sendSignInCode(email: string): Promise<void> {
   // Delete old codes
   await deleteSignInCode(email)
 
@@ -338,7 +419,10 @@ export async function sendSignInCode(email: string) {
   await logActivity("requested_sign_in_code")
 }
 
-export async function verifySignInCode(email: string, code: string) {
+export async function verifySignInCode(
+  email: string,
+  code: string,
+): Promise<boolean> {
   const signInCode = await db.query.signInCode.findFirst({
     where: (model, { eq, and, gte }) =>
       and(eq(model.email, email), gte(model.expiresAt, new Date())),
@@ -346,7 +430,7 @@ export async function verifySignInCode(email: string, code: string) {
 
   if (!signInCode) return false
 
-  const isValidCode = await sha.sha256.verify(signInCode.hash, code)
+  const isValidCode = sha.sha256.verify(signInCode.hash, code)
 
   if (!isValidCode) return false
 
@@ -356,27 +440,27 @@ export async function verifySignInCode(email: string, code: string) {
   return true
 }
 
-export function deleteSignInCode(email: string) {
-  return db
+export async function deleteSignInCode(email: string): Promise<void> {
+  await db
     .delete(signInCode)
     .where(filters.eq(signInCode.email, email))
     .returning()
 }
 
-export async function cleanExpiredSignInCodes() {
+export async function cleanExpiredSignInCodes(): Promise<number | null> {
   const result = await db
     .delete(signInCode)
     .where(filters.lt(signInCode.expiresAt, new Date()))
 
-  return result.rowsAffected
+  return result.rowCount
 }
 
-export function createSession(
+export async function createSession(
   token: string,
   userId: UserId,
   values: Omit<NewSession, "id" | "userId" | "expiresAt">,
-) {
-  return db
+): Promise<Session> {
+  const [newSession] = await db
     .insert(session)
     .values({
       ...values,
@@ -385,10 +469,17 @@ export function createSession(
       expiresAt: addDays(new Date(), SESSION_LENGTH_IN_DAYS),
     })
     .returning()
-    .get()
+
+  if (!newSession) {
+    throw new DatabaseError("Failed to create session")
+  }
+
+  return newSession
 }
 
-export async function findSessionById(sessionId: SessionId) {
+export async function findSessionById(
+  sessionId: SessionId,
+): Promise<(Session & { user: User }) | null> {
   const existingSession = await db.query.session.findFirst({
     where: filters.eq(session.id, sessionId),
     with: {
@@ -399,17 +490,17 @@ export async function findSessionById(sessionId: SessionId) {
   return existingSession ?? null
 }
 
-export async function deleteSession(sessionId: SessionId) {
+export async function deleteSession(sessionId: SessionId): Promise<void> {
   await db.delete(session).where(filters.eq(session.id, sessionId))
 }
 
-export async function deleteSessions(userId: UserId) {
+export async function deleteSessions(userId: UserId): Promise<void> {
   await db.delete(session).where(filters.eq(session.userId, userId))
 }
 
 export async function updateSession(
   sessionId: SessionId,
   values: Partial<Omit<NewSession, "id" | "userId">>,
-) {
+): Promise<void> {
   await db.update(session).set(values).where(filters.eq(session.id, sessionId))
 }

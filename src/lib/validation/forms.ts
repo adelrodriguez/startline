@@ -127,5 +127,5 @@ export const RequestPasswordResetSchema = z.object({
 export const InviteMemberSchema = z.object({
   email: z.string().email(),
   role: z.enum(["member", "admin"]),
-  organizationId: z.number().brand<"OrganizationId">(),
+  organizationId: z.bigint().brand<"OrganizationId">(),
 })

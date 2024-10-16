@@ -7,7 +7,7 @@ import s3 from "~/services/s3"
 import { obfuscate } from "~/utils/obfuscator"
 
 export function generateKey(userId: UserId, filename: string): string {
-  return `${obfuscate(userId)}/${sanitizeKey(filename)}`
+  return `${obfuscate(Number(userId))}/${sanitizeKey(filename)}`
 }
 
 export function sanitizeKey(key: string): string {
