@@ -1,6 +1,6 @@
 import { pgEnum, primaryKey } from "drizzle-orm/pg-core"
 import { DEFAULT_LOCALE, LOCALES } from "~/lib/consts"
-import { createTable } from "~/server/db/schema/helpers"
+import { createPublicId, createTable } from "~/server/db/schema/helpers"
 
 export const userRoleEnum = pgEnum("user_role", ["admin", "user"])
 
@@ -9,6 +9,7 @@ export const user = createTable("user", (t) => ({
     .bigint({ mode: "bigint" })
     .generatedAlwaysAsIdentity({ startWith: 1 })
     .primaryKey(),
+  publicId: t.text().notNull().unique().$defaultFn(createPublicId("usr")),
   createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
   updatedAt: t
     .timestamp({ mode: "date" })
@@ -96,6 +97,7 @@ export const passwordResetToken = createTable("password_reset_token", (t) => ({
 
 export const session = createTable("session", (t) => ({
   id: t.text().primaryKey(),
+  publicId: t.text().notNull().unique().$defaultFn(createPublicId("sess")),
   createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
   expiresAt: t.timestamp({ mode: "date" }).notNull(),
   userId: t
@@ -115,6 +117,7 @@ export const organization = createTable("organization", (t) => ({
     .bigint({ mode: "bigint" })
     .generatedAlwaysAsIdentity({ startWith: 1 })
     .primaryKey(),
+  publicId: t.text().notNull().unique().$defaultFn(createPublicId("org")),
   createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
   updatedAt: t
     .timestamp({ mode: "date" })
@@ -133,6 +136,7 @@ export const accountRoleEnum = pgEnum("account_role", [
 export const account = createTable(
   "account",
   (t) => ({
+    publicId: t.text().notNull().unique().$defaultFn(createPublicId("acc")),
     createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
     updatedAt: t
       .timestamp({ mode: "date" })
@@ -164,6 +168,7 @@ export const organizationInvitation = createTable(
       .bigint({ mode: "bigint" })
       .generatedAlwaysAsIdentity({ startWith: 1 })
       .primaryKey(),
+    publicId: t.text().notNull().unique().$defaultFn(createPublicId("inv")),
     createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
     updatedAt: t
       .timestamp({ mode: "date" })
@@ -199,6 +204,7 @@ export const webhookEvent = createTable("webhook_event", (t) => ({
     .bigint({ mode: "bigint" })
     .generatedAlwaysAsIdentity({ startWith: 1 })
     .primaryKey(),
+  publicId: t.text().notNull().unique().$defaultFn(createPublicId("wh")),
   createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
   processedAt: t.timestamp({ mode: "date" }),
   event: t.text().notNull(),
@@ -223,6 +229,7 @@ export const asset = createTable("asset", (t) => ({
     .bigint({ mode: "bigint" })
     .generatedAlwaysAsIdentity({ startWith: 1 })
     .primaryKey(),
+  publicId: t.text().notNull().unique().$defaultFn(createPublicId("ast")),
   createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
   updatedAt: t
     .timestamp({ mode: "date" })
@@ -270,6 +277,7 @@ export const activityLog = createTable("activity_log", (t) => ({
     .bigint({ mode: "bigint" })
     .generatedAlwaysAsIdentity({ startWith: 1 })
     .primaryKey(),
+  publicId: t.text().notNull().unique().$defaultFn(createPublicId("act")),
   createdAt: t.timestamp({ mode: "date" }).defaultNow().notNull(),
   type: activityLogTypeEnum().notNull(),
   userId: t.bigint({ mode: "bigint" }).references(() => user.id),
