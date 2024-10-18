@@ -1,7 +1,7 @@
+import { intro, log, outro, spinner } from "@clack/prompts"
 import type { CreateScheduleRequest } from "@upstash/qstash"
 import qstash from "~/services/qstash"
 import { buildUrl } from "~/utils/url"
-import { intro, outro, log, spinner } from "@clack/prompts"
 
 const schedules = qstash.schedules
 
@@ -11,14 +11,9 @@ function buildScheduleUrl(name: string) {
 
 const endpoints: CreateScheduleRequest[] = [
   {
-    destination: buildScheduleUrl("clean-password-reset-tokens"),
+    destination: buildScheduleUrl("clean-expired-codes"),
     cron: "0 0 * * *",
   },
-  {
-    destination: buildScheduleUrl("clean-email-verification-codes"),
-    cron: "0 0 * * *",
-  },
-  { destination: buildScheduleUrl("clean-sign-in-codes"), cron: "0 0 * * *" },
 ]
 
 intro("Creating schedules")
