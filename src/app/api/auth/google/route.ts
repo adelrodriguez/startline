@@ -20,14 +20,16 @@ export async function GET(): Promise<NextResponse> {
     scopes: ["profile", "email"],
   })
 
-  cookies().set("google_oauth_state", state, {
+  const cookieStore = cookies()
+
+  cookieStore.set("google_oauth_state", state, {
     secure: true,
     path: "/",
     httpOnly: true,
     maxAge: 60 * 10, // Ten minutes
   })
 
-  cookies().set("google_code_verifier", codeVerifier, {
+  cookieStore.set("google_code_verifier", codeVerifier, {
     secure: true,
     path: "/",
     httpOnly: true,

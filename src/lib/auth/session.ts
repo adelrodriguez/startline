@@ -60,7 +60,9 @@ async function validateSessionToken(
 }
 
 function setSessionTokenCookie(token: string, expiresAt: Date): void {
-  cookies().set(SESSION_COOKIE_NAME, token, {
+  const cookieStore = cookies()
+
+  cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: "lax",
     secure: isProduction,
@@ -70,7 +72,9 @@ function setSessionTokenCookie(token: string, expiresAt: Date): void {
 }
 
 export function deleteSessionTokenCookie(): void {
-  cookies().set(SESSION_COOKIE_NAME, "", {
+  const cookieStore = cookies()
+
+  cookieStore.set(SESSION_COOKIE_NAME, "", {
     httpOnly: true,
     sameSite: "lax",
     secure: isProduction,
@@ -97,6 +101,7 @@ export async function setSession(userId: UserId, request?: Request) {
 }
 
 export async function invalidateSession(sessionId: SessionId): Promise<void> {
+  deleteSessionTokenCookie()
   await deleteSession(sessionId)
 }
 
@@ -108,7 +113,8 @@ export const getCurrentSession = cache(
   async (): Promise<
     { user: User; session: Session } | { user: null; session: null }
   > => {
-    const sessionId = cookies().get(SESSION_COOKIE_NAME)?.value ?? null
+    const cookieStore = cookies()
+    const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null
 
     if (!sessionId) {
       return { user: null, session: null }

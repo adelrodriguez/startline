@@ -24,7 +24,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url)
   const code = url.searchParams.get("code")
   const state = url.searchParams.get("state")
-  const storedState = cookies().get("github_oauth_state")?.value ?? null
+  const cookieStore = cookies()
+  const storedState = cookieStore.get("github_oauth_state")?.value ?? null
 
   if (!code || !state || !storedState || state !== storedState) {
     return new NextResponse(null, {

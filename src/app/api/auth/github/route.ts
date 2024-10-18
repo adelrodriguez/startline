@@ -16,7 +16,8 @@ export async function GET(): Promise<NextResponse> {
   const state = generateState()
   const url = await github.createAuthorizationURL(state)
 
-  cookies().set("github_oauth_state", state, {
+  const cookieStore = cookies()
+  cookieStore.set("github_oauth_state", state, {
     secure: true,
     path: "/",
     httpOnly: true,

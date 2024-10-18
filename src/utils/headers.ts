@@ -16,8 +16,9 @@ export function getIpAddress(request?: Request): string | null {
     return ip.trim()
   }
 
-  const forwardedFor = headers().get("x-forwarded-for")
-  const realIp = headers().get("x-real-ip")
+  const headersList = headers()
+  const forwardedFor = headersList.get("x-forwarded-for")
+  const realIp = headersList.get("x-real-ip")
 
   const forwardedForIp = forwardedFor?.split(",")[0]?.trim()
 
@@ -45,9 +46,10 @@ export function getGeolocation(request?: Request): {
     }
   }
 
-  const region = headers().get("X-Vercel-IP-Country-Region")
-  const country = headers().get("X-Vercel-IP-Country")
-  const city = headers().get("X-Vercel-IP-City")
+  const headersList = headers()
+  const region = headersList.get("X-Vercel-IP-Country-Region")
+  const country = headersList.get("X-Vercel-IP-Country")
+  const city = headersList.get("X-Vercel-IP-City")
 
   return {
     country: country ? decodeURIComponent(country) : null,

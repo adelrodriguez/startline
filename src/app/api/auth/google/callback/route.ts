@@ -24,8 +24,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url)
   const code = url.searchParams.get("code")
   const state = url.searchParams.get("state")
-  const storedState = cookies().get("google_oauth_state")?.value ?? null
-  const codeVerifier = cookies().get("google_code_verifier")?.value ?? null
+  const cookieStore = cookies()
+  const storedState = cookieStore.get("google_oauth_state")?.value ?? null
+  const codeVerifier = cookieStore.get("google_code_verifier")?.value ?? null
 
   if (
     !code ||

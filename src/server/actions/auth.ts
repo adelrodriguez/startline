@@ -161,7 +161,8 @@ export async function signInWithCode(_: unknown, formData: FormData) {
 
   await logActivity("requested_sign_in_code")
 
-  cookies().set(VERIFICATION_EMAIL_COOKIE_NAME, submission.value.email, {
+  const cookieStore = cookies()
+  cookieStore.set(VERIFICATION_EMAIL_COOKIE_NAME, submission.value.email, {
     httpOnly: true,
     secure: isProduction,
     sameSite: "strict",
@@ -176,7 +177,8 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
     throw new Error("Sign-in codes are disabled")
   }
 
-  const email = cookies().get(VERIFICATION_EMAIL_COOKIE_NAME)?.value ?? null
+  const cookieStore = cookies()
+  const email = cookieStore.get(VERIFICATION_EMAIL_COOKIE_NAME)?.value ?? null
 
   if (!email) {
     return redirect(UNAUTHORIZED_URL)
@@ -200,7 +202,7 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
     })
   }
 
-  cookies().set(VERIFICATION_EMAIL_COOKIE_NAME, "")
+  cookieStore.set(VERIFICATION_EMAIL_COOKIE_NAME, "")
 
   let user = await findUserByEmail(email)
 
