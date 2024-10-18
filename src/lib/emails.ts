@@ -1,5 +1,6 @@
 import "server-only"
 import { render } from "@react-email/render"
+import chalk from "chalk"
 import type { ReactElement } from "react"
 import env from "~/lib/env.server"
 import { SendEmailError } from "~/lib/error"
@@ -9,17 +10,17 @@ export async function sendEmail(
   email: string,
   subject: string,
   body: ReactElement,
-  sendAt?: Date,
+  sendAt?: Date | string,
 ) {
   if (env.MOCK_RESEND) {
     const content = await render(body, { plainText: true })
 
-    console.info("===> MOCKING EMAIL SEND")
-    console.info("===> Sending email to", email)
-    console.info("===> Email content:")
-    console.info("----------------------------------------")
-    console.info(content)
-    console.info("----------------------------------------")
+    console.warn(chalk.bold.yellowBright("📪 env.MOCK_RESEND is set!"))
+    console.info(chalk.green("📫 Sending email to", email))
+    console.info(chalk.green("📝 Email content:"))
+    console.info(chalk.gray("----------------------------------------"))
+    console.info(chalk.gray.italic(content))
+    console.info(chalk.gray("----------------------------------------"))
 
     return
   }
@@ -29,7 +30,7 @@ export async function sendEmail(
     to: email,
     subject,
     react: body,
-    scheduledAt: sendAt?.toISOString(),
+    scheduledAt: typeof sendAt === "string" ? sendAt : sendAt?.toISOString(),
   })
 
   if (error) {
