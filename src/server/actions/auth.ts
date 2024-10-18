@@ -17,6 +17,7 @@ import {
   UNAUTHORIZED_URL,
 } from "~/lib/consts"
 import env from "~/lib/env.server"
+import { PasswordResetError } from "~/lib/error"
 import { logActivity } from "~/lib/logger"
 import { rateLimitByIp, rateLimitByUser } from "~/lib/rate-limit"
 import {
@@ -51,7 +52,6 @@ import {
   verifyPassword,
   verifySignInCode,
 } from "~/server/data/user"
-import { PasswordResetError } from "~/utils/error"
 
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 

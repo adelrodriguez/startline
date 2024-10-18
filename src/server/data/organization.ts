@@ -5,6 +5,12 @@ import { alphabet, generateRandomString } from "oslo/crypto"
 
 import { OrganizationInvitationEmail } from "~/components/emails"
 import { sendEmail } from "~/lib/emails"
+import {
+  DatabaseError,
+  NotFoundError,
+  OrganizationInvitationError,
+} from "~/lib/error"
+import { OrganizationError } from "~/lib/error"
 import type { UserId } from "~/server/data/user"
 import db, {
   account,
@@ -13,12 +19,6 @@ import db, {
   organizationInvitation,
   user,
 } from "~/server/db"
-import {
-  DatabaseError,
-  NotFoundError,
-  OrganizationInvitationError,
-} from "~/utils/error"
-import { OrganizationError } from "~/utils/error"
 
 export type Organization = typeof organization.$inferSelect
 export type NewOrganization = typeof organization.$inferInsert

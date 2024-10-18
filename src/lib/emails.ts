@@ -2,8 +2,8 @@ import "server-only"
 import { render } from "@react-email/render"
 import type { ReactElement } from "react"
 import env from "~/lib/env.server"
+import { SendEmailError } from "~/lib/error"
 import resend from "~/services/resend"
-import { SendEmailError } from "~/utils/error"
 
 export async function sendEmail(
   email: string,

@@ -13,9 +13,9 @@ import {
 import { redirect } from "next/navigation"
 import { getCurrentSession } from "~/lib/auth/session"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
+import { AuthError, RateLimitError } from "~/lib/error"
 import { rateLimitByIp, rateLimitByUser } from "~/lib/rate-limit"
 import type { User } from "~/server/data/user"
-import { AuthError, RateLimitError } from "~/utils/error"
 
 export const actionClient = createSafeActionClient({
   handleServerError(e) {

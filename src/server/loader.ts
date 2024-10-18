@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { cache } from "react"
 import { getCurrentSession } from "~/lib/auth/session"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
+import { OrganizationError, OrganizationInvitationError } from "~/lib/error"
 import {
   type Organization,
   findAccountsByUserId,
@@ -9,7 +10,6 @@ import {
   findOrganizationInvitationByToken,
 } from "~/server/data/organization"
 import type { User } from "~/server/data/user"
-import { OrganizationError, OrganizationInvitationError } from "~/utils/error"
 
 export const getCurrentUser = cache(async (): Promise<User> => {
   const { user } = await getCurrentSession()

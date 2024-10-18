@@ -1,6 +1,7 @@
 "use server"
 
 import { StorageBuckets } from "~/lib/consts"
+import { UploadError } from "~/lib/error"
 import { logActivity } from "~/lib/logger"
 import { authActionClient, withRateLimitByUser } from "~/lib/safe-action"
 import {
@@ -19,7 +20,6 @@ import {
   findAssetByPublicId,
   markAssetAsUploaded,
 } from "~/server/data/asset"
-import { UploadError } from "~/utils/error"
 import { buildAssetUrl } from "~/utils/url"
 
 export const uploadFile = authActionClient

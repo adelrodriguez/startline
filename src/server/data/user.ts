@@ -9,6 +9,7 @@ import {
 } from "~/components/emails"
 import { SESSION_LENGTH_IN_DAYS } from "~/lib/consts"
 import { sendEmail } from "~/lib/emails"
+import { DatabaseError, UnauthorizedError } from "~/lib/error"
 import { logActivity } from "~/lib/logger"
 import db, {
   emailVerificationCode,
@@ -20,7 +21,6 @@ import db, {
   signInCode,
   user,
 } from "~/server/db"
-import { DatabaseError, UnauthorizedError } from "~/utils/error"
 import { argon2, sha } from "~/utils/hash"
 import {
   generateRandomLowercaseString,

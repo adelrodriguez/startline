@@ -1,7 +1,7 @@
 import { Ratelimit } from "@upstash/ratelimit"
 import { Redis } from "@upstash/redis"
 import { waitUntil } from "@vercel/functions"
-import { RateLimitError } from "~/utils/error"
+import { RateLimitError } from "~/lib/error"
 import { getIpAddress } from "~/utils/headers"
 
 const ephemeralCache = new Map<string, number>()

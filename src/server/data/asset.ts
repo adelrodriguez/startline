@@ -1,7 +1,7 @@
 import "server-only"
+import { DatabaseError } from "~/lib/error"
 import type { UserId } from "~/server/data/user"
 import db, { asset, filters } from "~/server/db"
-import { DatabaseError } from "~/utils/error"
 
 export type Asset = typeof asset.$inferSelect
 export type NewAsset = typeof asset.$inferInsert

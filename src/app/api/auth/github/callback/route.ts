@@ -9,6 +9,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { github } from "~/lib/auth/oauth"
 import { setSession } from "~/lib/auth/session"
 import { AUTHORIZED_URL, DEFAULT_ORGANIZATION_NAME } from "~/lib/consts"
+import { DatabaseError } from "~/lib/error"
 import { logActivity } from "~/lib/logger"
 import { GitHubUserSchema } from "~/lib/validation/external"
 import { createOrganization } from "~/server/data/organization"
@@ -18,7 +19,6 @@ import {
   findUserByGitHubId,
   markUserAsEmailVerified,
 } from "~/server/data/user"
-import { DatabaseError } from "~/utils/error"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url)

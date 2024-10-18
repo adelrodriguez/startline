@@ -1,7 +1,7 @@
 import "server-only"
 
+import { DatabaseError } from "~/lib/error"
 import db, { filters, webhookEvent, helpers } from "~/server/db"
-import { DatabaseError } from "~/utils/error"
 import type { StrictOmit } from "~/utils/type"
 
 export type WebhookEvent = typeof webhookEvent.$inferSelect

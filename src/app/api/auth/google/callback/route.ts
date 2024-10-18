@@ -5,7 +5,7 @@ import { StatusCodes } from "http-status-codes"
 import ky from "ky"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
-import { DatabaseError } from "~/utils/error"
+import { DatabaseError } from "~/lib/error"
 
 import { google } from "~/lib/auth/oauth"
 import { setSession } from "~/lib/auth/session"

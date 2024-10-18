@@ -5,9 +5,9 @@ import ky from "ky"
 import type { NextRequest } from "next/server"
 import type { z } from "zod"
 import env from "~/lib/env.server"
+import { AssertionError } from "~/lib/error"
 import { StripeProcessWebhookEventPayloadSchema } from "~/lib/validation/jobs"
 import qstash from "~/services/qstash"
-import { AssertionError } from "~/utils/error"
 import { buildUrl } from "~/utils/url"
 
 const JobSchemaMap = {
