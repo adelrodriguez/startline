@@ -1,6 +1,5 @@
 import type Stripe from "stripe"
 import { z } from "zod"
-import { WebhookEventId } from "~/server/data/webhook-event"
 
 export const StripeProcessWebhookEventPayloadSchema = z.object({
   /**
@@ -10,5 +9,5 @@ export const StripeProcessWebhookEventPayloadSchema = z.object({
   /**
    * The webhook event ID. Use it to mark the event as processed.
    */
-  webhookEventId: WebhookEventId,
+  webhookEventId: z.string(),
 })

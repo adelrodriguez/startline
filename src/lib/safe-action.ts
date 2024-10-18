@@ -14,7 +14,7 @@ import { redirect } from "next/navigation"
 import { getCurrentSession } from "~/lib/auth/session"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
 import { rateLimitByIp, rateLimitByUser } from "~/lib/rate-limit"
-import { type User, UserId } from "~/server/data/user"
+import type { User } from "~/server/data/user"
 import { AuthError, RateLimitError } from "~/utils/error"
 
 export const actionClient = createSafeActionClient({
@@ -58,9 +58,3 @@ export const withRateLimitByUser = createMiddleware<{
 
   return next({ ctx })
 })
-
-export const withUserId = createMiddleware<{
-  ctx: { user: User }
-}>().define(async ({ next, ctx }) =>
-  next({ ctx: { userId: UserId.parse(ctx.user.id) } }),
-)

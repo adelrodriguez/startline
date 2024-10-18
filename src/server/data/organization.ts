@@ -1,33 +1,60 @@
 import "server-only"
 
+import { TimeSpan, createDate } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
-} from "~/server/db"
-export const OrganizationId = z.bigint().brand<"OrganizationId">()
-export type OrganizationId = z.infer<typeof OrganizationId>
 
-export type Acc
-export type type OrganizationInvitation = typeof organizationInvitation.$inferSelect
-export type =
-  typeof orgtype anizationInvitation.$inferInsert(
+import { OrganizationInvitationEmail } from "~/components/emails"
+import { sendEmail } from "~/lib/emails"
+import type { UserId } from "~/server/data/user"
+import db, {
+  account,
+  filters,
+  organization,
+  organizationInvitation,
+  user,
+} from "~/server/db"
+import {
+  DatabaseError,
+  NotFoundError,
+  OrganizationInvitationError,
+} from "~/utils/error"
+import { OrganizationError } from "~/utils/error"
+
+export type Organization = typeof organization.$inferSelect
+export type NewOrganization = typeof organization.$inferInsert
+export type OrganizationId = Organization["id"]
+export type OrganizationPublicId = Organization["publicId"]
+
+export type Account = typeof account.$inferSelect
+export type NewAccount = typeof account.$inferInsert
+export type AccountRole = Account["role"]
+
+export type OrganizationInvitation = typeof organizationInvitation.$inferSelect
+export type NewOrganizationInvitation =
+  typeof organizationInvitation.$inferInsert
+
+export async function createOrganization(
   values: NewOrganization = {
-    name: "Pers
-  const [newtype Organization] = await db
-    .insert(
-    .values(type values)
+    name: "Personal Workspace",
+  },
+  options?: { ownerId?: UserId },
+): Promise<Organization> {
+  const [newOrganization] = await db
+    .insert(organization)
+    .values(values)
+    .returning()
+
   if (!newOrganization) {
-    throw new Daa
-  if (option
-    await crtype eateAccount(
-      option
-      Organitype zationId.parse(newOrganization.i
+    throw new DatabaseError("Failed to create organization")
   }
 
-  await logAated_organization", {
-    userId: type nerId,
-    organizationId: OrganizationId.parse(newOrganization.id),
-  })
+  if (options?.ownerId) {
+    await createAccount(options.ownerId, newOrganization.id, "owner")
+  }
 
-  return newtype Organization
+  return newOrganization
+}
+
 export async function findOrganizationById(
   organizationId: OrganizationId,
 ): Promise<Organization | null> {
@@ -42,6 +69,18 @@ export async function findAccountsByUserId(userId: UserId): Promise<Account[]> {
   return db.query.account.findMany({
     where: (model, { eq }) => eq(model.userId, userId),
   })
+}
+
+export async function findOrganizationAccount(
+  organizationId: OrganizationId,
+  userId: UserId,
+): Promise<Account | null> {
+  const existingAccount = await db.query.account.findFirst({
+    where: (model, { eq, and }) =>
+      and(eq(model.organizationId, organizationId), eq(model.userId, userId)),
+  })
+
+  return existingAccount ?? null
 }
 
 export async function createAccount(
@@ -59,17 +98,11 @@ export async function createAccount(
   return existingAccount
 }
 
-export async function removeMemberFromOrganization(
+export async function deleteAccount(
   organizationId: OrganizationId,
   userId: UserId,
 ): Promise<void> {
-  const membership = await db.query.account.findFirst({
-    where: (model, { eq, and }) =>
-      and(eq(model.organizationId, organizationId), eq(model.userId, userId)),
-    columns: {
-      role: true,
-    },
-  })
+  const membership = await findOrganizationAccount(organizationId, userId)
 
   if (!membership) {
     throw new OrganizationError("User is not a member of the organization")
@@ -89,31 +122,11 @@ export async function removeMemberFromOrganization(
     )
 }
 
-export async function assertIsOrganizationOwner(
+export async function assertUserIsOrganizationMember(
   organizationId: OrganizationId,
   userId: UserId,
 ): Promise<void> {
-  const existingAccount = await db.query.account.findFirst({
-    where: (model, { eq, and }) =>
-      and(eq(model.organizationId, organizationId), eq(model.userId, userId)),
-    columns: {
-      role: true,
-    },
-  })
-
-  if (!existingAccount || existingAccount.role !== "owner") {
-    throw new OrganizationError("User is not an owner of the organization")
-  }
-}
-
-export async function assertIsOrganizationMember(
-  organizationId: OrganizationId,
-  userId: UserId,
-): Promise<void> {
-  const existingAccount = await db.query.account.findFirst({
-    where: (model, { eq, and }) =>
-      and(eq(model.organizationId, organizationId), eq(model.userId, userId)),
-  })
+  const existingAccount = await findOrganizationAccount(organizationId, userId)
 
   if (!existingAccount) {
     throw new OrganizationError("User is not a member of the organization")
@@ -163,7 +176,7 @@ export async function createOrganizationInvitation(
   }
 
   const token = await generateRandomString(32, alphabet("a-z", "A-Z", "0-9"))
-  const expiresAt = addDays(new Date(), 7)
+  const expiresAt = createDate(new TimeSpan(7, "d"))
 
   const [invitation] = await db
     .insert(organizationInvitation)
@@ -183,18 +196,13 @@ export async function createOrganizationInvitation(
 
   await sendOrganizationInvitationEmail(invitation)
 
-  await logActivity("invited_member_to_organization", {
-    userId: inviterId,
-    organizationId,
-  })
-
   return invitation
 }
 
 async function sendOrganizationInvitationEmail(
   invitation: OrganizationInvitation,
 ): Promise<void> {
-  const organizationId = OrganizationId.parse(invitation.organizationId)
+  const organizationId = invitation.organizationId as OrganizationId
   const organization = await findOrganizationById(organizationId)
 
   if (!organization) {
@@ -203,7 +211,7 @@ async function sendOrganizationInvitationEmail(
 
   await sendEmail(
     invitation.email,
-    "Organization Invitation",
+    `You've been invited to join the ${organization.name} organization`,
     OrganizationInvitationEmail({
       organizationName: organization.name,
       invitationToken: invitation.token,

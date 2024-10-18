@@ -23,7 +23,7 @@ import {
   actionClient,
   authActionClient,
   withRateLimitByIp,
-  withUserId,
+  withRateLimitByUser,
 } from "~/lib/safe-action"
 import {
   RequestPasswordResetSchema,
@@ -37,8 +37,6 @@ import {
 import { isProduction } from "~/lib/vars"
 import { createOrganization } from "~/server/data/organization"
 import {
-  SessionId,
-  UserId,
   createPassword,
   createProfile,
   createUser,
@@ -82,20 +80,23 @@ export async function signUp(_: unknown, formData: FormData) {
 
   const newUser = await createUser({ email: submission.value.email })
 
-  const userId = UserId.parse(newUser.id)
+  await createProfile(newUser.id)
+  await createPassword(newUser.id, submission.value.password)
+  await sendEmailVerificationCode(newUser.id, newUser.email)
 
-  await createProfile(userId)
-  await createPassword(userId, submission.value.password)
-  await sendEmailVerificationCode(userId, newUser.email)
+  await logActivity("signed_up_with_password", { userId: newUser.id })
 
-  await logActivity("signed_up_with_password", { userId })
-
-  await createOrganization(
+  const newOrganization = await createOrganization(
     { name: DEFAULT_ORGANIZATION_NAME },
-    { ownerId: userId },
+    { ownerId: newUser.id },
   )
 
-  await setSession(userId)
+  await logActivity("created_organization", {
+    userId: newUser.id,
+    organizationId: newOrganization.id,
+  })
+
+  await setSession(newUser.id)
 
   redirect(AUTHORIZED_URL)
 }
@@ -123,10 +124,8 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
     })
   }
 
-  const userId = UserId.parse(existingUser.id)
-
   const isValidPassword = await verifyPassword(
-    userId,
+    existingUser.id,
     submission.value.password,
   )
 
@@ -136,9 +135,9 @@ export async function signInWithPassword(_: unknown, formData: FormData) {
     })
   }
 
-  await logActivity("signed_in_with_password", { userId })
+  await logActivity("signed_in_with_password", { userId: existingUser.id })
 
-  await setSession(userId)
+  await setSession(existingUser.id)
 
   redirect(AUTHORIZED_URL)
 }
@@ -159,6 +158,8 @@ export async function signInWithCode(_: unknown, formData: FormData) {
   await rateLimitByIp()
 
   await sendSignInCode(submission.value.email)
+
+  await logActivity("requested_sign_in_code")
 
   cookies().set(VERIFICATION_EMAIL_COOKIE_NAME, submission.value.email, {
     httpOnly: true,
@@ -202,32 +203,27 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
   cookies().set(VERIFICATION_EMAIL_COOKIE_NAME, "")
 
   let user = await findUserByEmail(email)
-  let userId: UserId
 
   if (!user) {
     user = await createUser({ email })
 
-    userId = UserId.parse(user.id)
+    await createProfile(user.id)
 
-    await createProfile(userId)
-
-    await logActivity("signed_up_with_code", { userId })
+    await logActivity("signed_up_with_code", { userId: user.id })
 
     await createOrganization(
       { name: DEFAULT_ORGANIZATION_NAME },
-      { ownerId: userId },
+      { ownerId: user.id },
     )
 
-    await markUserAsEmailVerified(userId)
+    await markUserAsEmailVerified(user.id)
   } else {
-    userId = UserId.parse(user.id)
+    await markUserAsEmailVerified(user.id)
 
-    await markUserAsEmailVerified(userId)
-
-    await logActivity("signed_in_with_code", { userId })
+    await logActivity("signed_in_with_code", { userId: user.id })
   }
 
-  await setSession(userId)
+  await setSession(user.id)
 
   redirect(AUTHORIZED_URL)
 }
@@ -252,10 +248,8 @@ export async function checkEmailVerificationCode(
 
   await rateLimitByUser(user.email)
 
-  const userId = UserId.parse(user.id)
-
   const isValidCode = await verifyEmailVerificationCode(
-    userId,
+    user.id,
     submission.value.code,
   )
 
@@ -282,9 +276,8 @@ export async function requestPasswordReset(_: unknown, formData: FormData) {
   const existingUser = await findUserByEmail(submission.value.email)
 
   if (existingUser) {
-    const userId = UserId.parse(existingUser.id)
-
-    await sendPasswordResetToken(userId, existingUser.email)
+    await sendPasswordResetToken(existingUser.id, existingUser.email)
+    await logActivity("requested_password_reset", { userId: existingUser.id })
   }
 
   redirect(`${RESET_PASSWORD_URL}/confirm?to=${submission.value.email}`)
@@ -309,28 +302,26 @@ export async function resetPassword(_: unknown, formData: FormData) {
     throw new PasswordResetError("Your token has expired or is invalid")
   }
 
-  const userId = UserId.parse(passwordResetToken.userId)
-
   // Log the user out of all sessions
-  await invalidateAllSessions(userId)
+  await invalidateAllSessions(passwordResetToken.userId)
 
   await Promise.all([
-    createPassword(userId, submission.value.password),
-    markPasswordResetTokenAsUsed(userId),
+    createPassword(passwordResetToken.userId, submission.value.password),
+    markPasswordResetTokenAsUsed(passwordResetToken.userId),
   ])
 
-  await setSession(userId)
+  await logActivity("reset_password", { userId: passwordResetToken.userId })
+
+  await setSession(passwordResetToken.userId)
 
   redirect(AUTHORIZED_URL, RedirectType.replace)
 }
 
-export const signOut = authActionClient
-  .use(withUserId)
-  .action(async ({ ctx }) => {
-    await logActivity("signed_out", { userId: ctx.userId })
-    await invalidateSession(SessionId.parse(ctx.session.id))
-    redirect(UNAUTHORIZED_URL)
-  })
+export const signOut = authActionClient.action(async ({ ctx }) => {
+  await logActivity("signed_out", { userId: ctx.user.id })
+  await invalidateSession(ctx.session.id)
+  redirect(UNAUTHORIZED_URL)
+})
 
 export const resendSignInCode = actionClient
   .use(withRateLimitByIp)
@@ -340,8 +331,7 @@ export const resendSignInCode = actionClient
   })
 
 export const resendEmailVerificationCode = authActionClient
-  .use(withUserId)
-  .use(withRateLimitByIp)
+  .use(withRateLimitByUser)
   .action(async ({ ctx }) => {
-    await sendEmailVerificationCode(ctx.userId, ctx.user.email)
+    await sendEmailVerificationCode(ctx.user.id, ctx.user.email)
   })

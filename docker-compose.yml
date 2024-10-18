@@ -7,6 +7,8 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - '54320:5432'
+    volumes:
+      - ./.data/postgres-data:/data
 
   pg_proxy:
     image: ghcr.io/neondatabase/wsproxy:latest
@@ -23,6 +25,8 @@ services:
     image: redis:7.4.0
     ports:
       - '6379:6379'
+    volumes:
+      - ./.data/redis-data:/data
 
   serverless-redis-http:
     ports:

@@ -33,6 +33,13 @@ export async function sendEmail(
   })
 
   if (error) {
-    throw new SendEmailError(error.name, error.message, email)
+    throw new SendEmailError(
+      {
+        name: error.name,
+        message: error.message,
+        email,
+      },
+      error,
+    )
   }
 }

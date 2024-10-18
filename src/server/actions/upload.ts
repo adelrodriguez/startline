@@ -1,11 +1,8 @@
 "use server"
 
 import { StorageBuckets } from "~/lib/consts"
-import {
-  authActionClient,
-  withRateLimitByUser,
-  withUserId,
-} from "~/lib/safe-action"
+import { logActivity } from "~/lib/logger"
+import { authActionClient, withRateLimitByUser } from "~/lib/safe-action"
 import {
   generateKey,
   getBucketFromMimeType,
@@ -16,9 +13,8 @@ import {
   UploadFileRequestSchema,
 } from "~/lib/validation/upload"
 import {
-  AssetId,
   type AssetMimeType,
-  AssetPublicId,
+  type AssetPublicId,
   createAsset,
   findAssetByPublicId,
   markAssetAsUploaded,
@@ -29,10 +25,9 @@ import { buildAssetUrl } from "~/utils/url"
 export const uploadFile = authActionClient
   .schema(UploadFileRequestSchema)
   .use(withRateLimitByUser)
-  .use(withUserId)
   .action(
-    async ({ parsedInput: { filename, mimeType, size }, ctx: { userId } }) => {
-      const key = generateKey(userId, filename)
+    async ({ parsedInput: { filename, mimeType, size }, ctx: { user } }) => {
+      const key = generateKey(user.id, filename)
 
       const url = await getSignedPutUrl({
         key,
@@ -40,7 +35,7 @@ export const uploadFile = authActionClient
         mimeType,
       })
 
-      const pendingAsset = await createAsset(userId, {
+      const pendingAsset = await createAsset(user.id, {
         bucket: getBucketFromMimeType(mimeType as AssetMimeType),
         filename,
         mimeType: mimeType as AssetMimeType,
@@ -49,27 +44,29 @@ export const uploadFile = authActionClient
         url: buildAssetUrl(key),
       })
 
+      await logActivity("created_asset", { userId: user.id })
+
       return {
         presignedUrl: url,
-        publicId: AssetPublicId.parse(pendingAsset.publicId),
+        publicId: pendingAsset.publicId,
       }
     },
   )
 
 export const confirmUpload = authActionClient
   .schema(ConfirmUploadRequestSchema)
-  .use(withUserId)
-  .action(async ({ parsedInput: { publicId }, ctx: { userId } }) => {
-    const asset = await findAssetByPublicId(publicId)
+  .action(async ({ parsedInput: { publicId }, ctx: { user } }) => {
+    const asset = await findAssetByPublicId(publicId as AssetPublicId)
 
     if (!asset) {
       throw new UploadError("Asset not found")
     }
 
-    const uploadedAsset = await markAssetAsUploaded(
-      AssetId.parse(asset.id),
-      userId,
-    )
+    const uploadedAsset = await markAssetAsUploaded(asset.id, user.id)
+
+    await logActivity("marked_asset_as_uploaded", {
+      userId: user.id,
+    })
 
     return { url: uploadedAsset.url }
   })

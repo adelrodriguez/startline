@@ -4,12 +4,11 @@ import { getCurrentSession } from "~/lib/auth/session"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
 import {
   type Organization,
-  OrganizationId,
   findAccountsByUserId,
   findOrganizationById,
   findOrganizationInvitationByToken,
 } from "~/server/data/organization"
-import { type User, UserId } from "~/server/data/user"
+import type { User } from "~/server/data/user"
 import { OrganizationError, OrganizationInvitationError } from "~/utils/error"
 
 export const getCurrentUser = cache(async (): Promise<User> => {
@@ -25,16 +24,14 @@ export const getCurrentUser = cache(async (): Promise<User> => {
 export const getFirstOrganization = cache(async (): Promise<Organization> => {
   const user = await getCurrentUser()
 
-  const accounts = await findAccountsByUserId(UserId.parse(user.id))
+  const accounts = await findAccountsByUserId(user.id)
   const firstAccount = accounts[0]
 
   if (!firstAccount) {
     throw new OrganizationError("User does not have any organizations")
   }
 
-  const organization = await findOrganizationById(
-    OrganizationId.parse(firstAccount.organizationId),
-  )
+  const organization = await findOrganizationById(firstAccount.organizationId)
 
   if (!organization) {
     throw new OrganizationError("Organization does not exist")
@@ -51,9 +48,7 @@ export const getOrganizationFromInvitation = cache(
       throw new OrganizationInvitationError("Invalid or expired invitation")
     }
 
-    const organization = await findOrganizationById(
-      OrganizationId.parse(invitation.organizationId),
-    )
+    const organization = await findOrganizationById(invitation.organizationId)
 
     if (!organization) {
       throw new OrganizationError("Organization does not exist")

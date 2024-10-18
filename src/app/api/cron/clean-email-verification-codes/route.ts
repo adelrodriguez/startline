@@ -2,10 +2,11 @@ import { verifySignatureAppRouter } from "@upstash/qstash/nextjs"
 import { StatusCodes } from "http-status-codes"
 import { NextResponse } from "next/server"
 import env from "~/lib/env.server"
-import { cleanExpiredEmailVerificationCodes } from "~/server/data/user"
+import { deleteExpiredEmailVerificationCodes } from "~/server/data/user"
 
+// TODO(adelrodriguez): Merge with other clean jobs into a workflow
 async function handler() {
-  const rows = await cleanExpiredEmailVerificationCodes()
+  const rows = await deleteExpiredEmailVerificationCodes()
 
   return NextResponse.json({ success: true, rows }, { status: StatusCodes.OK })
 }

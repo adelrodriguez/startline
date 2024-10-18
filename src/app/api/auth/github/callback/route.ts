@@ -1,8 +1,11 @@
+import * as Sentry from "@sentry/nextjs"
 import { OAuth2RequestError } from "arctic"
+import chalk from "chalk"
 import { StatusCodes } from "http-status-codes"
 import ky from "ky"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
+
 import { github } from "~/lib/auth/oauth"
 import { setSession } from "~/lib/auth/session"
 import { AUTHORIZED_URL, DEFAULT_ORGANIZATION_NAME } from "~/lib/consts"
@@ -10,12 +13,12 @@ import { logActivity } from "~/lib/logger"
 import { GitHubUserSchema } from "~/lib/validation/external"
 import { createOrganization } from "~/server/data/organization"
 import {
-  UserId,
   createProfile,
   createUserFromGitHub,
   findUserByGitHubId,
   markUserAsEmailVerified,
 } from "~/server/data/user"
+import { DatabaseError } from "~/utils/error"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url)
@@ -53,15 +56,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const existingUser = await findUserByGitHubId(githubUser.id)
 
     if (existingUser) {
-      const userId = UserId.parse(existingUser.id)
+      await logActivity("signed_in_with_github", { userId: existingUser.id })
 
       if (!existingUser.emailVerifiedAt) {
-        await markUserAsEmailVerified(userId)
+        await markUserAsEmailVerified(existingUser.id)
+        await logActivity("marked_email_as_verified", {
+          userId: existingUser.id,
+        })
       }
 
-      await logActivity("signed_in_with_github", { userId })
-
-      await setSession(userId, request)
+      await setSession(existingUser.id, request)
 
       return new NextResponse(null, {
         status: StatusCodes.MOVED_TEMPORARILY,
@@ -76,19 +80,24 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       email: githubUser.email,
     })
 
-    const userId = UserId.parse(user.id)
+    await logActivity("signed_up_with_github", { userId: user.id })
 
-    await createProfile(userId, {
+    await createProfile(user.id, {
       name: githubUser.name,
       avatarUrl: githubUser.avatar_url,
     })
 
-    await createOrganization(
+    const organization = await createOrganization(
       { name: DEFAULT_ORGANIZATION_NAME },
-      { ownerId: userId },
+      { ownerId: user.id },
     )
 
-    await setSession(userId, request)
+    await logActivity("created_organization", {
+      userId: user.id,
+      organizationId: organization.id,
+    })
+
+    await setSession(user.id, request)
 
     return new NextResponse(null, {
       status: StatusCodes.MOVED_TEMPORARILY,
@@ -97,12 +106,25 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
     })
   } catch (e) {
-    console.error(e)
+    Sentry.captureException(e)
     // The specific error message depends on the provider
     if (e instanceof OAuth2RequestError) {
-      // Invalid code
+      console.info(chalk.red("❌ Invalid code provided by GitHub"))
+      console.error(e)
+
       return new NextResponse(null, {
         status: StatusCodes.BAD_REQUEST,
+      })
+    }
+
+    if (e instanceof DatabaseError) {
+      console.info(
+        chalk.red("💾 Encountered error while saving to the database"),
+      )
+      console.error(e)
+
+      return new NextResponse(null, {
+        status: StatusCodes.INTERNAL_SERVER_ERROR,
       })
     }
 

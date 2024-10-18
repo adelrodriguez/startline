@@ -9,12 +9,12 @@ import { SESSION_COOKIE_NAME, SESSION_LENGTH_IN_DAYS } from "~/lib/consts"
 import { isProduction } from "~/lib/vars"
 import {
   type Session,
-  SessionId,
+  type SessionId,
   type User,
   type UserId,
   createSession,
   deleteSession,
-  deleteSessions,
+  deleteUserSessions,
   findSessionById,
   updateSession,
 } from "~/server/data/user"
@@ -34,7 +34,7 @@ function generateSessionToken(): string {
 async function validateSessionToken(
   token: string,
 ): Promise<{ session: Session; user: User } | { session: null; user: null }> {
-  const sessionId = SessionId.parse(sha.sha256.hash(token))
+  const sessionId = sha.sha256.hash(token) as SessionId
 
   const session = await findSessionById(sessionId)
 
@@ -101,7 +101,7 @@ export async function invalidateSession(sessionId: SessionId): Promise<void> {
 }
 
 export async function invalidateAllSessions(userId: UserId): Promise<void> {
-  await deleteSessions(userId)
+  await deleteUserSessions(userId)
 }
 
 export const getCurrentSession = cache(

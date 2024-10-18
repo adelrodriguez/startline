@@ -2,13 +2,13 @@
 
 import { parseWithZod } from "@conform-to/zod"
 import { getCurrentSession } from "~/lib/auth/session"
+import { logActivity } from "~/lib/logger"
 import { InviteMemberSchema } from "~/lib/validation/forms"
 import {
-  OrganizationId,
-  assertIsOrganizationMember,
+  type OrganizationId,
+  assertUserIsOrganizationMember,
   createOrganizationInvitation,
 } from "~/server/data/organization"
-import { UserId } from "~/server/data/user"
 import { AuthError } from "~/utils/error"
 
 export async function inviteMember(_: unknown, formData: FormData) {
@@ -22,17 +22,20 @@ export async function inviteMember(_: unknown, formData: FormData) {
 
   const { user } = await getCurrentSession()
 
-  if (!user) {
-    throw new AuthError("User not found")
-  }
+  if (!user) throw new AuthError("User not found")
 
-  const organizationId = OrganizationId.parse(submission.value.organizationId)
-  const userId = UserId.parse(user.id)
+  // TODO(adelrodriguez): Get this from the current organization
+  const organizationId = submission.value.organizationId as OrganizationId
 
-  await assertIsOrganizationMember(organizationId, userId)
+  await assertUserIsOrganizationMember(organizationId, user.id)
 
-  await createOrganizationInvitation(organizationId, userId, {
+  await createOrganizationInvitation(organizationId, user.id, {
     email: submission.value.email,
     role: submission.value.role,
+  })
+
+  await logActivity("invited_member_to_organization", {
+    userId: user.id,
+    organizationId,
   })
 }

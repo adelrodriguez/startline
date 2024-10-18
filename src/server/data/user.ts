@@ -1,9 +1,6 @@
 import "server-only"
 
 import { addDays, addHours, addMinutes } from "date-fns"
-import { generateIdFromEntropySize } from "lucia"
-import { alphabet, generateRandomString } from "oslo/crypto"
-import { z } from "zod"
 
 import {
   EmailVerificationCodeEmail,
@@ -25,17 +22,17 @@ import db, {
 } from "~/server/db"
 import { DatabaseError, UnauthorizedError } from "~/utils/error"
 import { argon2, sha } from "~/utils/hash"
+import {
+  generateRandomLowercaseString,
+  generateRandomUppercaseString,
+} from "~/utils/random"
 import type { StrictOmit } from "~/utils/type"
 
 export type User = typeof user.$inferSelect
-export type UserRole = User["role"]
 export type NewUser = typeof user.$inferInsert
-
-export const UserId = z.bigint().brand<"UserId">()
-export type UserId = z.infer<typeof UserId>
-
-export const UserPublicId = z.string().brand<"UserPublicId">()
-export type UserPublicId = z.infer<typeof UserPublicId>
+export type UserId = User["id"]
+export type UserPublicId = User["publicId"]
+export type UserRole = User["role"]
 
 export type Password = typeof password.$inferSelect
 export type NewPassword = typeof password.$inferInsert
@@ -48,24 +45,13 @@ export type NewProfile = typeof profile.$inferInsert
 
 export type Session = typeof session.$inferSelect
 export type NewSession = typeof session.$inferInsert
-
-export const SessionId = z.string().brand<"SessionId">()
-export type SessionId = z.infer<typeof SessionId>
-
-export const SessionPublicId = z.string().brand<"SessionPublicId">()
-export type SessionPublicId = z.infer<typeof SessionPublicId>
+export type SessionId = Session["id"]
+export type SessionPublicId = Session["publicId"]
 
 export type EmailVerificationCode = typeof emailVerificationCode.$inferSelect
 export type NewEmailVerificationCode = typeof emailVerificationCode.$inferInsert
 
-export const EmailVerificationCodeId = z
-  .string()
-  .brand<"EmailVerificationCodeId">()
-export type EmailVerificationCodeId = z.infer<typeof EmailVerificationCodeId>
-
-export async function findUserByEmail(
-  email: User["email"],
-): Promise<User | null> {
+export async function findUserByEmail(email: string): Promise<User | null> {
   const existingUser = await db.query.user.findFirst({
     where: (model, { eq }) => eq(model.email, email),
   })
@@ -107,9 +93,7 @@ export async function createUser(values: NewUser): Promise<User> {
     .values({ ...values, role: "user" })
     .returning()
 
-  if (!newUser) {
-    throw new DatabaseError("Failed to create user")
-  }
+  if (!newUser) throw new DatabaseError("Failed to create user")
 
   return newUser
 }
@@ -130,10 +114,6 @@ export async function createUserFromGoogle(
     throw new DatabaseError("Failed to create user from Google")
   }
 
-  await logActivity("signed_up_with_google", {
-    userId: UserId.parse(newUser.id),
-  })
-
   return newUser
 }
 
@@ -152,10 +132,6 @@ export async function createUserFromGitHub(
   if (!newUser) {
     throw new DatabaseError("Failed to create user from GitHub")
   }
-
-  await logActivity("signed_up_with_github", {
-    userId: UserId.parse(newUser.id),
-  })
 
   return newUser
 }
@@ -186,8 +162,6 @@ export async function markUserAsEmailVerified(userId: UserId): Promise<void> {
         filters.isNull(user.emailVerifiedAt),
       ),
     )
-
-  await logActivity("marked_email_as_verified", { userId })
 }
 
 export function assertUserIsAdmin(
@@ -241,7 +215,7 @@ export async function sendEmailVerificationCode(
   // Delete old codes
   await deleteEmailVerificationCodes(userId)
 
-  const code = await generateRandomString(6, alphabet("0-9", "A-Z"))
+  const code = generateRandomUppercaseString(6)
 
   await db
     .insert(emailVerificationCode)
@@ -290,7 +264,7 @@ export async function deleteEmailVerificationCodes(
   return result.rowCount
 }
 
-export async function cleanExpiredEmailVerificationCodes(): Promise<
+export async function deleteExpiredEmailVerificationCodes(): Promise<
   number | null
 > {
   const result = await db
@@ -303,11 +277,11 @@ export async function cleanExpiredEmailVerificationCodes(): Promise<
 export async function findValidPasswordResetToken(
   input: string,
 ): Promise<PasswordResetToken | null> {
-  const hashed = await sha.sha256.hash(input)
+  const hashedInput = sha.sha256.hash(input)
 
   const token = await db.query.passwordResetToken.findFirst({
     where: (model, { eq, and, gte }) =>
-      and(eq(model.hash, hashed), gte(model.expiresAt, new Date())),
+      and(eq(model.hash, hashedInput), gte(model.expiresAt, new Date())),
   })
 
   return token ?? null
@@ -319,7 +293,7 @@ export async function sendPasswordResetToken(
 ): Promise<void> {
   await deletePasswordResetTokens(userId)
 
-  const token = generateIdFromEntropySize(25)
+  const token = generateRandomLowercaseString(25)
 
   await db.insert(passwordResetToken).values({
     userId,
@@ -332,16 +306,12 @@ export async function sendPasswordResetToken(
     "Reset your password",
     PasswordResetTokenEmail({ token }),
   )
-
-  await logActivity("requested_password_reset", { userId })
 }
 
 export async function markPasswordResetTokenAsUsed(
   userId: UserId,
 ): Promise<void> {
   await deletePasswordResetTokens(userId)
-
-  await logActivity("reset_password", { userId })
 
   // If the user received received the password reset token and it was verified,
   // we can mark the user as verified.
@@ -355,7 +325,7 @@ export async function deletePasswordResetTokens(userId: UserId): Promise<void> {
     .returning()
 }
 
-export async function cleanExpiredPasswordResetTokens(): Promise<
+export async function deleteExpiredPasswordResetTokens(): Promise<
   number | null
 > {
   const result = await db
@@ -369,14 +339,14 @@ export async function createPassword(
   userId: UserId,
   input: string,
 ): Promise<Password> {
-  const hashedPassword = await argon2.hash(input)
+  const hash = await argon2.hash(input)
 
   const [newPassword] = await db
     .insert(password)
-    .values({ hash: hashedPassword, userId })
+    .values({ hash, userId })
     .onConflictDoUpdate({
       target: password.userId,
-      set: { hash: hashedPassword },
+      set: { hash },
     })
     .returning()
 
@@ -388,31 +358,31 @@ export async function createPassword(
 }
 
 export async function findPassword(userId: UserId): Promise<Password | null> {
-  const password = await db.query.password.findFirst({
+  const existingPassword = await db.query.password.findFirst({
     where: (model, { eq }) => eq(model.userId, userId),
   })
 
-  return password ?? null
+  return existingPassword ?? null
 }
 
 export async function verifyPassword(
   userId: UserId,
   input: string,
 ): Promise<boolean> {
-  const password = await findPassword(userId)
+  const existingPassword = await findPassword(userId)
 
-  if (!password) {
+  if (!existingPassword) {
     return false
   }
 
-  return argon2.verify(password.hash, input)
+  return argon2.verify(existingPassword.hash, input)
 }
 
 export async function sendSignInCode(email: string): Promise<void> {
   // Delete old codes
   await deleteSignInCode(email)
 
-  const code = await generateRandomString(6, alphabet("0-9", "A-Z"))
+  const code = generateRandomUppercaseString(6)
 
   await db.insert(signInCode).values({
     email,
@@ -421,8 +391,6 @@ export async function sendSignInCode(email: string): Promise<void> {
   })
 
   await sendEmail(email, "Sign in code", SignInCodeEmail({ code }))
-
-  await logActivity("requested_sign_in_code")
 }
 
 export async function verifySignInCode(
@@ -453,7 +421,7 @@ export async function deleteSignInCode(email: string): Promise<void> {
     .returning()
 }
 
-export async function cleanExpiredSignInCodes(): Promise<number | null> {
+export async function deleteExpiredSignInCodes(): Promise<number | null> {
   const result = await db
     .delete(signInCode)
     .where(filters.lt(signInCode.expiresAt, new Date()))
@@ -471,7 +439,7 @@ export async function createSession(
     .values({
       ...values,
       userId,
-      id: SessionId.parse(sha.sha256.hash(token)),
+      id: sha.sha256.hash(token) as SessionId,
       expiresAt: addDays(new Date(), SESSION_LENGTH_IN_DAYS),
     })
     .returning()
@@ -500,7 +468,7 @@ export async function deleteSession(sessionId: SessionId): Promise<void> {
   await db.delete(session).where(filters.eq(session.id, sessionId))
 }
 
-export async function deleteSessions(userId: UserId): Promise<void> {
+export async function deleteUserSessions(userId: UserId): Promise<void> {
   await db.delete(session).where(filters.eq(session.userId, userId))
 }
 

@@ -5,10 +5,11 @@ import {
 import { UTApi, UploadThingError } from "uploadthing/server"
 
 import { getCurrentSession } from "~/lib/auth/session"
+import { logActivity } from "~/lib/logger"
 import { rateLimitByUser } from "~/lib/rate-limit"
 import type { AssetMimeType } from "~/server/data/asset"
 import { createAsset } from "~/server/data/asset"
-import { UserId } from "~/server/data/user"
+import type { UserId } from "~/server/data/user"
 
 export const utapi = new UTApi()
 
@@ -23,18 +24,21 @@ export const fileRouter = {
 
       await rateLimitByUser(user.email)
 
-      return { userId: UserId.parse(user.id).toString() }
+      return { userId: user.id.toString() }
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      const userId = UserId.parse(BigInt(metadata.userId))
+      const userId = BigInt(metadata.userId) as UserId
 
-      await createAsset(userId, {
+      const asset = await createAsset(userId, {
         service: "uploadthing",
         mimeType: file.type as AssetMimeType,
         filename: file.name,
         size: file.size,
         url: file.url,
+        status: "uploaded",
       })
+
+      await logActivity("created_asset", { userId })
 
       return { uploadedBy: metadata.userId }
     }),

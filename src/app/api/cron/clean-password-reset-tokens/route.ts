@@ -2,10 +2,11 @@ import { verifySignatureAppRouter } from "@upstash/qstash/nextjs"
 import { StatusCodes } from "http-status-codes"
 import { NextResponse } from "next/server"
 import env from "~/lib/env.server"
-import { cleanExpiredPasswordResetTokens } from "~/server/data/user"
+import { deleteExpiredPasswordResetTokens } from "~/server/data/user"
 
+// TODO(adelrodriguez): Merge with other clean jobs into a workflow
 async function handler() {
-  const rows = await cleanExpiredPasswordResetTokens()
+  const rows = await deleteExpiredPasswordResetTokens()
 
   return NextResponse.json({ success: true, rows }, { status: StatusCodes.OK })
 }

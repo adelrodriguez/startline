@@ -69,6 +69,7 @@
     "@vercel/functions": "1.4.2",
     "arctic": "1.9.2",
     "bufferutil": "^4.0.8",
+    "chalk": "^5.3.0",
     "class-variance-authority": "0.7.0",
     "clsx": "2.1.1",
     "date-fns": "4.1.0",

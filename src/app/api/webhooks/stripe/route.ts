@@ -3,7 +3,6 @@ import { type NextRequest, NextResponse } from "next/server"
 import env from "~/lib/env.server"
 import { enqueueJob } from "~/lib/jobs"
 import {
-  WebhookEventId,
   createWebhookEvent,
   findWebhookEventByExternalId,
 } from "~/server/data/webhook-event"
@@ -49,7 +48,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   })
 
   await enqueueJob("stripe/process-webhook-event", {
-    webhookEventId: WebhookEventId.parse(newWebhookEvent.id),
+    webhookEventId: newWebhookEvent.id.toString(),
     stripeEvent: event,
   })
 
