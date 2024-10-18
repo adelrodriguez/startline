@@ -3,7 +3,7 @@
 import { parseWithZod } from "@conform-to/zod"
 import { getCurrentSession } from "~/lib/auth/session"
 import { logActivity } from "~/lib/logger"
-import { InviteMemberSchema } from "~/lib/validation/forms"
+import { createInviteMemberSchema } from "~/lib/validation/forms"
 import {
   type OrganizationId,
   assertUserIsOrganizationMember,
@@ -13,7 +13,7 @@ import { AuthError } from "~/utils/error"
 
 export async function inviteMember(_: unknown, formData: FormData) {
   const submission = parseWithZod(formData, {
-    schema: InviteMemberSchema,
+    schema: createInviteMemberSchema(),
   })
 
   if (submission.status !== "success") {

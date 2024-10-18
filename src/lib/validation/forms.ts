@@ -120,12 +120,10 @@ export function createNewPasswordSchema() {
     })
 }
 
-export const RequestPasswordResetSchema = z.object({
-  email: z.string().email(),
-})
-
-export const InviteMemberSchema = z.object({
-  email: z.string().email(),
-  role: z.enum(["member", "admin"]),
-  organizationId: z.bigint(),
-})
+export function createInviteMemberSchema() {
+  return z.object({
+    email: z.string().email(),
+    role: z.enum(["member", "admin"]),
+    organizationId: z.bigint(),
+  })
+}

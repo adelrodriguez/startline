@@ -26,10 +26,10 @@ import {
   withRateLimitByUser,
 } from "~/lib/safe-action"
 import {
-  RequestPasswordResetSchema,
   createCheckEmailVerificationCodeSchema,
   createCheckInWithCodeSchema,
   createNewPasswordSchema,
+  createRequestPasswordResetSchema,
   createSignInWithCodeSchema,
   createSignInWithPasswordSchema,
   createSignUpSchema,
@@ -264,7 +264,7 @@ export async function checkEmailVerificationCode(
 
 export async function requestPasswordReset(_: unknown, formData: FormData) {
   const submission = parseWithZod(formData, {
-    schema: RequestPasswordResetSchema,
+    schema: createRequestPasswordResetSchema(),
   })
 
   if (submission.status !== "success") {

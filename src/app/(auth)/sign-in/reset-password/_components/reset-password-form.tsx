@@ -5,7 +5,7 @@ import { parseWithZod } from "@conform-to/zod"
 import { Loader2Icon } from "lucide-react"
 import { useFormState } from "react-dom"
 import { Form, FormItem, FormSubmit, Input, Label } from "~/components/ui"
-import { RequestPasswordResetSchema } from "~/lib/validation/forms"
+import { createRequestPasswordResetSchema } from "~/lib/validation/forms"
 import { requestPasswordReset } from "~/server/actions/auth"
 
 export default function ResetPasswordForm() {
@@ -13,7 +13,9 @@ export default function ResetPasswordForm() {
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: RequestPasswordResetSchema })
+      return parseWithZod(formData, {
+        schema: createRequestPasswordResetSchema(),
+      })
     },
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
