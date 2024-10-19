@@ -11,7 +11,7 @@ import {
   createSafeActionClient,
 } from "next-safe-action"
 import { redirect } from "next/navigation"
-import { getCurrentSession } from "~/lib/auth/session"
+import { validateRequest } from "~/lib/auth/session"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
 import { AuthError, RateLimitError } from "~/lib/error"
 import { rateLimitByIp, rateLimitByUser } from "~/lib/rate-limit"
@@ -34,7 +34,7 @@ export const actionClient = createSafeActionClient({
 })
 
 export const authActionClient = actionClient.use(async ({ next }) => {
-  const { session, user } = await getCurrentSession()
+  const { session, user } = await validateRequest()
 
   if (!session) {
     throw new AuthError("Session not found")

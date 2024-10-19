@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { cache } from "react"
-import { getCurrentSession } from "~/lib/auth/session"
+import { validateRequest } from "~/lib/auth/session"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
 import { OrganizationError, OrganizationInvitationError } from "~/lib/error"
 import {
@@ -12,7 +12,7 @@ import {
 import type { User } from "~/server/data/user"
 
 export const getCurrentUser = cache(async (): Promise<User> => {
-  const { user } = await getCurrentSession()
+  const { user } = await validateRequest()
 
   if (!user) {
     redirect(UNAUTHORIZED_URL)

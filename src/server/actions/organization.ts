@@ -1,7 +1,7 @@
 "use server"
 
 import { parseWithZod } from "@conform-to/zod"
-import { getCurrentSession } from "~/lib/auth/session"
+import { validateRequest } from "~/lib/auth/session"
 import { AuthError } from "~/lib/error"
 import { logActivity } from "~/lib/logger"
 import { createInviteMemberSchema } from "~/lib/validation/forms"
@@ -20,7 +20,7 @@ export async function inviteMember(_: unknown, formData: FormData) {
     return submission.reply()
   }
 
-  const { user } = await getCurrentSession()
+  const { user } = await validateRequest()
 
   if (!user) throw new AuthError("User not found")
 

@@ -5,10 +5,10 @@ import { cookies } from "next/headers"
 import { RedirectType, redirect } from "next/navigation"
 import { z } from "zod"
 import {
-  getCurrentSession,
   invalidateAllSessions,
   invalidateSession,
   setSession,
+  validateRequest,
 } from "~/lib/auth/session"
 import {
   AUTHORIZED_URL,
@@ -234,7 +234,7 @@ export async function checkEmailVerificationCode(
   _: unknown,
   formData: FormData,
 ) {
-  const { user } = await getCurrentSession()
+  const { user } = await validateRequest()
 
   if (!user) {
     return redirect(UNAUTHORIZED_URL)

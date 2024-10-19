@@ -59,7 +59,13 @@ async function validateSessionToken(
   return { session, user: session.user }
 }
 
-function setSessionTokenCookie(token: string, expiresAt: Date): void {
+function getSessionToken(): string | null {
+  const cookieStore = cookies()
+
+  return cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null
+}
+
+function setSessionToken(token: string, expiresAt: Date): void {
   const cookieStore = cookies()
 
   cookieStore.set(SESSION_COOKIE_NAME, token, {
@@ -71,7 +77,7 @@ function setSessionTokenCookie(token: string, expiresAt: Date): void {
   })
 }
 
-export function deleteSessionTokenCookie(): void {
+function deleteSessionToken(): void {
   const cookieStore = cookies()
 
   cookieStore.set(SESSION_COOKIE_NAME, "", {
@@ -95,26 +101,24 @@ export async function setSession(userId: UserId, request?: Request) {
     city: geolocation?.city,
   })
 
-  setSessionTokenCookie(token, session.expiresAt)
-
-  return session
+  setSessionToken(token, session.expiresAt)
 }
 
 export async function invalidateSession(sessionId: SessionId): Promise<void> {
-  deleteSessionTokenCookie()
+  deleteSessionToken()
   await deleteSession(sessionId)
 }
 
 export async function invalidateAllSessions(userId: UserId): Promise<void> {
+  deleteSessionToken()
   await deleteUserSessions(userId)
 }
 
-export const getCurrentSession = cache(
+export const validateRequest = cache(
   async (): Promise<
     { user: User; session: Session } | { user: null; session: null }
   > => {
-    const cookieStore = cookies()
-    const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null
+    const sessionId = getSessionToken()
 
     if (!sessionId) {
       return { user: null, session: null }
@@ -134,7 +138,7 @@ type ProtectedRouteHandler = (
 
 export function protectedRoute(handler: ProtectedRouteHandler) {
   return async (request: NextRequest, params?: Record<string, string>) => {
-    const { user, session } = await getCurrentSession()
+    const { user, session } = await validateRequest()
 
     if (!session) {
       return NextResponse.json(
