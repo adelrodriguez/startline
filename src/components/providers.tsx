@@ -1,6 +1,7 @@
 "use client"
 
 import { ThemeProvider } from "next-themes"
+import { NuqsAdapter } from "nuqs/adapters/next/app"
 import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
 import { Suspense } from "react"
@@ -35,7 +36,7 @@ export default function Providers({
         disableTransitionOnChange
       >
         <TooltipProvider>
-          {children}
+          <NuqsAdapter>{children}</NuqsAdapter>
           <Toaster />
         </TooltipProvider>
       </ThemeProvider>

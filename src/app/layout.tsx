@@ -30,14 +30,16 @@ export default async function RootLayout({
       <head>
         <PlausibleProvider domain={env.NEXT_PUBLIC_DOMAIN} />
       </head>
-      <NextSSRPlugin routerConfig={extractRouterConfig(fileRouter)} />
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
           fonts.body.variable,
         )}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <NextSSRPlugin routerConfig={extractRouterConfig(fileRouter)} />
+          {children}
+        </Providers>
       </body>
     </html>
   )
