@@ -17,7 +17,7 @@ const router = createUploadthing()
 
 export const fileRouter = {
   imageUploader: router({ image: { maxFileSize: "4MB" } })
-    .middleware(async ({ req }) => {
+    .middleware(async () => {
       const { user } = await validateRequest()
 
       if (!user) throw new UploadThingError("Unauthorized")
@@ -40,7 +40,7 @@ export const fileRouter = {
 
       await logActivity("created_asset", { userId })
 
-      return { uploadedBy: metadata.userId }
+      return { uploadedBy: metadata.userId, publicId: asset.publicId }
     }),
 } satisfies UploadThingFileRouter
 

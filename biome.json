@@ -19,7 +19,8 @@
     "enabled": true,
     "rules": {
       "correctness": {
-        "noUnusedImports": "error"
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error"
       },
       "nursery": {
         "useSortedClasses": "error"
