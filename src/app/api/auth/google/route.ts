@@ -14,11 +14,10 @@ export async function GET(): Promise<NextResponse> {
   }
 
   const state = generateState()
+  const scopes = ["openid", "profile", "email"]
   const codeVerifier = generateCodeVerifier()
 
-  const url = await google.createAuthorizationURL(state, codeVerifier, {
-    scopes: ["profile", "email"],
-  })
+  const url = google.createAuthorizationURL(state, codeVerifier, scopes)
 
   const cookieStore = await cookies()
 

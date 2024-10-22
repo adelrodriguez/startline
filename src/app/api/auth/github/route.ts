@@ -14,7 +14,8 @@ export async function GET(): Promise<NextResponse> {
   }
 
   const state = generateState()
-  const url = await github.createAuthorizationURL(state)
+  const scopes = ["user:email"]
+  const url = github.createAuthorizationURL(state, scopes)
 
   const cookieStore = await cookies()
   cookieStore.set("github_oauth_state", state, {

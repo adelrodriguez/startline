@@ -8,4 +8,8 @@ export const google = new Google(
   buildUrl("/api/auth/google/callback"),
 )
 
-export const github = new GitHub(env.GITHUB_CLIENT_ID, env.GITHUB_CLIENT_SECRET)
+export const github = new GitHub(
+  env.GITHUB_CLIENT_ID,
+  env.GITHUB_CLIENT_SECRET,
+  buildUrl("/api/auth/github/callback"),
+)

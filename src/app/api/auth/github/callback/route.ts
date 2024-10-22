@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/nextjs"
-import { OAuth2RequestError } from "arctic"
+import { ArcticFetchError, OAuth2RequestError } from "arctic"
 import chalk from "chalk"
 import { StatusCodes } from "http-status-codes"
 import ky from "ky"
@@ -35,11 +35,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   try {
     const tokens = await github.validateAuthorizationCode(code)
+    const accessToken = tokens.accessToken()
 
     const data = await ky
       .get("https://api.github.com/user", {
         headers: {
-          Authorization: `Bearer ${tokens.accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       })
       .json()
@@ -115,6 +116,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
       return new NextResponse(null, {
         status: StatusCodes.BAD_REQUEST,
+      })
+    }
+
+    if (e instanceof ArcticFetchError) {
+      console.info(chalk.red("❌ Failed to fetch user from GitHub"))
+      console.error(e)
+
+      return new NextResponse(null, {
+        status: StatusCodes.INTERNAL_SERVER_ERROR,
       })
     }
 
