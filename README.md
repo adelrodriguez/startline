@@ -1,12 +1,12 @@
 <p align="center">
-  <h1 align="center">🪽 Startline</h1>
+  <h1 align="center">🏎️ <code>startline-web</code></h1>
 
   <p align="center">
     <em><strong>An opinionated SaaS starter template to hit the ground running</strong></em>
   </p>
 </p>
 
-_This project is built with [Startline](https://github.com/adelrodriguez/startline)._
+_This project is built with [Startline Web](https://github.com/adelrodriguez/startline-web)._
 
 Startline is an opinionated, batteries-included starter template to build SaaS applications using (my current favorite) technologies. The stack is built around [Next.js](https://nextjs.org) and serverless technologies.
 

@@ -21,7 +21,7 @@ export default function Page() {
           prefetch={false}
         >
           <RabbitIcon className="size-6" />
-          <span className="sr-only">Startline</span>
+          <span className="sr-only">Startline Web</span>
         </Link>
         <nav className="ml-auto flex gap-1 sm:gap-2">
           <SignedIn>
@@ -46,7 +46,7 @@ export default function Page() {
         <section className="w-full pt-12 md:pt-24 lg:pt-32">
           <div className="container space-y-10 xl:space-y-16">
             <div className="flex flex-col items-center gap-4 text-center">
-              <TypographyH1>Startline</TypographyH1>
+              <TypographyH1>Startline Web</TypographyH1>
 
               <TypographyLead className="max-w-2xl">
                 A feature-rich template to kickstart your next project. Packed

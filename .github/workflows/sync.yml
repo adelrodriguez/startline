@@ -1,4 +1,4 @@
-name: Sync with the Startline template
+name: Sync with the Startline Web template
 
 on:
   schedule:
@@ -20,8 +20,8 @@ jobs:
       - name: Sync template
         uses: AndreasAugustin/actions-template-sync@v2
         with:
-          source_repo_path: adelrodriguez/startline
+          source_repo_path: adelrodriguez/startline-web
           upstream_branch: main
           pr_labels: template_sync
-          pr_title: Sync the latest `startline` template changes
+          pr_title: Sync the latest `startline-web` template changes
           is_pr_cleanup: true

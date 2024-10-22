@@ -1,5 +1,5 @@
-export const APP_NAME = "Startline"
-export const APP_ID = "startline"
+export const APP_NAME = "Startline Web"
+export const APP_ID = "startline-web"
 
 export const DEFAULT_ORGANIZATION_NAME = "Personal Workspace"
 

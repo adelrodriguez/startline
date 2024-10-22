@@ -1,10 +1,10 @@
 {
-  "name": "startline",
-  "version": "0.1.0",
+  "name": "startline-web",
+  "version": "0.2.0",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/adelrodriguez/startline.git"
+    "url": "git+https://github.com/adelrodriguez/startline-web.git"
   },
   "scripts": {
     "analyze": "ANALYZE=true next build",
@@ -121,8 +121,5 @@
     "typescript": "5.6.3"
   },
   "type": "module",
-  "trustedDependencies": [
-    "@biomejs/biome",
-    "@sentry/cli"
-  ]
+  "trustedDependencies": ["@biomejs/biome", "@sentry/cli"]
 }

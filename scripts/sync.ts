@@ -27,7 +27,7 @@ if (!remotes.includes("template")) {
 
   if (!confirmation || isCancel(confirmation)) {
     cancel(
-      "Please add the template remote by running the command: `git remote add template git@github.com:adelrodriguez/startline.git`",
+      "Please add the template remote by running the command: `git remote add template git@github.com:adelrodriguez/startline-web.git`",
     )
 
     process.exit(0)
@@ -35,7 +35,7 @@ if (!remotes.includes("template")) {
 
   s.start("Adding template remote...")
 
-  await $`git remote add template git@github.com:adelrodriguez/startline.git`
+  await $`git remote add template git@github.com:adelrodriguez/startline-web.git`
 
   s.stop("Template remote added")
 } else {

@@ -1,4 +1,4 @@
-name: startline
+name: startline-web
 
 services:
   postgres:
