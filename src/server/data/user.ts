@@ -187,7 +187,11 @@ export async function createProfile(
   const [newProfile] = await db
     .insert(profile)
     .values({ ...values, userId })
-    .onConflictDoNothing()
+    .onConflictDoUpdate({
+      target: profile.userId,
+      set: values,
+      setWhere: filters.isNull(profile.name),
+    })
     .returning()
 
   if (!newProfile) {
