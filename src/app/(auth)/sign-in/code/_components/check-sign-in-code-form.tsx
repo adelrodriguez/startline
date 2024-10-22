@@ -5,8 +5,7 @@ import { parseWithZod } from "@conform-to/zod"
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
 import { Loader2Icon } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
-import { type ElementRef, useRef } from "react"
-import { useFormState } from "react-dom"
+import { type ComponentRef, useActionState, useRef } from "react"
 import { toast } from "sonner"
 
 import {
@@ -24,8 +23,8 @@ import { createCheckInWithCodeSchema } from "~/lib/validation/forms"
 import { checkSignInCode, resendSignInCode } from "~/server/actions/auth"
 
 export default function CheckSignInCodeForm({ email }: { email: string }) {
-  const formRef = useRef<ElementRef<typeof Form>>(null)
-  const [lastResult, action] = useFormState(checkSignInCode, undefined)
+  const formRef = useRef<ComponentRef<typeof Form>>(null)
+  const [lastResult, action] = useActionState(checkSignInCode, undefined)
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {

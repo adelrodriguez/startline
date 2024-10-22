@@ -8,13 +8,13 @@ import type { OrganizationId } from "~/server/data/organization"
 import type { UserId } from "~/server/data/user"
 import { getIpAddress } from "~/utils/headers"
 
-export function logActivity(
+export async function logActivity(
   type: ActivityType,
   values?: { userId?: UserId; organizationId?: OrganizationId },
 ) {
   return createActivityLog({
     type,
-    ipAddress: getIpAddress(),
+    ipAddress: await getIpAddress(),
     ...values,
   })
 }

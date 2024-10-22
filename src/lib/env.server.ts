@@ -46,6 +46,7 @@ export default createEnv({
     SENTRY_ORG: z.string(),
     SENTRY_PROJECT: z.string(),
     SENTRY_AUTH_TOKEN: z.string(),
+    SENTRY_DEBUG: z.boolean().default(false),
 
     // Stripe
     STRIPE_SECRET_KEY: z

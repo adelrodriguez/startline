@@ -5,8 +5,8 @@ import { cookies } from "next/headers"
 import { RedirectType, redirect } from "next/navigation"
 import { z } from "zod"
 import {
-  invalidateAllSessions,
   invalidateSession,
+  invalidateUserSessions,
   setSession,
   validateRequest,
 } from "~/lib/auth/session"
@@ -161,7 +161,7 @@ export async function signInWithCode(_: unknown, formData: FormData) {
 
   await logActivity("requested_sign_in_code")
 
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   cookieStore.set(VERIFICATION_EMAIL_COOKIE_NAME, submission.value.email, {
     httpOnly: true,
     secure: isProduction,
@@ -177,7 +177,7 @@ export async function checkSignInCode(_: unknown, formData: FormData) {
     throw new Error("Sign-in codes are disabled")
   }
 
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const email = cookieStore.get(VERIFICATION_EMAIL_COOKIE_NAME)?.value ?? null
 
   if (!email) {
@@ -305,7 +305,7 @@ export async function resetPassword(_: unknown, formData: FormData) {
   }
 
   // Log the user out of all sessions
-  await invalidateAllSessions(passwordResetToken.userId)
+  await invalidateUserSessions(passwordResetToken.userId)
 
   await Promise.all([
     createPassword(passwordResetToken.userId, submission.value.password),

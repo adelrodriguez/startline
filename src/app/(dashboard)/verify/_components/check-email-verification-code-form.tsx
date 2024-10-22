@@ -4,21 +4,17 @@ import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
 import { useAction } from "next-safe-action/hooks"
-import { type ElementRef, useRef } from "react"
-import { useFormState } from "react-dom"
+import { type ComponentRef, useActionState, useRef } from "react"
 import { toast } from "sonner"
 
+import { Button } from "~/components/ui/button"
+import { Form, FormItem, FormMessage, FormSubmit } from "~/components/ui/form"
 import {
-  Button,
-  Form,
-  FormItem,
-  FormMessage,
-  FormSubmit,
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "~/components/ui"
+} from "~/components/ui/input-otp"
 import { createCheckEmailVerificationCodeSchema } from "~/lib/validation/forms"
 import {
   checkEmailVerificationCode,
@@ -26,8 +22,8 @@ import {
 } from "~/server/actions/auth"
 
 export default function CheckEmailVerificationCodeForm() {
-  const formRef = useRef<ElementRef<typeof Form>>(null)
-  const [lastResult, action] = useFormState(
+  const formRef = useRef<ComponentRef<typeof Form>>(null)
+  const [lastResult, action] = useActionState(
     checkEmailVerificationCode,
     undefined,
   )

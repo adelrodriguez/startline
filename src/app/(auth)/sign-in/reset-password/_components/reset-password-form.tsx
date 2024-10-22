@@ -3,13 +3,14 @@
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { Loader2Icon } from "lucide-react"
-import { useFormState } from "react-dom"
+import { useActionState } from "react"
+
 import { Form, FormItem, FormSubmit, Input, Label } from "~/components/ui"
 import { createRequestPasswordResetSchema } from "~/lib/validation/forms"
 import { requestPasswordReset } from "~/server/actions/auth"
 
 export default function ResetPasswordForm() {
-  const [lastResult, action] = useFormState(requestPasswordReset, undefined)
+  const [lastResult, action] = useActionState(requestPasswordReset, undefined)
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {

@@ -10,9 +10,11 @@ import {
 } from "~/components/ui"
 import { RESET_PASSWORD_URL } from "~/lib/consts"
 
-export default function Page({
-  searchParams: { to },
-}: { searchParams: { to: string } }) {
+export default async function Page({
+  searchParams,
+}: { searchParams: Promise<{ to: string }> }) {
+  const { to } = await searchParams
+
   if (!to) {
     redirect(RESET_PASSWORD_URL)
   }

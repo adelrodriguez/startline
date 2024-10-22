@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 
 const FALLBACK_IP = "127.0.0.1"
 
-export function getIpAddress(request?: Request): string | null {
+export async function getIpAddress(request?: Request): Promise<string | null> {
   if (request) {
     const ip = ipAddress(request)
 
@@ -16,7 +16,7 @@ export function getIpAddress(request?: Request): string | null {
     return ip.trim()
   }
 
-  const headersList = headers()
+  const headersList = await headers()
   const forwardedFor = headersList.get("x-forwarded-for")
   const realIp = headersList.get("x-real-ip")
 
@@ -31,11 +31,11 @@ export function getIpAddress(request?: Request): string | null {
   return FALLBACK_IP
 }
 
-export function getGeolocation(request?: Request): {
+export async function getGeolocation(request?: Request): Promise<{
   country: string | null
   city: string | null
   region: string | null
-} {
+}> {
   if (request) {
     const geo = geolocation(request)
 
@@ -46,7 +46,7 @@ export function getGeolocation(request?: Request): {
     }
   }
 
-  const headersList = headers()
+  const headersList = await headers()
   const region = headersList.get("X-Vercel-IP-Country-Region")
   const country = headersList.get("X-Vercel-IP-Country")
   const city = headersList.get("X-Vercel-IP-City")

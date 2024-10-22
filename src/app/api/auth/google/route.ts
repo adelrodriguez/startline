@@ -20,7 +20,7 @@ export async function GET(): Promise<NextResponse> {
     scopes: ["profile", "email"],
   })
 
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
 
   cookieStore.set("google_oauth_state", state, {
     secure: true,

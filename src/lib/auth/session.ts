@@ -59,14 +59,14 @@ async function validateSessionToken(
   return { session, user: session.user }
 }
 
-function getSessionToken(): string | null {
-  const cookieStore = cookies()
+async function getSessionToken(): Promise<string | null> {
+  const cookieStore = await cookies()
 
   return cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null
 }
 
-function setSessionToken(token: string, expiresAt: Date): void {
-  const cookieStore = cookies()
+async function setSessionToken(token: string, expiresAt: Date): Promise<void> {
+  const cookieStore = await cookies()
 
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
@@ -77,8 +77,8 @@ function setSessionToken(token: string, expiresAt: Date): void {
   })
 }
 
-function deleteSessionToken(): void {
-  const cookieStore = cookies()
+async function deleteSessionToken(): Promise<void> {
+  const cookieStore = await cookies()
 
   cookieStore.set(SESSION_COOKIE_NAME, "", {
     httpOnly: true,
@@ -91,8 +91,8 @@ function deleteSessionToken(): void {
 
 export async function setSession(userId: UserId, request?: Request) {
   const token = generateSessionToken()
-  const ipAddress = getIpAddress(request)
-  const geolocation = getGeolocation(request)
+  const ipAddress = await getIpAddress(request)
+  const geolocation = await getGeolocation(request)
 
   const session = await createSession(token, userId, {
     ipAddress,
@@ -101,16 +101,16 @@ export async function setSession(userId: UserId, request?: Request) {
     city: geolocation?.city,
   })
 
-  setSessionToken(token, session.expiresAt)
+  await setSessionToken(token, session.expiresAt)
 }
 
 export async function invalidateSession(sessionId: SessionId): Promise<void> {
-  deleteSessionToken()
+  await deleteSessionToken()
   await deleteSession(sessionId)
 }
 
-export async function invalidateAllSessions(userId: UserId): Promise<void> {
-  deleteSessionToken()
+export async function invalidateUserSessions(userId: UserId): Promise<void> {
+  await deleteSessionToken()
   await deleteUserSessions(userId)
 }
 
@@ -118,7 +118,7 @@ export const validateRequest = cache(
   async (): Promise<
     { user: User; session: Session } | { user: null; session: null }
   > => {
-    const sessionId = getSessionToken()
+    const sessionId = await getSessionToken()
 
     if (!sessionId) {
       return { user: null, session: null }

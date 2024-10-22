@@ -10,8 +10,11 @@ import {
 } from "~/components/ui/card"
 import { getOrganizationFromInvitation } from "~/server/loader"
 
-export default async function Page({ params }: { params: { token: string } }) {
-  const organization = await getOrganizationFromInvitation(params.token)
+export default async function Page({
+  params,
+}: { params: Promise<{ token: string }> }) {
+  const { token } = await params
+  const organization = await getOrganizationFromInvitation(token)
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">

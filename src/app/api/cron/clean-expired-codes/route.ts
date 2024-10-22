@@ -10,7 +10,7 @@ import {
 } from "~/server/data/user"
 import { buildBaseUrl } from "~/utils/url"
 
-export async function handler(context: WorkflowContext) {
+async function handler(context: WorkflowContext) {
   const [
     deletedPasswordResetTokens,
     deletedEmailVerificationCodes,

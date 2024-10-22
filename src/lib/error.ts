@@ -54,7 +54,11 @@ export class SendEmailError extends CustomError {
     { email, name, message }: { email: string; name: string; message: string },
     cause?: unknown,
   ) {
-    super("SendEmailError", `Error sending email to ${email}. ${name}: ${message}`, cause)
+    super(
+      "SendEmailError",
+      `Error sending email to ${email}. ${name}: ${message}`,
+      cause,
+    )
   }
 }
 

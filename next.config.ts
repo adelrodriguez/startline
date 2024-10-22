@@ -1,25 +1,21 @@
-import { fileURLToPath } from "node:url"
 import bundleAnalyzer from "@next/bundle-analyzer"
 import { withSentryConfig } from "@sentry/nextjs"
-import createJiti from "jiti"
+import type { NextConfig } from "next"
 import createNextIntlPlugin from "next-intl/plugin"
 import { withPlausibleProxy } from "next-plausible"
+
+import envClient from "~/lib/env.client"
+import envServer from "~/lib/env.server"
+
+export { envClient, envServer }
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 })
 const withNextIntl = createNextIntlPlugin("./src/lib/i18n.ts")
 
-const jiti = createJiti(fileURLToPath(import.meta.url))
-
-jiti("./src/lib/env.server.ts")
-jiti("./src/lib/env.client.ts")
-
-/** @type {import('next').NextConfig} */
-let nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ["@node-rs/argon2"],
-  },
+let nextConfig: NextConfig = {
+  serverExternalPackages: ["@node-rs/argon2"],
 
   async rewrites() {
     return [
@@ -57,9 +53,10 @@ nextConfig = withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
 
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  authToken: process.env.SENTRY_AUTH_TOKEN,
+  org: envServer.SENTRY_ORG,
+  project: envServer.SENTRY_PROJECT,
+  authToken: envServer.SENTRY_AUTH_TOKEN,
+  debug: envServer.SENTRY_DEBUG,
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,

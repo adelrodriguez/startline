@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui"
 import { VERIFICATION_EMAIL_COOKIE_NAME } from "~/lib/consts"
 import CheckSignInCodeForm from "./_components/check-sign-in-code-form"
 
-export default function Page() {
-  const cookieStore = cookies()
+export default async function Page() {
+  const cookieStore = await cookies()
   const email = cookieStore.get(VERIFICATION_EMAIL_COOKIE_NAME)?.value ?? null
 
   if (!email) {

@@ -7,9 +7,11 @@ import {
 } from "~/components/ui"
 import NewPasswordForm from "./_components/new-password-form"
 
-export default function Page({
-  params: { token },
-}: { params: { token: string } }) {
+export default async function Page({
+  params,
+}: { params: Promise<{ token: string }> }) {
+  const { token } = await params
+
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-12 sm:px-8">
       <Card className="w-full sm:mx-auto sm:max-w-[500px]">

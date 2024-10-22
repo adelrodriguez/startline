@@ -4,7 +4,8 @@ import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { Loader2Icon } from "lucide-react"
 import Link from "next/link"
-import { useFormState } from "react-dom"
+import { useActionState } from "react"
+
 import { Button } from "~/components/ui/button"
 import { Form, FormItem, FormMessage, FormSubmit } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
@@ -13,7 +14,7 @@ import { createSignInWithPasswordSchema } from "~/lib/validation/forms"
 import { signInWithPassword } from "~/server/actions/auth"
 
 export default function SignInForm() {
-  const [lastResult, action] = useFormState(signInWithPassword, undefined)
+  const [lastResult, action] = useActionState(signInWithPassword, undefined)
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {

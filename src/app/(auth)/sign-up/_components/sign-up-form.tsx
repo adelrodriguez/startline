@@ -3,7 +3,8 @@
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { Loader2Icon } from "lucide-react"
-import { useFormState } from "react-dom"
+import { useActionState } from "react"
+
 import {
   Form,
   FormItem,
@@ -16,7 +17,7 @@ import { createSignUpSchema } from "~/lib/validation/forms"
 import { signUp } from "~/server/actions/auth"
 
 export default function SignUpForm() {
-  const [lastResult, action] = useFormState(signUp, undefined)
+  const [lastResult, action] = useActionState(signUp, undefined)
   const [form, fields] = useForm({
     lastResult,
 

@@ -1,10 +1,9 @@
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin"
 import type { Metadata } from "next"
 import PlausibleProvider from "next-plausible"
-import dynamic from "next/dynamic"
 import { extractRouterConfig } from "uploadthing/server"
+
 import Providers from "~/components/providers"
-import { Toaster } from "~/components/ui/sonner"
 import { APP_NAME, type Locale } from "~/lib/consts"
 import env from "~/lib/env.client"
 import { fileRouter } from "~/services/uploadthing"
@@ -17,19 +16,17 @@ export const metadata: Metadata = {
   title: APP_NAME,
 }
 
-const PostHogTrackPageview = dynamic(
-  () => import("~/components/analytics/posthog-track-pageview"),
-  {
-    ssr: false,
-  },
-)
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
-  params: { locale },
-}: Readonly<{ children: React.ReactNode; params: { locale: Locale } }>) {
+  params,
+}: Readonly<{
+  children: React.ReactNode
+  params: Promise<{ locale: Locale }>
+}>) {
+  const { locale } = await params
+
   return (
-    <html lang={locale} className="h-full">
+    <html lang={locale} className="h-full" suppressHydrationWarning>
       <head>
         <PlausibleProvider domain={env.NEXT_PUBLIC_DOMAIN} />
       </head>
@@ -40,11 +37,7 @@ export default function RootLayout({
           fonts.body.variable,
         )}
       >
-        <Providers>
-          <PostHogTrackPageview />
-          <Toaster />
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

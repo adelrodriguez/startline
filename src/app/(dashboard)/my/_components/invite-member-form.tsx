@@ -2,7 +2,8 @@
 
 import { getFormProps, getInputProps, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
-import { useFormState } from "react-dom"
+import { useActionState } from "react"
+
 import { Form, FormItem, FormSubmit, Input, Label } from "~/components/ui"
 import { createInviteMemberSchema } from "~/lib/validation/forms"
 import { inviteMember } from "~/server/actions/organization"
@@ -11,7 +12,7 @@ import type { OrganizationId } from "~/server/data/organization"
 export default function InviteMemberForm({
   organizationId,
 }: { organizationId: OrganizationId }) {
-  const [lastResult, action] = useFormState(inviteMember, undefined)
+  const [lastResult, action] = useActionState(inviteMember, undefined)
   const [form, fields] = useForm({
     lastResult,
     defaultValue: {
