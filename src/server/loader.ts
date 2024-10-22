@@ -9,17 +9,25 @@ import {
   findOrganizationById,
   findOrganizationInvitationByToken,
 } from "~/server/data/organization"
-import type { User } from "~/server/data/user"
+import {
+  type Profile,
+  type User,
+  findProfileByUserId,
+} from "~/server/data/user"
 
-export const getCurrentUser = cache(async (): Promise<User> => {
-  const { user } = await validateRequest()
+export const getCurrentUser = cache(
+  async (): Promise<User & { profile: Profile | null }> => {
+    const { user } = await validateRequest()
 
-  if (!user) {
-    redirect(UNAUTHORIZED_URL)
-  }
+    if (!user) {
+      redirect(UNAUTHORIZED_URL)
+    }
 
-  return user
-})
+    const profile = await findProfileByUserId(user.id)
+
+    return { ...user, profile }
+  },
+)
 
 export const getFirstOrganization = cache(async (): Promise<Organization> => {
   const user = await getCurrentUser()

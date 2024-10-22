@@ -180,6 +180,16 @@ export function assertUserIsUser(
   }
 }
 
+export async function findProfileByUserId(
+  userId: UserId,
+): Promise<Profile | null> {
+  const existingProfile = await db.query.profile.findFirst({
+    where: filters.eq(profile.userId, userId),
+  })
+
+  return existingProfile ?? null
+}
+
 export async function createProfile(
   userId: UserId,
   values: StrictOmit<NewProfile, "userId"> = {},

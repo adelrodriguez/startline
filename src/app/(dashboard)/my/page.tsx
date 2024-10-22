@@ -31,11 +31,18 @@ export default async function Page() {
           <CardContent className="flex flex-col gap-4">
             <div className="flex items-center gap-4">
               <Avatar>
-                <AvatarImage src="/placeholder-user.jpg" alt="Avatar" />
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarImage
+                  src={user.profile?.avatarUrl || undefined}
+                  alt="Avatar"
+                />
+                <AvatarFallback>
+                  {user.profile?.name?.[0] || "U"}
+                </AvatarFallback>
               </Avatar>
               <div>
-                <div className="font-medium">John Doe</div>
+                <div className="font-medium">
+                  {user.profile?.name || "Unknown"}
+                </div>
                 <div className="text-muted-foreground">{user.email}</div>
               </div>
             </div>
