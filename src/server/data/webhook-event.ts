@@ -1,7 +1,7 @@
 import "server-only"
 
-import { DatabaseError } from "~/lib/error"
 import db, { filters, webhookEvent, helpers } from "~/server/db"
+import { invariantReturning } from "~/utils/invariant"
 import type { StrictOmit } from "~/utils/type"
 
 export type WebhookEvent = typeof webhookEvent.$inferSelect
@@ -33,9 +33,7 @@ export async function createWebhookEvent(
     })
     .returning()
 
-  if (!newWebhookEvent) {
-    throw new DatabaseError("Failed to create webhook event")
-  }
+  invariantReturning(newWebhookEvent, "Failed to create webhook event")
 
   return newWebhookEvent
 }

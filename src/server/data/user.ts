@@ -9,7 +9,7 @@ import {
 } from "~/components/emails"
 import { SESSION_LENGTH_IN_DAYS } from "~/lib/consts"
 import { sendEmail } from "~/lib/emails"
-import { DatabaseError, UnauthorizedError } from "~/lib/error"
+import { UnauthorizedError } from "~/lib/error"
 import { logActivity } from "~/lib/logger"
 import db, {
   emailVerificationCode,
@@ -22,6 +22,7 @@ import db, {
   user,
 } from "~/server/db"
 import { argon2, sha } from "~/utils/hash"
+import { invariantReturning } from "~/utils/invariant"
 import {
   generateRandomLowercaseString,
   generateRandomUppercaseString,
@@ -93,7 +94,7 @@ export async function createUser(values: NewUser): Promise<User> {
     .values({ ...values, role: "user" })
     .returning()
 
-  if (!newUser) throw new DatabaseError("Failed to create user")
+  invariantReturning(newUser, "Failed to create user")
 
   return newUser
 }
@@ -110,9 +111,7 @@ export async function createUserFromGoogle(
     })
     .returning()
 
-  if (!newUser) {
-    throw new DatabaseError("Failed to create user from Google")
-  }
+  invariantReturning(newUser, "Failed to create user from Google")
 
   return newUser
 }
@@ -129,9 +128,7 @@ export async function createUserFromGitHub(
     })
     .returning()
 
-  if (!newUser) {
-    throw new DatabaseError("Failed to create user from GitHub")
-  }
+  invariantReturning(newUser, "Failed to create user from GitHub")
 
   return newUser
 }
@@ -145,9 +142,7 @@ export async function findOrCreateUser(
     .onConflictDoNothing()
     .returning()
 
-  if (!newUser) {
-    throw new DatabaseError("Failed to find or create user")
-  }
+  invariantReturning(newUser, "Failed to find or create user")
 
   return newUser
 }
@@ -204,9 +199,7 @@ export async function createProfile(
     })
     .returning()
 
-  if (!newProfile) {
-    throw new DatabaseError("Failed to create profile")
-  }
+  invariantReturning(newProfile, "Failed to create profile")
 
   return newProfile
 }
@@ -364,9 +357,7 @@ export async function createPassword(
     })
     .returning()
 
-  if (!newPassword) {
-    throw new DatabaseError("Failed to create password")
-  }
+  invariantReturning(newPassword, "Failed to create password")
 
   return newPassword
 }
@@ -458,9 +449,7 @@ export async function createSession(
     })
     .returning()
 
-  if (!newSession) {
-    throw new DatabaseError("Failed to create session")
-  }
+  invariantReturning(newSession, "Failed to create session")
 
   return newSession
 }

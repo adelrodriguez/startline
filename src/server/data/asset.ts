@@ -1,7 +1,7 @@
 import "server-only"
-import { DatabaseError } from "~/lib/error"
 import type { UserId } from "~/server/data/user"
 import db, { asset, filters } from "~/server/db"
+import { invariantReturning } from "~/utils/invariant"
 
 export type Asset = typeof asset.$inferSelect
 export type NewAsset = typeof asset.$inferInsert
@@ -36,9 +36,7 @@ export async function createAsset(
     .values({ ...values, userId })
     .returning()
 
-  if (!newAsset) {
-    throw new DatabaseError("Failed to create asset")
-  }
+  invariantReturning(newAsset, "Failed to create asset")
 
   return newAsset
 }
@@ -59,9 +57,7 @@ export async function markAssetAsUploaded(
     )
     .returning()
 
-  if (!uploadedAsset) {
-    throw new DatabaseError("Failed to mark asset as uploaded")
-  }
+  invariantReturning(uploadedAsset, "Failed to mark asset as uploaded")
 
   return uploadedAsset
 }

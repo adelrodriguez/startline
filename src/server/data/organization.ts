@@ -5,11 +5,7 @@ import { alphabet, generateRandomString } from "oslo/crypto"
 
 import { OrganizationInvitationEmail } from "~/components/emails"
 import { sendEmail } from "~/lib/emails"
-import {
-  DatabaseError,
-  NotFoundError,
-  OrganizationInvitationError,
-} from "~/lib/error"
+import { NotFoundError, OrganizationInvitationError } from "~/lib/error"
 import { OrganizationError } from "~/lib/error"
 import type { UserId } from "~/server/data/user"
 import db, {
@@ -19,6 +15,7 @@ import db, {
   organizationInvitation,
   user,
 } from "~/server/db"
+import { invariantReturning } from "~/utils/invariant"
 
 export type Organization = typeof organization.$inferSelect
 export type NewOrganization = typeof organization.$inferInsert
@@ -44,9 +41,7 @@ export async function createOrganization(
     .values(values)
     .returning()
 
-  if (!newOrganization) {
-    throw new DatabaseError("Failed to create organization")
-  }
+  invariantReturning(newOrganization, "Failed to create organization")
 
   if (options?.ownerId) {
     await createAccount(options.ownerId, newOrganization.id, "owner")
@@ -93,7 +88,7 @@ export async function createAccount(
     .values({ userId, organizationId, role })
     .returning()
 
-  if (!existingAccount) throw new DatabaseError("Failed to create account")
+  invariantReturning(existingAccount, "Failed to create account")
 
   return existingAccount
 }
@@ -190,9 +185,7 @@ export async function createOrganizationInvitation(
     })
     .returning()
 
-  if (!invitation) {
-    throw new DatabaseError("Failed to create organization invitation")
-  }
+  invariantReturning(invitation, "Failed to create organization invitation")
 
   await sendOrganizationInvitationEmail(invitation)
 
