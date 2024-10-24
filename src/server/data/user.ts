@@ -227,7 +227,7 @@ export async function sendEmailVerificationCode(
   await db
     .insert(emailVerificationCode)
     .values({
-      hash: await sha.sha256.hash(code),
+      hash: sha.sha256.hash(code),
       userId,
       expiresAt: addHours(new Date(), 24),
     })
@@ -251,7 +251,7 @@ export async function verifyEmailVerificationCode(
 
   if (!emailVerificationCode) return false
 
-  const isValidCode = await sha.sha256.verify(emailVerificationCode.hash, code)
+  const isValidCode = sha.sha256.verify(emailVerificationCode.hash, code)
 
   if (!isValidCode) return false
 
@@ -304,7 +304,7 @@ export async function sendPasswordResetToken(
 
   await db.insert(passwordResetToken).values({
     userId,
-    hash: await sha.sha256.hash(token),
+    hash: sha.sha256.hash(token),
     expiresAt: addHours(new Date(), 24),
   })
 
@@ -391,7 +391,7 @@ export async function sendSignInCode(email: string): Promise<void> {
 
   await db.insert(signInCode).values({
     email,
-    hash: await sha.sha256.hash(code),
+    hash: sha.sha256.hash(code),
     expiresAt: addMinutes(new Date(), 15),
   })
 
