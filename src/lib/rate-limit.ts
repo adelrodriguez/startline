@@ -17,7 +17,7 @@ const rateLimit = {
   }),
   unknown: new Ratelimit({
     redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(10, "10 s"),
+    limiter: Ratelimit.slidingWindow(1, "1 s"),
     analytics: true,
     ephemeralCache,
     prefix: "ratelimit:unknown",

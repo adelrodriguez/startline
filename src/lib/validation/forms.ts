@@ -1,5 +1,3 @@
-import type { Intent } from "@conform-to/react"
-import { conformZodMessage } from "@conform-to/zod"
 import { z } from "zod"
 
 const PasswordSchema = z
@@ -16,114 +14,49 @@ const CodeSchema = z
 const matchPasswords = (data: { password: string; confirmPassword: string }) =>
   data.password === data.confirmPassword
 
-export function createSignUpSchema(
-  intent: Intent | null,
-  options?: {
-    checkIsEmailUnique: (email: string) => Promise<boolean>
-  },
-) {
-  // TODO(adelrodriguez): Fix this validation so we don't trigger the submission
-  // loading state. Another benefit of fixing this is that we can debounce the
-  // email validation.
-  return z
-    .object({
-      email: z
-        .string()
-        .email()
-        .pipe(
-          z.string().superRefine((email, ctx) => {
-            const isValidatingEmail =
-              intent === null ||
-              (intent.type === "validate" && intent.payload.name === "email")
-
-            // This make Conform to use the previous result instead by
-            // indicating that the validation is skipped
-            if (!isValidatingEmail) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: conformZodMessage.VALIDATION_SKIPPED,
-              })
-
-              return
-            }
-
-            if (typeof options?.checkIsEmailUnique !== "function") {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: conformZodMessage.VALIDATION_UNDEFINED,
-                fatal: true,
-              })
-
-              return
-            }
-
-            return options.checkIsEmailUnique(email).then((isEmailUnique) => {
-              if (isEmailUnique) return
-
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Email is already used",
-              })
-            })
-          }),
-        ),
-      password: PasswordSchema,
-      confirmPassword: PasswordSchema,
-    })
-    .refine(matchPasswords, {
-      message: "Passwords don't match",
-      path: ["confirmPassword"],
-    })
-}
-
-export function createSignInWithPasswordSchema() {
-  return z.object({
+export const SignUpSchema = z
+  .object({
+    name: z.string().min(1),
     email: z.string().email(),
     password: PasswordSchema,
+    confirmPassword: PasswordSchema,
   })
-}
-
-export function createSignInWithCodeSchema() {
-  return z.object({
-    email: z.string().email(),
+  .refine(matchPasswords, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
   })
-}
 
-export function createCheckInWithCodeSchema() {
-  return z.object({
-    code: CodeSchema,
+export const SignInWithCodeSchema = z.object({
+  email: z.string().email(),
+})
+
+export const SignInWithPasswordSchema = z.object({
+  email: z.string().email(),
+  password: PasswordSchema,
+})
+
+export const CheckSignInWithCodeSchema = z.object({
+  code: CodeSchema,
+})
+
+export const CheckEmailVerificationCodeSchema = z.object({
+  code: CodeSchema,
+})
+
+export const RequestPasswordResetSchema = z.object({
+  email: z.string().email(),
+})
+
+export const NewPasswordSchema = z
+  .object({
+    password: PasswordSchema,
+    confirmPassword: PasswordSchema,
   })
-}
-
-export function createCheckEmailVerificationCodeSchema() {
-  return z.object({
-    code: CodeSchema,
+  .refine(matchPasswords, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
   })
-}
 
-export function createRequestPasswordResetSchema() {
-  return z.object({
-    email: z.string().email(),
-  })
-}
-
-export function createNewPasswordSchema() {
-  return z
-    .object({
-      token: z.string().min(1),
-      password: PasswordSchema,
-      confirmPassword: PasswordSchema,
-    })
-    .refine(matchPasswords, {
-      message: "Passwords don't match",
-      path: ["confirmPassword"],
-    })
-}
-
-export function createInviteMemberSchema() {
-  return z.object({
-    email: z.string().email(),
-    role: z.enum(["member", "admin"]),
-    organizationId: z.bigint(),
-  })
-}
+export const InviteMemberSchema = z.object({
+  email: z.string().email(),
+})

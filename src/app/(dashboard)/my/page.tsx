@@ -9,8 +9,8 @@ import {
   CardTitle,
 } from "~/components/ui/card"
 import { TypographySmall } from "~/components/ui/typography"
-
 import { getCurrentUser, getFirstOrganization } from "~/server/loader"
+
 import InviteMemberForm from "./_components/invite-member-form"
 import SignOutButton from "./_components/sign-out-button"
 

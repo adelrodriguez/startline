@@ -1,41 +1,42 @@
 "use server"
 
-import { parseWithZod } from "@conform-to/zod"
-import { validateRequest } from "~/lib/auth/session"
-import { AuthError } from "~/lib/error"
+import { z } from "zod"
 import { logActivity } from "~/lib/logger"
-import { createInviteMemberSchema } from "~/lib/validation/forms"
+import { authActionClient, withRateLimitByUser } from "~/lib/safe-action"
+import { InviteMemberSchema } from "~/lib/validation/forms"
 import {
   type OrganizationId,
   assertUserIsOrganizationMember,
   createOrganizationInvitation,
 } from "~/server/data/organization"
 
-export async function inviteMember(_: unknown, formData: FormData) {
-  const submission = parseWithZod(formData, {
-    schema: createInviteMemberSchema(),
-  })
+export const inviteMember = authActionClient
+  .use(withRateLimitByUser)
+  .schema(InviteMemberSchema)
+  // TODO(adelrodriguez): Replace this with the current organization (from a cookie)
+  .bindArgsSchemas([z.coerce.bigint()])
+  .action(
+    async ({
+      parsedInput: { email },
+      // TODO(adelrodriguez): Replace this with a middleware that injects the
+      // current organization
+      bindArgsParsedInputs: [organizationId],
+      ctx,
+    }) => {
+      await assertUserIsOrganizationMember(
+        organizationId as OrganizationId,
+        ctx.user.id,
+      )
 
-  if (submission.status !== "success") {
-    return submission.reply()
-  }
+      await createOrganizationInvitation(
+        organizationId as OrganizationId,
+        ctx.user.id,
+        { email, role: "member" },
+      )
 
-  const { user } = await validateRequest()
-
-  if (!user) throw new AuthError("User not found")
-
-  // TODO(adelrodriguez): Get this from the current organization
-  const organizationId = submission.value.organizationId as OrganizationId
-
-  await assertUserIsOrganizationMember(organizationId, user.id)
-
-  await createOrganizationInvitation(organizationId, user.id, {
-    email: submission.value.email,
-    role: submission.value.role,
-  })
-
-  await logActivity("invited_member_to_organization", {
-    userId: user.id,
-    organizationId,
-  })
-}
+      await logActivity("invited_member_to_organization", {
+        userId: ctx.user.id,
+        organizationId: organizationId as OrganizationId,
+      })
+    },
+  )

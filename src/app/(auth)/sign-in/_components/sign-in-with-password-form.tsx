@@ -1,68 +1,68 @@
 "use client"
 
-import { getFormProps, getInputProps, useForm } from "@conform-to/react"
-import { parseWithZod } from "@conform-to/zod"
-import { Loader2Icon } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import Link from "next/link"
-import { useActionState } from "react"
 
 import { Button } from "~/components/ui/button"
-import { Form, FormItem, FormMessage, FormSubmit } from "~/components/ui/form"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormSubmit,
+} from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
-import { createSignInWithPasswordSchema } from "~/lib/validation/forms"
+import { SignInWithPasswordSchema } from "~/lib/validation/forms"
 import { signInWithPassword } from "~/server/actions/auth"
 
 export default function SignInForm() {
-  const [lastResult, action] = useActionState(signInWithPassword, undefined)
-  const [form, fields] = useForm({
-    lastResult,
-    onValidate({ formData }) {
-      return parseWithZod(formData, {
-        schema: createSignInWithPasswordSchema(),
-      })
-    },
-    shouldValidate: "onBlur",
-    shouldRevalidate: "onInput",
-  })
+  const { form, handleSubmitWithAction } = useHookFormAction(
+    signInWithPassword,
+    zodResolver(SignInWithPasswordSchema),
+    { formProps: { defaultValues: { email: "", password: "" } } },
+  )
 
   return (
-    <Form {...getFormProps(form)} action={action}>
-      <FormItem>
-        <Label htmlFor={fields.email.id}>Email address</Label>
-        <Input
-          {...getInputProps(fields.email, { type: "email" })}
-          autoComplete="email"
+    <Form {...form}>
+      <form onSubmit={handleSubmitWithAction} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email address</FormLabel>
+              <FormControl>
+                <Input {...field} type="email" autoComplete="email" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </FormItem>
-
-      <FormItem>
-        <Label htmlFor={fields.password.id}>Password</Label>
-        <div className="space-y-0.5">
-          <Input
-            {...getInputProps(fields.password, { type: "password" })}
-            autoComplete="password"
-          />
-
-          <Button variant="link" asChild className="p-0">
-            <Link href="/sign-in/reset-password">Forgot password?</Link>
-          </Button>
-        </div>
-      </FormItem>
-
-      <FormMessage className="text-center">{form.errors}</FormMessage>
-
-      <FormSubmit
-        className="w-full"
-        renderLoading={
-          <>
-            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-            Signing in...
-          </>
-        }
-      >
-        Sign in
-      </FormSubmit>
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input {...field} type="password" autoComplete="password" />
+              </FormControl>
+              <Button variant="link" asChild className="p-0">
+                <Link href="/sign-in/reset-password" className="h-auto">
+                  Forgot password?
+                </Link>
+              </Button>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormSubmit className="w-full" submittingMessage="Signing in...">
+          Sign in
+        </FormSubmit>
+      </form>
     </Form>
   )
 }

@@ -1,49 +1,47 @@
 "use client"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 
-import { getFormProps, getInputProps, useForm } from "@conform-to/react"
-import { parseWithZod } from "@conform-to/zod"
-import { Loader2Icon } from "lucide-react"
-import { useActionState } from "react"
-
-import { Form, FormItem, FormSubmit, Input, Label } from "~/components/ui"
-import { createRequestPasswordResetSchema } from "~/lib/validation/forms"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormSubmit,
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
+import { RequestPasswordResetSchema } from "~/lib/validation/forms"
 import { requestPasswordReset } from "~/server/actions/auth"
 
 export default function ResetPasswordForm() {
-  const [lastResult, action] = useActionState(requestPasswordReset, undefined)
-  const [form, fields] = useForm({
-    lastResult,
-    onValidate({ formData }) {
-      return parseWithZod(formData, {
-        schema: createRequestPasswordResetSchema(),
-      })
-    },
-    shouldValidate: "onBlur",
-    shouldRevalidate: "onInput",
-  })
+  const { form, handleSubmitWithAction } = useHookFormAction(
+    requestPasswordReset,
+    zodResolver(RequestPasswordResetSchema),
+    { formProps: { defaultValues: { email: "" } } },
+  )
 
   return (
-    <Form {...getFormProps(form)} action={action}>
-      <FormItem>
-        <Label htmlFor={fields.email.id}>Email address</Label>
-
-        <Input
-          {...getInputProps(fields.email, { type: "email" })}
-          autoComplete="email"
+    <Form {...form}>
+      <form onSubmit={handleSubmitWithAction} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email address</FormLabel>
+              <FormControl>
+                <Input {...field} type="email" autoComplete="email" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </FormItem>
-
-      <FormSubmit
-        className="w-full"
-        renderLoading={
-          <>
-            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-            Sending...
-          </>
-        }
-      >
-        Send
-      </FormSubmit>
+        <FormSubmit className="w-full" submittingMessage="Sending request...">
+          Send request
+        </FormSubmit>
+      </form>
     </Form>
   )
 }

@@ -1,64 +1,63 @@
 "use client"
 
-import { getFormProps, getInputProps, useForm } from "@conform-to/react"
-import { parseWithZod } from "@conform-to/zod"
-import { Loader2Icon } from "lucide-react"
-import { useActionState } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 
-import { Form, FormItem, FormMessage, FormSubmit } from "~/components/ui/form"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormSubmit,
+} from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
-import { createNewPasswordSchema } from "~/lib/validation/forms"
+import { NewPasswordSchema } from "~/lib/validation/forms"
 import { resetPassword } from "~/server/actions/auth"
 
 export default function NewPasswordForm({ token }: { token: string }) {
-  const [lastResult, action] = useActionState(resetPassword, undefined)
-  const [form, fields] = useForm({
-    lastResult,
-    defaultValue: { token },
-    onValidate: ({ formData }) =>
-      parseWithZod(formData, { schema: createNewPasswordSchema() }),
-
-    shouldValidate: "onBlur",
-    shouldRevalidate: "onInput",
-  })
+  const { form, handleSubmitWithAction } = useHookFormAction(
+    resetPassword.bind(null, token),
+    zodResolver(NewPasswordSchema),
+    {
+      formProps: { defaultValues: { password: "", confirmPassword: "" } },
+    },
+  )
 
   return (
-    <Form {...getFormProps(form)} action={action}>
-      <input {...getInputProps(fields.token, { type: "hidden" })} />
-      <FormItem>
-        <Label htmlFor={fields.password.id}>New Password</Label>
-        <Input
-          {...getInputProps(fields.password, { type: "password" })}
-          autoComplete="new-password"
+    <Form {...form}>
+      <form onSubmit={handleSubmitWithAction} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>New Password</FormLabel>
+              <FormControl>
+                <Input {...field} type="password" autoComplete="new-password" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <FormMessage id={fields.password.errorId}>
-          {fields.password.errors}
-        </FormMessage>
-      </FormItem>
-
-      <FormItem>
-        <Label htmlFor={fields.confirmPassword.id}>Confirm Password</Label>
-        <Input
-          {...getInputProps(fields.confirmPassword, { type: "password" })}
-          autoComplete="new-password"
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input {...field} type="password" autoComplete="new-password" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <FormMessage id={fields.confirmPassword.errorId}>
-          {fields.confirmPassword.errors}
-        </FormMessage>
-      </FormItem>
-
-      <FormSubmit
-        className="w-full"
-        renderLoading={
-          <>
-            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-            Changing password...
-          </>
-        }
-      >
-        Change Password
-      </FormSubmit>
+        <FormSubmit className="w-full" submittingMessage="Changing password...">
+          Change Password
+        </FormSubmit>
+      </form>
     </Form>
   )
 }

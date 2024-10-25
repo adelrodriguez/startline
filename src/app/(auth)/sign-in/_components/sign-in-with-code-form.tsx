@@ -1,47 +1,48 @@
 "use client"
 
-import { getFormProps, getInputProps, useForm } from "@conform-to/react"
-import { parseWithZod } from "@conform-to/zod"
-import { Loader2Icon } from "lucide-react"
-import { useActionState } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 
-import { Form, FormItem, FormSubmit, Input, Label } from "~/components/ui"
-import { createSignInWithCodeSchema } from "~/lib/validation/forms"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormSubmit,
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
+import { SignInWithCodeSchema } from "~/lib/validation/forms"
 import { signInWithCode } from "~/server/actions/auth"
 
 export default function SignInWithCodeForm() {
-  const [lastResult, action] = useActionState(signInWithCode, undefined)
-  const [form, fields] = useForm({
-    lastResult,
-    onValidate({ formData }) {
-      return parseWithZod(formData, { schema: createSignInWithCodeSchema() })
+  const { form, handleSubmitWithAction } = useHookFormAction(
+    signInWithCode,
+    zodResolver(SignInWithCodeSchema),
+    {
+      formProps: { defaultValues: { email: "" } },
     },
-    shouldValidate: "onBlur",
-    shouldRevalidate: "onInput",
-  })
+  )
 
   return (
-    <Form {...getFormProps(form)} action={action}>
-      <FormItem>
-        <Label htmlFor={fields.email.id}>Email address</Label>
-
-        <Input
-          {...getInputProps(fields.email, { type: "email" })}
-          autoComplete="email"
+    <Form {...form}>
+      <form onSubmit={handleSubmitWithAction} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email address</FormLabel>
+              <FormControl>
+                <Input {...field} autoComplete="email" />
+              </FormControl>
+            </FormItem>
+          )}
         />
-      </FormItem>
-
-      <FormSubmit
-        className="w-full"
-        renderLoading={
-          <>
-            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-            Sending...
-          </>
-        }
-      >
-        Send a sign in code
-      </FormSubmit>
+        <FormSubmit className="w-full" submittingMessage="Sending...">
+          Send a sign in code
+        </FormSubmit>
+      </form>
     </Form>
   )
 }

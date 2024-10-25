@@ -1,80 +1,102 @@
 "use client"
 
-import { getFormProps, getInputProps, useForm } from "@conform-to/react"
-import { parseWithZod } from "@conform-to/zod"
-import { Loader2Icon } from "lucide-react"
-import { useActionState } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
+import { toast } from "sonner"
 
 import {
   Form,
+  FormControl,
+  FormField,
   FormItem,
+  FormLabel,
   FormMessage,
   FormSubmit,
-  Input,
-  Label,
-} from "~/components/ui"
-import { createSignUpSchema } from "~/lib/validation/forms"
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
+import { SignUpSchema } from "~/lib/validation/forms"
 import { signUp } from "~/server/actions/auth"
 
 export default function SignUpForm() {
-  const [lastResult, action] = useActionState(signUp, undefined)
-  const [form, fields] = useForm({
-    lastResult,
-
-    onValidate: ({ formData }) =>
-      parseWithZod(formData, {
-        schema: (intent) => createSignUpSchema(intent),
-      }),
-
-    shouldValidate: "onBlur",
-    shouldRevalidate: "onInput",
-  })
+  const { form, handleSubmitWithAction } = useHookFormAction(
+    signUp,
+    zodResolver(SignUpSchema),
+    {
+      formProps: {
+        defaultValues: {
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        },
+      },
+      actionProps: {
+        onError({ error }) {
+          toast.error(error.serverError)
+        },
+      },
+    },
+  )
 
   return (
-    <Form {...getFormProps(form)} action={action}>
-      <FormItem>
-        <Label htmlFor={fields.email.id}>Email</Label>
-        <Input
-          {...getInputProps(fields.email, { type: "email" })}
-          autoComplete="email"
+    <Form {...form}>
+      <form onSubmit={handleSubmitWithAction} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input {...field} type="text" autoComplete="name" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <FormMessage id={fields.email.errorId}>
-          {fields.email.errors}
-        </FormMessage>
-      </FormItem>
-
-      <FormItem>
-        <Label htmlFor={fields.password.id}>Password</Label>
-        <Input
-          {...getInputProps(fields.password, { type: "password" })}
-          autoComplete="new-password"
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email address</FormLabel>
+              <FormControl>
+                <Input {...field} type="email" autoComplete="email" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <FormMessage id={fields.password.errorId}>
-          {fields.password.errors}
-        </FormMessage>
-      </FormItem>
-
-      <FormItem>
-        <Label htmlFor={fields.confirmPassword.id}>Confirm Password</Label>
-        <Input
-          {...getInputProps(fields.confirmPassword, { type: "password" })}
-          autoComplete="new-password"
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input {...field} type="password" autoComplete="new-password" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <FormMessage id={fields.confirmPassword.errorId}>
-          {fields.confirmPassword.errors}
-        </FormMessage>
-      </FormItem>
-      <FormSubmit
-        className="w-full"
-        renderLoading={
-          <>
-            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-            Signing up...
-          </>
-        }
-      >
-        Sign Up
-      </FormSubmit>
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input {...field} type="password" autoComplete="new-password" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormSubmit className="w-full" submittingMessage="Signing up...">
+          Sign Up
+        </FormSubmit>
+      </form>
     </Form>
   )
 }
