@@ -4,7 +4,23 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { usePostHog } from "posthog-js/react"
 import { useEffect, useRef } from "react"
 
-export default function PostHogTrackPageview() {
+import type { User } from "~/server/data/user"
+
+export function PostHogIdentifyUser({ user }: { user: User }) {
+  const posthog = usePostHog()
+
+  useEffect(() => {
+    if (!posthog) return
+
+    posthog.identify(user.id.toString(), {
+      email: user.email,
+    })
+  }, [posthog, user.id, user.email])
+
+  return null
+}
+
+export function PostHogTrackPageview() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const posthog = usePostHog()

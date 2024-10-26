@@ -3,7 +3,7 @@ import "server-only"
 import { TimeSpan, createDate } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
 
-import { OrganizationInvitationEmail } from "~/components/emails"
+import OrganizationInvitationEmail from "~/components/emails/organization-invitation"
 import { sendEmail } from "~/lib/emails"
 import { NotFoundError, OrganizationInvitationError } from "~/lib/error"
 import { OrganizationError } from "~/lib/error"

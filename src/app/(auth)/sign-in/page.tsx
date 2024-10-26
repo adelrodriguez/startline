@@ -1,12 +1,9 @@
 import Link from "next/link"
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Separator,
-} from "~/components/ui"
+
+import { Button } from "~/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { Separator } from "~/components/ui/separator"
+
 import SignInWithCodeForm from "./_components/sign-in-with-code-form"
 import SignInWithPasswordForm from "./_components/sign-in-with-password-form"
 

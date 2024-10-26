@@ -6,10 +6,10 @@ import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
 import { Suspense } from "react"
 
+import { PostHogTrackPageview } from "~/components/analytics/posthog"
 import { Toaster } from "~/components/ui/sonner"
 import { TooltipProvider } from "~/components/ui/tooltip"
 import env from "~/lib/env.client"
-import { PostHogTrackPageview } from "./analytics"
 
 if (typeof window !== "undefined") {
   posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {

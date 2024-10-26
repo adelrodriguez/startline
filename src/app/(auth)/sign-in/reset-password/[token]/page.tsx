@@ -4,7 +4,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/ui"
+} from "~/components/ui/card"
 import NewPasswordForm from "./_components/new-password-form"
 
 export default async function Page({

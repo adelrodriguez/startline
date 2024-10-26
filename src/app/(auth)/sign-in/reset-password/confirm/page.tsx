@@ -1,13 +1,14 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
+
+import { Button } from "~/components/ui/button"
 import {
-  Button,
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "~/components/ui"
+} from "~/components/ui/card"
 import { RESET_PASSWORD_URL } from "~/lib/consts"
 
 export default async function Page({

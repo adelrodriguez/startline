@@ -1,4 +1,4 @@
-import { PostHogIdentifyUser } from "~/components/analytics"
+import { PostHogIdentifyUser } from "~/components/analytics/posthog"
 import { getCurrentUser } from "~/server/loader"
 
 export default async function Layout({

@@ -4,7 +4,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/ui"
+} from "~/components/ui/card"
 import ResetPasswordForm from "./_components/reset-password-form"
 
 export default function Page() {

@@ -11,8 +11,8 @@
     "build": "next build",
     "check": "biome check --write src",
     "clean": "bun scripts/clean.ts",
-    "component:add": "bun scripts/add-component.ts",
-    "component:diff": "shadcn diff",
+    "components:add": "shadcn add",
+    "components:diff": "shadcn diff",
     "db:check": "drizzle-kit check",
     "db:drop": "drizzle-kit drop",
     "db:generate": "drizzle-kit generate",
@@ -122,10 +122,7 @@
     "typescript": "5.6.3"
   },
   "type": "module",
-  "trustedDependencies": [
-    "@biomejs/biome",
-    "@sentry/cli"
-  ],
+  "trustedDependencies": ["@biomejs/biome", "@sentry/cli"],
   "overrides": {
     "@types/react": "npm:types-react@19.0.0-rc.1",
     "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1"
