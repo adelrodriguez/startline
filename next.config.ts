@@ -12,7 +12,7 @@ export { envClient, envServer }
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 })
-const withNextIntl = createNextIntlPlugin("./src/lib/i18n.ts")
+const withNextIntl = createNextIntlPlugin()
 
 let nextConfig: NextConfig = {
   serverExternalPackages: ["@node-rs/argon2"],

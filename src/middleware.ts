@@ -1,8 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { nextIntlMiddleware } from "~/i18n/routing"
 import { LOCALES, SESSION_COOKIE_NAME } from "~/lib/consts"
-import { nextIntlMiddleware } from "~/server/middlewares"
-
-export const handleI18nRouting = nextIntlMiddleware
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (request.method === "GET") {
@@ -55,7 +53,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl
 
   if (new RegExp(`^/(${LOCALES.join("|")})(/.*)?$`).test(pathname)) {
-    return handleI18nRouting(request)
+    return nextIntlMiddleware(request)
   }
 
   return NextResponse.next()
