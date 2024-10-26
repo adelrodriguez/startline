@@ -14,10 +14,10 @@ import { logActivity } from "~/lib/logger"
 import { GoogleUserSchema } from "~/lib/validation/external"
 import { createOrganization } from "~/server/data/organization"
 import {
-  createProfile,
   createUserFromGoogle,
   findUserByGoogleId,
   markUserAsEmailVerified,
+  upsertProfile,
 } from "~/server/data/user"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -99,7 +99,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     await logActivity("signed_up_with_google", { userId: user.id })
 
-    await createProfile(user.id, {
+    await upsertProfile(user.id, {
       name: googleUser.name,
       avatarUrl: googleUser.picture,
       preferredLocale: googleUser.locale,

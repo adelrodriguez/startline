@@ -192,16 +192,38 @@ export async function createProfile(
   const [newProfile] = await db
     .insert(profile)
     .values({ ...values, userId })
-    .onConflictDoUpdate({
-      target: profile.userId,
-      set: values,
-      setWhere: filters.isNull(profile.name),
-    })
+    .onConflictDoNothing()
     .returning()
 
   invariantReturning(newProfile, "Failed to create profile")
 
   return newProfile
+}
+
+export async function upsertProfile(
+  userId: UserId,
+  values: StrictOmit<NewProfile, "userId"> = {},
+): Promise<Profile> {
+  const existingProfile = await findProfileByUserId(userId)
+
+  if (!existingProfile) {
+    return createProfile(userId, values)
+  }
+
+  const [updatedProfile] = await db
+    .update(profile)
+    .set({
+      name: existingProfile.name ?? values.name,
+      avatarUrl: existingProfile.avatarUrl ?? values.avatarUrl,
+      preferredLocale:
+        existingProfile.preferredLocale ?? values.preferredLocale,
+    })
+    .where(filters.eq(profile.userId, userId))
+    .returning()
+
+  invariantReturning(updatedProfile, "Failed to update profile")
+
+  return updatedProfile
 }
 
 export async function findValidEmailVerificationCodeByUserId(

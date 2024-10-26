@@ -14,10 +14,10 @@ import { logActivity } from "~/lib/logger"
 import { GitHubUserSchema } from "~/lib/validation/external"
 import { createOrganization } from "~/server/data/organization"
 import {
-  createProfile,
   createUserFromGitHub,
   findUserByGitHubId,
   markUserAsEmailVerified,
+  upsertProfile,
 } from "~/server/data/user"
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     await logActivity("signed_up_with_github", { userId: user.id })
 
-    await createProfile(user.id, {
+    await upsertProfile(user.id, {
       name: githubUser.name,
       avatarUrl: githubUser.avatar_url,
     })
