@@ -1,9 +1,9 @@
 "use server"
 
 import { z } from "zod"
-import { logActivity } from "~/lib/logger"
 import { authActionClient, withRateLimitByUser } from "~/lib/safe-action"
 import { InviteMemberSchema } from "~/lib/validation/forms"
+import { createActivityLog } from "~/server/data/activity-log"
 import {
   type OrganizationId,
   assertUserIsOrganizationMember,
@@ -11,6 +11,7 @@ import {
 } from "~/server/data/organization"
 
 export const inviteMember = authActionClient
+  .metadata({ actionName: "organization/inviteMember" })
   .use(withRateLimitByUser)
   .schema(InviteMemberSchema)
   // TODO(adelrodriguez): Replace this with the current organization (from a cookie)
@@ -34,7 +35,7 @@ export const inviteMember = authActionClient
         { email, role: "member" },
       )
 
-      await logActivity("invited_member_to_organization", {
+      await createActivityLog("invited_member_to_organization", {
         userId: ctx.user.id,
         organizationId: organizationId as OrganizationId,
       })

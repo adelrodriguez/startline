@@ -1,14 +1,15 @@
 import { StatusCodes } from "http-status-codes"
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import env from "~/lib/env.server"
 import { enqueueJob } from "~/lib/jobs"
+import { withLogger } from "~/lib/logger"
 import {
   createWebhookEvent,
   findWebhookEventByExternalId,
 } from "~/server/data/webhook-event"
 import stripe from "~/services/stripe"
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
+export const POST = withLogger(async (req) => {
   const signature = req.headers.get("stripe-signature")
 
   if (!signature) {
@@ -28,7 +29,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const processedWebhookEvent = await findWebhookEventByExternalId(event.id)
 
   if (processedWebhookEvent?.processedAt) {
-    console.info("Webhook event already processed")
+    req.log.info("Webhook event already processed", {
+      webhookEventId: event.id,
+    })
 
     return NextResponse.json(
       {
@@ -56,4 +59,4 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     { success: true, receivedAt: new Date() },
     { status: StatusCodes.OK },
   )
-}
+})

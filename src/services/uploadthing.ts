@@ -5,8 +5,8 @@ import {
 import { UTApi, UploadThingError } from "uploadthing/server"
 
 import { validateRequest } from "~/lib/auth/session"
-import { logActivity } from "~/lib/logger"
 import { rateLimitByUser } from "~/lib/rate-limit"
+import { createActivityLog } from "~/server/data/activity-log"
 import type { AssetMimeType } from "~/server/data/asset"
 import { createAsset } from "~/server/data/asset"
 import type { UserId } from "~/server/data/user"
@@ -38,7 +38,7 @@ export const fileRouter = {
         status: "uploaded",
       })
 
-      await logActivity("created_asset", { userId })
+      await createActivityLog("created_asset", { userId })
 
       return { uploadedBy: metadata.userId, publicId: asset.publicId }
     }),

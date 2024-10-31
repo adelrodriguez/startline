@@ -1,6 +1,7 @@
 import "server-only"
 
 import type { PublishRequest } from "@upstash/qstash"
+import chalk from "chalk"
 import ky from "ky"
 import type { NextRequest } from "next/server"
 import type { z } from "zod"
@@ -44,7 +45,8 @@ export async function enqueueJob<T extends JobType>(
   }
 
   if (env.MOCK_QSTASH) {
-    console.log("Mocking QStash request", request)
+    console.warn(chalk.bold.yellowBright("📤 env.MOCK_QSTASH is set!"))
+    console.log(chalk.green("⚙️ Mocking QStash request"), request)
 
     return ky.post(request.url, {
       json: request.body,

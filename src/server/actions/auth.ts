@@ -17,7 +17,6 @@ import {
 } from "~/lib/consts"
 import env from "~/lib/env.server"
 import { PasswordResetError } from "~/lib/error"
-import { logActivity } from "~/lib/logger"
 import {
   actionClient,
   authActionClient,
@@ -34,6 +33,7 @@ import {
   SignUpSchema,
 } from "~/lib/validation/forms"
 import { isProduction } from "~/lib/vars"
+import { createActivityLog } from "~/server/data/activity-log"
 import { createOrganization } from "~/server/data/organization"
 import {
   createPassword,
@@ -54,6 +54,7 @@ import {
 const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
 export const signUp = actionClient
+  .metadata({ actionName: "auth/signUp" })
   .use(withRateLimitByIp)
   .schema(SignUpSchema)
   .action(async ({ parsedInput: { email, password, name } }) => {
@@ -67,14 +68,17 @@ export const signUp = actionClient
     await createPassword(newUser.id, password)
     await sendEmailVerificationCode(newUser.id, email)
 
-    await logActivity("signed_up_with_password", { userId: newUser.id })
+    await createActivityLog("requested_email_verification", {
+      userId: newUser.id,
+    })
+    await createActivityLog("signed_up_with_password", { userId: newUser.id })
 
     const newOrganization = await createOrganization(
       { name: DEFAULT_ORGANIZATION_NAME },
       { ownerId: newUser.id },
     )
 
-    await logActivity("created_organization", {
+    await createActivityLog("created_organization", {
       userId: newUser.id,
       organizationId: newOrganization.id,
     })
@@ -85,6 +89,7 @@ export const signUp = actionClient
   })
 
 export const signInWithPassword = actionClient
+  .metadata({ actionName: "auth/signInWithPassword" })
   .use(withRateLimitByIp)
   .schema(SignInWithPasswordSchema)
   .action(async ({ parsedInput: { email, password } }) => {
@@ -112,7 +117,9 @@ export const signInWithPassword = actionClient
       })
     }
 
-    await logActivity("signed_in_with_password", { userId: existingUser.id })
+    await createActivityLog("signed_in_with_password", {
+      userId: existingUser.id,
+    })
 
     await setSession(existingUser.id)
 
@@ -120,6 +127,7 @@ export const signInWithPassword = actionClient
   })
 
 export const signInWithCode = actionClient
+  .metadata({ actionName: "auth/signInWithCode" })
   .use(withRateLimitByIp)
   .schema(SignInWithCodeSchema)
   .action(async ({ parsedInput }) => {
@@ -131,7 +139,7 @@ export const signInWithCode = actionClient
 
     await sendSignInCode(email)
 
-    await logActivity("requested_sign_in_code")
+    await createActivityLog("requested_sign_in_code")
 
     const cookieStore = await cookies()
     cookieStore.set(VERIFICATION_EMAIL_COOKIE_NAME, email, {
@@ -146,6 +154,7 @@ export const signInWithCode = actionClient
   })
 
 export const checkSignInCode = actionClient
+  .metadata({ actionName: "auth/checkSignInCode" })
   .use(withRateLimitByIp)
   .schema(CheckSignInWithCodeSchema)
   .action(async ({ parsedInput }) => {
@@ -181,7 +190,7 @@ export const checkSignInCode = actionClient
 
       await createProfile(user.id)
 
-      await logActivity("signed_up_with_code", { userId: user.id })
+      await createActivityLog("signed_up_with_code", { userId: user.id })
 
       await createOrganization(
         { name: DEFAULT_ORGANIZATION_NAME },
@@ -192,7 +201,7 @@ export const checkSignInCode = actionClient
     } else {
       await markUserAsEmailVerified(user.id)
 
-      await logActivity("signed_in_with_code", { userId: user.id })
+      await createActivityLog("signed_in_with_code", { userId: user.id })
     }
 
     await setSession(user.id)
@@ -201,6 +210,7 @@ export const checkSignInCode = actionClient
   })
 
 export const checkEmailVerificationCode = authActionClient
+  .metadata({ actionName: "auth/checkEmailVerificationCode" })
   .use(withRateLimitByUser)
   .schema(CheckEmailVerificationCodeSchema)
   .action(async ({ parsedInput: { code }, ctx: { user } }) => {
@@ -218,6 +228,7 @@ export const checkEmailVerificationCode = authActionClient
   })
 
 export const requestPasswordReset = actionClient
+  .metadata({ actionName: "auth/requestPasswordReset" })
   .use(withRateLimitByIp)
   .schema(RequestPasswordResetSchema)
   .action(async ({ parsedInput: { email } }) => {
@@ -226,13 +237,16 @@ export const requestPasswordReset = actionClient
     if (existingUser) {
       await sendPasswordResetToken(existingUser.id, existingUser.email)
 
-      await logActivity("requested_password_reset", { userId: existingUser.id })
+      await createActivityLog("requested_password_reset", {
+        userId: existingUser.id,
+      })
     }
 
     redirect(`${RESET_PASSWORD_URL}/confirm?to=${email}`)
   })
 
 export const resetPassword = actionClient
+  .metadata({ actionName: "auth/resetPassword" })
   .use(withRateLimitByIp)
   .schema(NewPasswordSchema)
   .bindArgsSchemas([z.string().min(1)])
@@ -249,7 +263,9 @@ export const resetPassword = actionClient
       await createPassword(passwordResetToken.userId, password)
       await markPasswordResetTokenAsUsed(passwordResetToken.userId)
 
-      await logActivity("reset_password", { userId: passwordResetToken.userId })
+      await createActivityLog("reset_password", {
+        userId: passwordResetToken.userId,
+      })
 
       await setSession(passwordResetToken.userId)
 
@@ -257,13 +273,16 @@ export const resetPassword = actionClient
     },
   )
 
-export const signOut = authActionClient.action(async ({ ctx }) => {
-  await logActivity("signed_out", { userId: ctx.user.id })
-  await invalidateSession(ctx.session.id)
-  redirect(UNAUTHORIZED_URL)
-})
+export const signOut = authActionClient
+  .metadata({ actionName: "auth/signOut" })
+  .action(async ({ ctx }) => {
+    await createActivityLog("signed_out", { userId: ctx.user.id })
+    await invalidateSession(ctx.session.id)
+    redirect(UNAUTHORIZED_URL)
+  })
 
 export const resendSignInCode = actionClient
+  .metadata({ actionName: "auth/resendSignInCode" })
   .use(withRateLimitByIp)
   .schema(z.object({ email: z.string().email() }))
   .action(async ({ parsedInput }) => {
@@ -271,7 +290,11 @@ export const resendSignInCode = actionClient
   })
 
 export const resendEmailVerificationCode = authActionClient
+  .metadata({ actionName: "auth/resendEmailVerificationCode" })
   .use(withRateLimitByUser)
   .action(async ({ ctx }) => {
     await sendEmailVerificationCode(ctx.user.id, ctx.user.email)
+    await createActivityLog("requested_email_verification", {
+      userId: ctx.user.id,
+    })
   })

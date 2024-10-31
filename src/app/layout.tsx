@@ -1,5 +1,6 @@
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin"
 import type { Metadata } from "next"
+import { AxiomWebVitals } from "next-axiom"
 import PlausibleProvider from "next-plausible"
 import { extractRouterConfig } from "uploadthing/server"
 
@@ -29,6 +30,7 @@ export default async function RootLayout({
     <html lang={locale} className="h-full" suppressHydrationWarning>
       <head>
         <PlausibleProvider domain={env.NEXT_PUBLIC_DOMAIN} />
+        <AxiomWebVitals />
       </head>
       <body
         className={cn(

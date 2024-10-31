@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs"
+import type { Logger } from "next-axiom"
 import {
   DEFAULT_SERVER_ERROR_MESSAGE,
   createMiddleware,
@@ -9,14 +10,23 @@ import { redirect } from "next/navigation"
 import { validateRequest } from "~/lib/auth/session"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
 import { AuthError, OrganizationError, RateLimitError } from "~/lib/error"
+import { createActionLogger } from "~/lib/logger"
 import { rateLimitByIp, rateLimitByUser } from "~/lib/rate-limit"
-import type { User } from "~/server/data/user"
+import { ActionMetadataSchema } from "~/lib/validation/actions"
+import type { Session, User } from "~/server/data/user"
 
 export const actionClient = createSafeActionClient({
-  handleServerError(e) {
-    console.error(e)
+  defineMetadataSchema: () => ActionMetadataSchema,
+  handleServerError(e, utils) {
+    const ctx = utils.ctx as { log: Logger; user?: User; session?: Session }
 
-    Sentry.captureException(e)
+    const sentryId = Sentry.captureException(e)
+
+    ctx.log.error(e.message, {
+      sentryId,
+      userId: ctx.user?.id.toString(),
+      sessionId: ctx.session?.id.toString(),
+    })
 
     if (e instanceof OrganizationError) {
       return e.message
@@ -32,6 +42,14 @@ export const actionClient = createSafeActionClient({
 
     return DEFAULT_SERVER_ERROR_MESSAGE
   },
+}).use(async ({ next, metadata }) => {
+  const logger = createActionLogger(metadata)
+
+  const result = await next({ ctx: { log: logger.log } })
+
+  logger.flush(result.success)
+
+  return result
 })
 
 export const authActionClient = actionClient.use(async ({ next }) => {

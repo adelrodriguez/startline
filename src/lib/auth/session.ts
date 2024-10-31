@@ -130,14 +130,22 @@ export const validateRequest = cache(
   },
 )
 
-type ProtectedRouteHandler = (
-  request: NextRequest,
-  user: User,
-  params: Record<string, string> | undefined,
-) => Promise<NextResponse> | NextResponse
+type AuthenticatedNextRequest<T extends NextRequest> = T & {
+  user: User
+  session: Session
+}
+type ProtectedRouteHandler<T extends NextRequest = NextRequest> = (
+  request: AuthenticatedNextRequest<T>,
+  { params }: { params?: Promise<Record<string, string>> },
+) => Promise<Response> | Promise<NextResponse> | NextResponse | Response
 
-export function protectedRoute(handler: ProtectedRouteHandler) {
-  return async (request: NextRequest, params?: Record<string, string>) => {
+export function protectedRoute<T extends NextRequest = NextRequest>(
+  handler: ProtectedRouteHandler<T>,
+) {
+  return async (
+    request: T,
+    args: { params?: Promise<Record<string, string>> },
+  ) => {
     const { user, session } = await validateRequest()
 
     if (!session) {
@@ -147,6 +155,10 @@ export function protectedRoute(handler: ProtectedRouteHandler) {
       )
     }
 
-    return handler(request, user, params)
+    const modifiedRequest = request as AuthenticatedNextRequest<T>
+    modifiedRequest.user = user
+    modifiedRequest.session = session
+
+    return handler(modifiedRequest, args)
   }
 }

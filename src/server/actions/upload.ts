@@ -2,7 +2,6 @@
 
 import { StorageBuckets } from "~/lib/consts"
 import { UploadError } from "~/lib/error"
-import { logActivity } from "~/lib/logger"
 import { authActionClient, withRateLimitByUser } from "~/lib/safe-action"
 import {
   generateKey,
@@ -13,6 +12,7 @@ import {
   ConfirmUploadRequestSchema,
   UploadFileRequestSchema,
 } from "~/lib/validation/upload"
+import { createActivityLog } from "~/server/data/activity-log"
 import {
   type AssetMimeType,
   type AssetPublicId,
@@ -23,6 +23,7 @@ import {
 import { buildAssetUrl } from "~/utils/url"
 
 export const uploadFile = authActionClient
+  .metadata({ actionName: "upload/uploadFile" })
   .schema(UploadFileRequestSchema)
   .use(withRateLimitByUser)
   .action(
@@ -44,7 +45,7 @@ export const uploadFile = authActionClient
         url: buildAssetUrl(key),
       })
 
-      await logActivity("created_asset", { userId: user.id })
+      await createActivityLog("created_asset", { userId: user.id })
 
       return {
         presignedUrl: url,
@@ -54,6 +55,7 @@ export const uploadFile = authActionClient
   )
 
 export const confirmUpload = authActionClient
+  .metadata({ actionName: "upload/confirmUpload" })
   .schema(ConfirmUploadRequestSchema)
   .action(async ({ parsedInput: { publicId }, ctx: { user } }) => {
     const asset = await findAssetByPublicId(publicId as AssetPublicId)
@@ -64,7 +66,7 @@ export const confirmUpload = authActionClient
 
     const uploadedAsset = await markAssetAsUploaded(asset.id, user.id)
 
-    await logActivity("marked_asset_as_uploaded", {
+    await createActivityLog("marked_asset_as_uploaded", {
       userId: user.id,
     })
 

@@ -8,7 +8,6 @@ import SignInCodeEmail from "~/components/emails/sign-in-code"
 import { SESSION_LENGTH_IN_DAYS } from "~/lib/consts"
 import { sendEmail } from "~/lib/emails"
 import { UnauthorizedError } from "~/lib/error"
-import { logActivity } from "~/lib/logger"
 import db, {
   emailVerificationCode,
   filters,
@@ -258,8 +257,6 @@ export async function sendEmailVerificationCode(
     "Verify your email",
     EmailVerificationCodeEmail({ code }),
   )
-
-  await logActivity("requested_email_verification", { userId })
 }
 
 export async function verifyEmailVerificationCode(

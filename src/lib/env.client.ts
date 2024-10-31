@@ -6,6 +6,10 @@ export default createEnv({
     NEXT_PUBLIC_DOMAIN: z.string(),
     NEXT_PUBLIC_ASSETS_DOMAIN: z.string(),
 
+    // Axiom
+    NEXT_PUBLIC_AXIOM_TOKEN: z.string(),
+    NEXT_PUBLIC_AXIOM_DATASET: z.string(),
+
     // PostHog
     NEXT_PUBLIC_POSTHOG_KEY: z.string(),
     NEXT_PUBLIC_POSTHOG_HOST: z.string(),
@@ -15,8 +19,10 @@ export default createEnv({
   },
 
   experimental__runtimeEnv: {
-    NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN,
     NEXT_PUBLIC_ASSETS_DOMAIN: process.env.NEXT_PUBLIC_ASSETS_DOMAIN,
+    NEXT_PUBLIC_AXIOM_DATASET: process.env.NEXT_PUBLIC_AXIOM_TOKEN,
+    NEXT_PUBLIC_AXIOM_TOKEN: process.env.NEXT_PUBLIC_AXIOM_TOKEN,
+    NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN,
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,

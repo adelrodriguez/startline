@@ -1,17 +1,17 @@
 import * as Sentry from "@sentry/nextjs"
 import { ArcticFetchError, OAuth2RequestError } from "arctic"
-import chalk from "chalk"
 import { StatusCodes } from "http-status-codes"
 import ky from "ky"
 import { cookies } from "next/headers"
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { DatabaseError } from "~/lib/error"
 
 import { google } from "~/lib/auth/oauth"
 import { setSession } from "~/lib/auth/session"
 import { AUTHORIZED_URL, DEFAULT_ORGANIZATION_NAME } from "~/lib/consts"
-import { logActivity } from "~/lib/logger"
+import { withLogger } from "~/lib/logger"
 import { GoogleUserSchema } from "~/lib/validation/external"
+import { createActivityLog } from "~/server/data/activity-log"
 import { createOrganization } from "~/server/data/organization"
 import {
   createUserFromGoogle,
@@ -20,10 +20,10 @@ import {
   upsertProfile,
 } from "~/server/data/user"
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  const url = new URL(request.url)
-  const code = url.searchParams.get("code")
-  const state = url.searchParams.get("state")
+export const GET = withLogger(async (request) => {
+  const code = request.nextUrl.searchParams.get("code")
+  const state = request.nextUrl.searchParams.get("state")
+
   const cookieStore = await cookies()
   const storedState = cookieStore.get("google_oauth_state")?.value ?? null
   const codeVerifier = cookieStore.get("google_code_verifier")?.value ?? null
@@ -65,11 +65,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const existingUser = await findUserByGoogleId(googleUser.sub)
 
     if (existingUser) {
-      await logActivity("signed_in_with_google", { userId: existingUser.id })
+      await createActivityLog("signed_in_with_google", {
+        userId: existingUser.id,
+      })
 
       if (!existingUser.emailVerifiedAt && googleUser.email_verified) {
         await markUserAsEmailVerified(existingUser.id)
-        await logActivity("marked_email_as_verified", {
+        await createActivityLog("marked_email_as_verified", {
           userId: existingUser.id,
         })
       }
@@ -97,7 +99,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       email: googleUser.email,
     })
 
-    await logActivity("signed_up_with_google", { userId: user.id })
+    await createActivityLog("signed_up_with_google", { userId: user.id })
 
     await upsertProfile(user.id, {
       name: googleUser.name,
@@ -110,7 +112,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       { ownerId: user.id },
     )
 
-    await logActivity("created_organization", {
+    await createActivityLog("created_organization", {
       userId: user.id,
       organizationId: organization.id,
     })
@@ -128,8 +130,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // The specific error message depends on the provider
     if (e instanceof OAuth2RequestError) {
-      console.info(chalk.red("❌ Invalid code provided by Google"))
-      console.error(e)
+      request.log.error("❌ Invalid code provided by Google", e)
 
       return new NextResponse(null, {
         status: StatusCodes.BAD_REQUEST,
@@ -137,8 +138,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     if (e instanceof ArcticFetchError) {
-      console.info(chalk.red("❌ Failed to fetch user from Google"))
-      console.error(e)
+      request.log.error("❌ Failed to fetch user from Google", e)
 
       return new NextResponse(null, {
         status: StatusCodes.INTERNAL_SERVER_ERROR,
@@ -146,18 +146,20 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     if (e instanceof DatabaseError) {
-      console.info(
-        chalk.red("💾 Encountered error while saving to the database"),
-      )
-      console.error(e)
+      request.log.error("💾 Encountered error while saving to the database", e)
 
       return new NextResponse(null, {
         status: StatusCodes.INTERNAL_SERVER_ERROR,
       })
     }
 
+    request.log.error(
+      "Encountered an unknown error while handling a Google OAuth callback",
+      e as Error,
+    )
+
     return new NextResponse(null, {
       status: StatusCodes.INTERNAL_SERVER_ERROR,
     })
   }
-}
+})

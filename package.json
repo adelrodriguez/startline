@@ -81,6 +81,7 @@
     "lucide-react": "0.453.0",
     "nanoid": "5.0.7",
     "next": "15.0.1",
+    "next-axiom": "^1.5.1",
     "next-intl": "3.23.5",
     "next-plausible": "3.12.2",
     "next-safe-action": "^7.9.7",

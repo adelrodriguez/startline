@@ -1,17 +1,17 @@
 import * as Sentry from "@sentry/nextjs"
 import { ArcticFetchError, OAuth2RequestError } from "arctic"
-import chalk from "chalk"
 import { StatusCodes } from "http-status-codes"
 import ky from "ky"
 import { cookies } from "next/headers"
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 
 import { github } from "~/lib/auth/oauth"
 import { setSession } from "~/lib/auth/session"
 import { AUTHORIZED_URL, DEFAULT_ORGANIZATION_NAME } from "~/lib/consts"
 import { DatabaseError } from "~/lib/error"
-import { logActivity } from "~/lib/logger"
+import { withLogger } from "~/lib/logger"
 import { GitHubUserSchema } from "~/lib/validation/external"
+import { createActivityLog } from "~/server/data/activity-log"
 import { createOrganization } from "~/server/data/organization"
 import {
   createUserFromGitHub,
@@ -20,7 +20,7 @@ import {
   upsertProfile,
 } from "~/server/data/user"
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export const GET = withLogger(async (request) => {
   const url = new URL(request.url)
   const code = url.searchParams.get("code")
   const state = url.searchParams.get("state")
@@ -58,11 +58,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const existingUser = await findUserByGitHubId(githubUser.id)
 
     if (existingUser) {
-      await logActivity("signed_in_with_github", { userId: existingUser.id })
+      await createActivityLog("signed_in_with_github", {
+        userId: existingUser.id,
+      })
 
       if (!existingUser.emailVerifiedAt) {
         await markUserAsEmailVerified(existingUser.id)
-        await logActivity("marked_email_as_verified", {
+        await createActivityLog("marked_email_as_verified", {
           userId: existingUser.id,
         })
       }
@@ -82,7 +84,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       email: githubUser.email,
     })
 
-    await logActivity("signed_up_with_github", { userId: user.id })
+    await createActivityLog("signed_up_with_github", { userId: user.id })
 
     await upsertProfile(user.id, {
       name: githubUser.name,
@@ -94,7 +96,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       { ownerId: user.id },
     )
 
-    await logActivity("created_organization", {
+    await createActivityLog("created_organization", {
       userId: user.id,
       organizationId: organization.id,
     })
@@ -111,8 +113,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     Sentry.captureException(e)
     // The specific error message depends on the provider
     if (e instanceof OAuth2RequestError) {
-      console.info(chalk.red("❌ Invalid code provided by GitHub"))
-      console.error(e)
+      request.log.error("❌ Invalid code provided by GitHub", e)
 
       return new NextResponse(null, {
         status: StatusCodes.BAD_REQUEST,
@@ -120,8 +121,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     if (e instanceof ArcticFetchError) {
-      console.info(chalk.red("❌ Failed to fetch user from GitHub"))
-      console.error(e)
+      request.log.error("❌ Failed to fetch user from GitHub", e)
 
       return new NextResponse(null, {
         status: StatusCodes.INTERNAL_SERVER_ERROR,
@@ -129,18 +129,20 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     if (e instanceof DatabaseError) {
-      console.info(
-        chalk.red("💾 Encountered error while saving to the database"),
-      )
-      console.error(e)
+      request.log.error("💾 Encountered error while saving to the database", e)
 
       return new NextResponse(null, {
         status: StatusCodes.INTERNAL_SERVER_ERROR,
       })
     }
 
+    request.log.error(
+      "Encountered an unknown error while handling a GitHub OAuth callback",
+      e as Error,
+    )
+
     return new NextResponse(null, {
       status: StatusCodes.INTERNAL_SERVER_ERROR,
     })
   }
-}
+})

@@ -1,8 +1,18 @@
-import { type NextRequest, NextResponse } from "next/server"
+import {
+  type NextFetchEvent,
+  type NextRequest,
+  NextResponse,
+} from "next/server"
 import { nextIntlMiddleware } from "~/i18n/routing"
 import { LOCALES, SESSION_COOKIE_NAME } from "~/lib/consts"
+import { middlewareLogger } from "~/lib/logger"
 
-export async function middleware(request: NextRequest): Promise<NextResponse> {
+export async function middleware(
+  request: NextRequest,
+  event: NextFetchEvent,
+): Promise<NextResponse> {
+  middlewareLogger(request, event)
+
   if (request.method === "GET") {
     const response = NextResponse.next()
     const token = request.cookies.get(SESSION_COOKIE_NAME)?.value ?? null
@@ -49,6 +59,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
   }
 
+  // TODO(adelrodriguez): Move this to the i18n folder
   // Handle i18n routing
   const { pathname } = request.nextUrl
 

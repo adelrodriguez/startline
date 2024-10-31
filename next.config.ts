@@ -1,6 +1,7 @@
 import bundleAnalyzer from "@next/bundle-analyzer"
 import { withSentryConfig } from "@sentry/nextjs"
 import type { NextConfig } from "next"
+import { withAxiom } from "next-axiom"
 import createNextIntlPlugin from "next-intl/plugin"
 import { withPlausibleProxy } from "next-plausible"
 
@@ -86,5 +87,6 @@ nextConfig = withSentryConfig(nextConfig, {
   automaticVercelMonitors: true,
 })
 nextConfig = withPlausibleProxy()(nextConfig)
+nextConfig = withAxiom(nextConfig)
 
 export default nextConfig
