@@ -1,12 +1,13 @@
 "use client"
 
 import { OTPInput, OTPInputContext } from "input-otp"
-import { DotIcon } from "lucide-react"
+import { Dot } from "lucide-react"
 import * as React from "react"
+
 import { cn } from "~/utils/ui"
 
 const InputOTP = React.forwardRef<
-  React.ElementRef<typeof OTPInput>,
+  React.ComponentRef<typeof OTPInput>,
   React.ComponentPropsWithoutRef<typeof OTPInput>
 >(({ className, containerClassName, ...props }, ref) => (
   <OTPInput
@@ -22,7 +23,7 @@ const InputOTP = React.forwardRef<
 InputOTP.displayName = "InputOTP"
 
 const InputOTPGroup = React.forwardRef<
-  React.ElementRef<"div">,
+  React.ComponentRef<"div">,
   React.ComponentPropsWithoutRef<"div">
 >(({ className, ...props }, ref) => (
   <div ref={ref} className={cn("flex items-center", className)} {...props} />
@@ -30,7 +31,7 @@ const InputOTPGroup = React.forwardRef<
 InputOTPGroup.displayName = "InputOTPGroup"
 
 const InputOTPSlot = React.forwardRef<
-  React.ElementRef<"div">,
+  React.ComponentRef<"div">,
   React.ComponentPropsWithoutRef<"div"> & { index: number }
 >(({ index, className, ...props }, ref) => {
   const inputOTPContext = React.useContext(OTPInputContext)
@@ -62,21 +63,11 @@ const InputOTPSlot = React.forwardRef<
 InputOTPSlot.displayName = "InputOTPSlot"
 
 const InputOTPSeparator = React.forwardRef<
-  React.ElementRef<"div">,
+  React.ComponentRef<"div">,
   React.ComponentPropsWithoutRef<"div">
 >(({ ...props }, ref) => (
-  // biome-ignore lint/a11y/useFocusableInteractive: Element is not interactive
-  <div
-    ref={ref}
-    // biome-ignore lint/a11y/useSemanticElements: Element is not interactive
-    role="separator"
-    aria-orientation="vertical"
-    aria-valuemin={0}
-    aria-valuemax={100}
-    aria-valuenow={50}
-    {...props}
-  >
-    <DotIcon />
+  <div {...props} ref={ref}>
+    <Dot />
   </div>
 ))
 InputOTPSeparator.displayName = "InputOTPSeparator"

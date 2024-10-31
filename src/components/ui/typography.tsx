@@ -3,7 +3,7 @@ import React from "react"
 import { cn } from "~/utils/ui"
 
 const TypographyH1 = React.forwardRef<
-  React.ElementRef<"h1">,
+  React.ComponentRef<"h1">,
   React.ComponentPropsWithoutRef<"h1">
 >(({ className, ...props }, ref) => (
   <h1
@@ -18,7 +18,7 @@ const TypographyH1 = React.forwardRef<
 TypographyH1.displayName = "TypographyH1"
 
 const TypographyH2 = React.forwardRef<
-  React.ElementRef<"h2">,
+  React.ComponentRef<"h2">,
   React.ComponentPropsWithoutRef<"h2">
 >(({ className, ...props }, ref) => (
   <h2
@@ -33,7 +33,7 @@ const TypographyH2 = React.forwardRef<
 TypographyH2.displayName = "TypographyH2"
 
 const TypographyH3 = React.forwardRef<
-  React.ElementRef<"h3">,
+  React.ComponentRef<"h3">,
   React.ComponentPropsWithoutRef<"h3">
 >(({ className, ...props }, ref) => (
   <h3
@@ -48,7 +48,7 @@ const TypographyH3 = React.forwardRef<
 TypographyH3.displayName = "TypographyH3"
 
 const TypographyH4 = React.forwardRef<
-  React.ElementRef<"h4">,
+  React.ComponentRef<"h4">,
   React.ComponentPropsWithoutRef<"h4">
 >(({ className, ...props }, ref) => (
   <h4
@@ -63,7 +63,7 @@ const TypographyH4 = React.forwardRef<
 TypographyH4.displayName = "TypographyH4"
 
 const TypographyP = React.forwardRef<
-  React.ElementRef<"p">,
+  React.ComponentRef<"p">,
   React.ComponentPropsWithoutRef<"p">
 >(({ className, ...props }, ref) => (
   <p
@@ -75,7 +75,7 @@ const TypographyP = React.forwardRef<
 TypographyP.displayName = "TypographyP"
 
 const TypographyBlockquote = React.forwardRef<
-  React.ElementRef<"blockquote">,
+  React.ComponentRef<"blockquote">,
   React.ComponentPropsWithoutRef<"blockquote">
 >(({ className, ...props }, ref) => (
   <blockquote
@@ -87,7 +87,7 @@ const TypographyBlockquote = React.forwardRef<
 TypographyBlockquote.displayName = "TypographyBlockquote"
 
 const TypographyList = React.forwardRef<
-  React.ElementRef<"ul">,
+  React.ComponentRef<"ul">,
   React.ComponentPropsWithoutRef<"ul">
 >(({ className, ...props }, ref) => (
   <ul
@@ -99,7 +99,7 @@ const TypographyList = React.forwardRef<
 TypographyList.displayName = "TypographyList"
 
 const TypographyInlineCode = React.forwardRef<
-  React.ElementRef<"code">,
+  React.ComponentRef<"code">,
   React.ComponentPropsWithoutRef<"code">
 >(({ className, ...props }, ref) => (
   <code
@@ -114,7 +114,7 @@ const TypographyInlineCode = React.forwardRef<
 TypographyInlineCode.displayName = "TypographyInlineCode"
 
 const TypographyLead = React.forwardRef<
-  React.ElementRef<"p">,
+  React.ComponentRef<"p">,
   React.ComponentPropsWithoutRef<"p">
 >(({ className, ...props }, ref) => (
   <p
@@ -126,7 +126,7 @@ const TypographyLead = React.forwardRef<
 TypographyLead.displayName = "TypographyLead"
 
 const TypographyLarge = React.forwardRef<
-  React.ElementRef<"div">,
+  React.ComponentRef<"div">,
   React.ComponentPropsWithoutRef<"div">
 >(({ className, ...props }, ref) => (
   <div
@@ -138,7 +138,7 @@ const TypographyLarge = React.forwardRef<
 TypographyLarge.displayName = "TypographyLarge"
 
 const TypographySmall = React.forwardRef<
-  React.ElementRef<"small">,
+  React.ComponentRef<"small">,
   React.ComponentPropsWithoutRef<"small">
 >(({ className, ...props }, ref) => (
   <small
@@ -150,7 +150,7 @@ const TypographySmall = React.forwardRef<
 TypographySmall.displayName = "TypographySmall"
 
 const TypographyMuted = React.forwardRef<
-  React.ElementRef<"p">,
+  React.ComponentRef<"p">,
   React.ComponentPropsWithoutRef<"p">
 >(({ className, ...props }, ref) => (
   <p
