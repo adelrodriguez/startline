@@ -1,5 +1,5 @@
-import { serve } from "@upstash/qstash/nextjs"
-import type { WorkflowContext } from "@upstash/qstash/workflow"
+import type { WorkflowContext } from "@upstash/workflow"
+import { serve } from "@upstash/workflow/nextjs"
 import chalk from "chalk"
 import { isDevelopment } from "~/lib/vars"
 
@@ -37,11 +37,12 @@ async function handler(context: WorkflowContext) {
       `📨 Deleted expired email verification codes: ${deletedEmailVerificationCodes}`,
     ),
   )
+
   console.info(
     chalk.green(`🔓 Deleted expired sign in codes: ${deletedSignInCodes}`),
   )
 }
 
-export const POST = serve(handler, {
+export const { POST } = serve(handler, {
   baseUrl: isDevelopment ? buildBaseUrl() : undefined,
 })

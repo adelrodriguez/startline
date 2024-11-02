@@ -86,6 +86,7 @@
     "@upstash/qstash": "2.7.13",
     "@upstash/ratelimit": "2.0.4",
     "@upstash/redis": "1.34.3",
+    "@upstash/workflow": "^0.1.2",
     "@vercel/functions": "1.4.2",
     "arctic": "^2.0.1",
     "bufferutil": "^4.0.8",
