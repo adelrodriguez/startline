@@ -4,7 +4,7 @@ import { render } from "@react-email/render"
 import chalk from "chalk"
 import type { ReactElement } from "react"
 import { Resend } from "resend"
-import env from "~/shared/env.server"
+import env from "~/shared/env"
 import { SendEmailError } from "~/shared/error"
 import { logger } from "~/shared/logger"
 

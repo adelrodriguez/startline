@@ -3,7 +3,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import Link from "next/link"
-import { Button } from "~/components/ui/button"
+import { signInWithPassword } from "~/server/actions/auth"
+import { Button } from "~/shared/components/ui/button"
 import {
   Form,
   FormControl,
@@ -12,9 +13,8 @@ import {
   FormLabel,
   FormMessage,
   FormSubmit,
-} from "~/components/ui/form"
-import { Input } from "~/components/ui/input"
-import { signInWithPassword } from "~/server/actions/auth"
+} from "~/shared/components/ui/form"
+import { Input } from "~/shared/components/ui/input"
 import { SignInWithPasswordSchema } from "~/shared/validation/forms"
 
 export default function SignInForm() {

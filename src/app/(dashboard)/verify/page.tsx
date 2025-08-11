@@ -1,12 +1,12 @@
 import { redirect } from "next/navigation"
+import { getCurrentUser } from "~/server/loader"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card"
-import { getCurrentUser } from "~/server/loader"
+} from "~/shared/components/ui/card"
 import CheckEmailVerificationCodeForm from "./_components/check-email-verification-code-form"
 
 export default async function Page() {

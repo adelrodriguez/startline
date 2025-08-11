@@ -8,7 +8,7 @@ import {
   Tailwind,
 } from "@react-email/components"
 import { APP_NAME, RESET_PASSWORD_URL } from "~/shared/consts"
-import { buildUrl } from "~/utils/url"
+import { buildUrl } from "~/shared/utils/url"
 
 export default function PasswordResetTokenEmail({ token }: { token: string }) {
   return (

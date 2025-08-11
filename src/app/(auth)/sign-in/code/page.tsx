@@ -1,6 +1,11 @@
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "~/shared/components/ui/card"
 import { VERIFICATION_EMAIL_COOKIE_NAME } from "~/shared/consts"
 import CheckSignInCodeForm from "./_components/check-sign-in-code-form"
 

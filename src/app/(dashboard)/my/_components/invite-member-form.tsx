@@ -3,6 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import { useEffect } from "react"
 import { toast } from "sonner"
+import { inviteMember } from "~/server/actions/organization"
+import type { OrganizationId } from "~/server/data/organization"
 import {
   Form,
   FormControl,
@@ -11,10 +13,8 @@ import {
   FormLabel,
   FormMessage,
   FormSubmit,
-} from "~/components/ui/form"
-import { Input } from "~/components/ui/input"
-import { inviteMember } from "~/server/actions/organization"
-import type { OrganizationId } from "~/server/data/organization"
+} from "~/shared/components/ui/form"
+import { Input } from "~/shared/components/ui/input"
 import { InviteMemberSchema } from "~/shared/validation/forms"
 
 export default function InviteMemberForm({

@@ -1,17 +1,16 @@
 import bundleAnalyzer from "@next/bundle-analyzer"
 import type { NextConfig } from "next"
-import createNextIntlPlugin from "next-intl/plugin"
+
+// import createNextIntlPlugin from "next-intl/plugin"
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 })
-const withNextIntl = createNextIntlPlugin()
+// const withNextIntl = createNextIntlPlugin("./src/shared/i18n/request")
 
-let nextConfig: NextConfig = {
-  serverExternalPackages: ["@node-rs/argon2"],
-}
+let nextConfig: NextConfig = {}
 
 nextConfig = withBundleAnalyzer(nextConfig)
-nextConfig = withNextIntl(nextConfig)
+// nextConfig = withNextIntl(nextConfig)
 
 export default nextConfig

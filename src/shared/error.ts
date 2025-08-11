@@ -86,21 +86,9 @@ export class InternalError extends CustomError {
   }
 }
 
-export class StripeError extends CustomError {
-  constructor(message: string, cause?: unknown) {
-    super("StripeError", message, cause)
-  }
-}
-
 export class RateLimitError extends CustomError {
   constructor(message: string, cause?: unknown) {
     super("RateLimitError", message, cause)
-  }
-}
-
-export class UploadError extends CustomError {
-  constructor(message: string, cause?: unknown) {
-    super("UploadError", message, cause)
   }
 }
 

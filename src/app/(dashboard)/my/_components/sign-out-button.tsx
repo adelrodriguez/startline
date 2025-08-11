@@ -2,8 +2,8 @@
 
 import { Loader2Icon } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
-import { Button } from "~/components/ui/button"
 import { signOut } from "~/server/actions/auth"
+import { Button } from "~/shared/components/ui/button"
 
 export default function SignOutButton() {
   const { execute, isPending } = useAction(signOut)

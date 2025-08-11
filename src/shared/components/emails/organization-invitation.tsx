@@ -9,7 +9,7 @@ import {
   Text,
 } from "@react-email/components"
 import { ACCEPT_INVITATION_URL, APP_NAME } from "~/shared/consts"
-import { buildUrl } from "~/utils/url"
+import { buildUrl } from "~/shared/utils/url"
 
 export default function OrganizationInvitationEmail({
   organizationName,

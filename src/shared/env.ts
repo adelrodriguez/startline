@@ -18,18 +18,11 @@ export default createEnv({
 
     // Mocks
     MOCK_RESEND: z.preprocess((v) => v === "true", z.boolean().default(false)),
-    MOCK_QSTASH: z.preprocess((v) => v === "true", z.boolean().default(false)),
 
     // Node
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
-
-    // QStash
-    QSTASH_URL: z.string(),
-    QSTASH_TOKEN: z.string(),
-    QSTASH_CURRENT_SIGNING_KEY: z.string(),
-    QSTASH_NEXT_SIGNING_KEY: z.string(),
 
     // Resend
     RESEND_API_KEY: z.string(),
@@ -45,7 +38,14 @@ export default createEnv({
     ),
     AUTH_OAUTH: z.preprocess((v) => v === "true", z.boolean().default(false)),
   },
-  experimental__runtimeEnv: process.env,
+  
+  client: {
+    NEXT_PUBLIC_DOMAIN: z.string(),
+  },
+
+  experimental__runtimeEnv: {
+    NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN,
+  },
 
   skipValidation:
     process.env.SKIP_ENV_VALIDATION === "true" || process.env.CI === "true",

@@ -6,7 +6,8 @@ import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
 import { useAction } from "next-safe-action/hooks"
 import { type ComponentRef, useRef } from "react"
 import { toast } from "sonner"
-import { Button } from "~/components/ui/button"
+import { checkSignInCode, resendSignInCode } from "~/server/actions/auth"
+import { Button } from "~/shared/components/ui/button"
 import {
   Form,
   FormControl,
@@ -14,14 +15,13 @@ import {
   FormItem,
   FormMessage,
   FormSubmit,
-} from "~/components/ui/form"
+} from "~/shared/components/ui/form"
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "~/components/ui/input-otp"
-import { checkSignInCode, resendSignInCode } from "~/server/actions/auth"
+} from "~/shared/components/ui/input-otp"
 import { CheckSignInWithCodeSchema } from "~/shared/validation/forms"
 
 export default function CheckSignInCodeForm({ email }: { email: string }) {

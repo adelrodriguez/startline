@@ -1,14 +1,14 @@
 import { RabbitIcon } from "lucide-react"
 import Link from "next/link"
-import { Button } from "~/components/ui/button"
+import { Authenticated, Unauthenticated } from "~/shared/components/auth/state"
+import { ModeToggle } from "~/shared/components/theme"
+import { Button } from "~/shared/components/ui/button"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "~/components/ui/tooltip"
-import { TypographyH1, TypographyLead } from "~/components/ui/typography"
-import { SignedIn, SignedOut } from "~/shared/components/auth/state"
-import { ModeToggle } from "~/shared/components/theme"
+} from "~/shared/components/ui/tooltip"
+import { TypographyH1, TypographyLead } from "~/shared/components/ui/typography"
 
 export default function Page() {
   return (
@@ -23,20 +23,20 @@ export default function Page() {
           <span className="sr-only">Startline Web</span>
         </Link>
         <nav className="ml-auto flex gap-1 sm:gap-2">
-          <SignedIn>
+          <Authenticated>
             <Button asChild variant="link">
               <Link href="/my">Go to dashboard</Link>
             </Button>
-          </SignedIn>
+          </Authenticated>
 
-          <SignedOut>
+          <Unauthenticated>
             <Button asChild variant="link">
               <Link href="/sign-in">Sign in</Link>
             </Button>
             <Button asChild variant="link">
               <Link href="/sign-up">Sign up</Link>
             </Button>
-          </SignedOut>
+          </Unauthenticated>
 
           <ModeToggle />
         </nav>

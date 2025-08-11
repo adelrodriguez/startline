@@ -1,5 +1,5 @@
 import { defineConfig } from "drizzle-kit"
-import env from "~/shared/env.server"
+import env from "~/shared/env"
 
 // For drizzle-kit to work locally, we use have installed `pg` so it'll be used as the
 // driver. Otherwise, it will use try to use `@neondatabase/serverless`, which

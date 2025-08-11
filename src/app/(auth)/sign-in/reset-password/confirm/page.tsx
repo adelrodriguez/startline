@@ -1,13 +1,13 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { Button } from "~/components/ui/button"
+import { Button } from "~/shared/components/ui/button"
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card"
+} from "~/shared/components/ui/card"
 import { RESET_PASSWORD_URL } from "~/shared/consts"
 
 export default async function Page({

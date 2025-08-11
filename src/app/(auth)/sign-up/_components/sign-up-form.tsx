@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import { toast } from "sonner"
+import { signUp } from "~/server/actions/auth"
 import {
   Form,
   FormControl,
@@ -11,9 +12,8 @@ import {
   FormLabel,
   FormMessage,
   FormSubmit,
-} from "~/components/ui/form"
-import { Input } from "~/components/ui/input"
-import { signUp } from "~/server/actions/auth"
+} from "~/shared/components/ui/form"
+import { Input } from "~/shared/components/ui/input"
 import { SignUpSchema } from "~/shared/validation/forms"
 
 export default function SignUpForm() {

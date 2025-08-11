@@ -1,5 +1,5 @@
 import { AUTHORIZED_URL } from "~/shared/consts"
-import env from "~/shared/env.client"
+import env from "~/shared/env"
 
 export function buildBaseUrl(protocol: "http" | "https" = "https") {
   return `${protocol}://${env.NEXT_PUBLIC_DOMAIN}`
@@ -28,10 +28,6 @@ export function buildUrl<T extends string>(
   }
 
   return stringUrl
-}
-
-export function buildAssetUrl(key: string) {
-  return `https://${env.NEXT_PUBLIC_ASSETS_DOMAIN}/${key}`
 }
 
 export function buildAuthPathname<T extends string>(pathname: T) {

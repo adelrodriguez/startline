@@ -1,5 +1,6 @@
 import { geolocation, ipAddress } from "@vercel/functions"
 import { headers } from "next/headers"
+import { logger } from "~/shared/logger"
 
 const FALLBACK_IP = "127.0.0.1"
 
@@ -8,7 +9,7 @@ export async function getIpAddress(request?: Request): Promise<string | null> {
     const ip = ipAddress(request)
 
     if (!ip) {
-      console.warn("No IP address found, using fallback")
+      logger.warn("No IP address found, using fallback")
 
       return FALLBACK_IP
     }
@@ -22,11 +23,15 @@ export async function getIpAddress(request?: Request): Promise<string | null> {
 
   const forwardedForIp = forwardedFor?.split(",")[0]?.trim()
 
-  if (forwardedForIp) return forwardedForIp
+  if (forwardedForIp) {
+    return forwardedForIp
+  }
 
-  if (realIp) return realIp.trim()
+  if (realIp) {
+    return realIp.trim()
+  }
 
-  console.warn("No IP address found, using fallback")
+  logger.warn("No IP address found, using fallback")
 
   return FALLBACK_IP
 }
