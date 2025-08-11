@@ -12,7 +12,9 @@ export function invariant(
   condition: boolean,
   throwable: Error | string
 ): asserts condition {
-  if (condition) return
+  if (condition) {
+    return
+  }
 
   throw typeof throwable === "string" ? new Error(throwable) : throwable
 }

@@ -1,31 +1,31 @@
-import * as Sentry from "@sentry/nextjs"
 import { redirect } from "next/navigation"
-import type { Logger } from "next-axiom"
 import {
-  createMiddleware,
   createSafeActionClient,
   DEFAULT_SERVER_ERROR_MESSAGE,
 } from "next-safe-action"
 import { validateRequest } from "~/lib/auth/session"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
 import { AuthError, OrganizationError, RateLimitError } from "~/lib/error"
-import { createActionLogger } from "~/lib/logger"
-import { rateLimitByIp, rateLimitByUser } from "~/lib/rate-limit"
+import { type Logger, logger } from "~/lib/logger"
 import { ActionMetadataSchema } from "~/lib/validation/actions"
 import type { Session, User } from "~/server/data/user"
 
 export const actionClient = createSafeActionClient({
   defineMetadataSchema: () => ActionMetadataSchema,
   handleServerError(e, utils) {
-    const ctx = utils.ctx as { log: Logger; user?: User; session?: Session }
+    const ctx = utils.ctx as {
+      log: Logger
+      user?: User
+      session?: Session
+    }
 
-    const sentryId = Sentry.captureException(e)
-
-    ctx.log.error(e.message, {
-      sentryId,
-      userId: ctx.user?.id.toString(),
-      sessionId: ctx.session?.id.toString(),
-    })
+    ctx.log.error(
+      {
+        userId: ctx.user?.id.toString(),
+        sessionId: ctx.session?.id.toString(),
+      },
+      e.message
+    )
 
     if (e instanceof OrganizationError) {
       return e.message
@@ -41,15 +41,11 @@ export const actionClient = createSafeActionClient({
 
     return DEFAULT_SERVER_ERROR_MESSAGE
   },
-}).use(async ({ next, metadata }) => {
-  const logger = createActionLogger(metadata)
-
-  const result = await next({ ctx: { log: logger.log } })
-
-  logger.flush(result.success)
-
-  return result
-})
+}).use(async ({ next, metadata }) =>
+  next({
+    ctx: { log: logger.child({ actionName: metadata.actionName, metadata }) },
+  })
+)
 
 export const authActionClient = actionClient.use(async ({ next }) => {
   const { session, user } = await validateRequest()
@@ -59,20 +55,4 @@ export const authActionClient = actionClient.use(async ({ next }) => {
   }
 
   return next({ ctx: { session, user } })
-})
-
-export const withRateLimitByIp = createMiddleware().define(
-  async ({ next, ctx }) => {
-    await rateLimitByIp()
-
-    return next({ ctx })
-  }
-)
-
-export const withRateLimitByUser = createMiddleware<{
-  ctx: { user: User }
-}>().define(async ({ next, ctx }) => {
-  await rateLimitByUser(ctx.user.email)
-
-  return next({ ctx })
 })

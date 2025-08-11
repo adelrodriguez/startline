@@ -5,13 +5,13 @@ import {
 } from "next/server"
 import { nextIntlMiddleware } from "~/i18n/routing"
 import { LOCALES, SESSION_COOKIE_NAME } from "~/lib/consts"
-import { middlewareLogger } from "~/lib/logger"
+import { logger } from "~/lib/logger"
 
 export async function middleware(
   request: NextRequest,
   event: NextFetchEvent
 ): Promise<NextResponse> {
-  middlewareLogger(request, event)
+  logger.debug("Processing request")
 
   if (request.method === "GET") {
     const response = NextResponse.next()

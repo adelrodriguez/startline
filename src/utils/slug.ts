@@ -10,11 +10,15 @@ export function generateSlug(
     append?: string
   }
 ) {
-  if (text.length === 0) return ""
+  if (text.length === 0) {
+    return ""
+  }
 
   let slug = text
 
-  if (typeof slug !== "string") slug = String(slug)
+  if (typeof slug !== "string") {
+    slug = String(slug)
+  }
 
   const trim = options?.trim ?? true
   const strict = options?.strict ?? true
@@ -29,21 +33,37 @@ export function generateSlug(
     .split("")
     .reduce((result, ch) => {
       let appendChar = locale?.[ch]
-      if (appendChar === undefined) appendChar = charMap[ch]
-      if (appendChar === undefined) appendChar = ch
-      if (appendChar === "-") appendChar = " "
+      if (appendChar === undefined) {
+        appendChar = charMap[ch]
+      }
+      if (appendChar === undefined) {
+        appendChar = ch
+      }
+      if (appendChar === "-") {
+        appendChar = " "
+      }
 
       return result + appendChar.replace(remove, "")
     }, "")
 
-  if (strict) slug = slug.replace(/[^A-Za-z0-9\s]/g, "")
-  if (trim) slug = slug.trim()
+  if (strict) {
+    slug = slug.replace(/[^A-Za-z0-9\s]/g, "")
+  }
+  if (trim) {
+    slug = slug.trim()
+  }
   // Replace spaces with replacement character, treating multiple consecutive
   // spaces as a single space.
-  if (replacement) slug = slug.replace(/\s+/g, replacement)
-  if (lower) slug = slug.toLowerCase()
+  if (replacement) {
+    slug = slug.replace(/\s+/g, replacement)
+  }
+  if (lower) {
+    slug = slug.toLowerCase()
+  }
 
-  if (append) slug = `${slug}-${append}`
+  if (append) {
+    slug = `${slug}-${append}`
+  }
 
   return slug
 }

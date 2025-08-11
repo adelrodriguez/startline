@@ -4,6 +4,7 @@ import { cookies } from "next/headers"
 import { RedirectType, redirect } from "next/navigation"
 import { returnValidationErrors } from "next-safe-action"
 import { z } from "zod"
+import { actionClient, authActionClient } from "~/lib/action-client"
 import {
   invalidateSession,
   invalidateUserSessions,
@@ -17,12 +18,6 @@ import {
 } from "~/lib/consts"
 import env from "~/lib/env.server"
 import { PasswordResetError } from "~/lib/error"
-import {
-  actionClient,
-  authActionClient,
-  withRateLimitByIp,
-  withRateLimitByUser,
-} from "~/lib/safe-action"
 import {
   CheckEmailVerificationCodeSchema,
   CheckSignInWithCodeSchema,
@@ -55,7 +50,6 @@ const VERIFICATION_EMAIL_COOKIE_NAME = "verification-email"
 
 export const signUp = actionClient
   .metadata({ actionName: "auth/signUp" })
-  .use(withRateLimitByIp)
   .schema(SignUpSchema)
   .action(async ({ parsedInput: { email, password, name } }) => {
     if (!env.AUTH_PASSWORD) {
@@ -90,7 +84,6 @@ export const signUp = actionClient
 
 export const signInWithPassword = actionClient
   .metadata({ actionName: "auth/signInWithPassword" })
-  .use(withRateLimitByIp)
   .schema(SignInWithPasswordSchema)
   .action(async ({ parsedInput: { email, password } }) => {
     if (!env.AUTH_PASSWORD) {
@@ -128,7 +121,6 @@ export const signInWithPassword = actionClient
 
 export const signInWithCode = actionClient
   .metadata({ actionName: "auth/signInWithCode" })
-  .use(withRateLimitByIp)
   .schema(SignInWithCodeSchema)
   .action(async ({ parsedInput }) => {
     if (!env.AUTH_SIGN_IN_CODES) {
@@ -155,7 +147,6 @@ export const signInWithCode = actionClient
 
 export const checkSignInCode = actionClient
   .metadata({ actionName: "auth/checkSignInCode" })
-  .use(withRateLimitByIp)
   .schema(CheckSignInWithCodeSchema)
   .action(async ({ parsedInput }) => {
     if (!env.AUTH_SIGN_IN_CODES) {
@@ -211,7 +202,6 @@ export const checkSignInCode = actionClient
 
 export const checkEmailVerificationCode = authActionClient
   .metadata({ actionName: "auth/checkEmailVerificationCode" })
-  .use(withRateLimitByUser)
   .schema(CheckEmailVerificationCodeSchema)
   .action(async ({ parsedInput: { code }, ctx: { user } }) => {
     const isValidCode = await verifyEmailVerificationCode(user.id, code)
@@ -229,7 +219,6 @@ export const checkEmailVerificationCode = authActionClient
 
 export const requestPasswordReset = actionClient
   .metadata({ actionName: "auth/requestPasswordReset" })
-  .use(withRateLimitByIp)
   .schema(RequestPasswordResetSchema)
   .action(async ({ parsedInput: { email } }) => {
     const existingUser = await findUserByEmail(email)
@@ -247,7 +236,6 @@ export const requestPasswordReset = actionClient
 
 export const resetPassword = actionClient
   .metadata({ actionName: "auth/resetPassword" })
-  .use(withRateLimitByIp)
   .schema(NewPasswordSchema)
   .bindArgsSchemas([z.string().min(1)])
   .action(
@@ -283,7 +271,6 @@ export const signOut = authActionClient
 
 export const resendSignInCode = actionClient
   .metadata({ actionName: "auth/resendSignInCode" })
-  .use(withRateLimitByIp)
   .schema(z.object({ email: z.string().email() }))
   .action(async ({ parsedInput }) => {
     await sendSignInCode(parsedInput.email)
@@ -291,7 +278,6 @@ export const resendSignInCode = actionClient
 
 export const resendEmailVerificationCode = authActionClient
   .metadata({ actionName: "auth/resendEmailVerificationCode" })
-  .use(withRateLimitByUser)
   .action(async ({ ctx }) => {
     await sendEmailVerificationCode(ctx.user.id, ctx.user.email)
     await createActivityLog("requested_email_verification", {

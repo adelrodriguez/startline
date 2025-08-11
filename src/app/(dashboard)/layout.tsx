@@ -1,4 +1,3 @@
-import { PostHogIdentifyUser } from "~/components/analytics/posthog"
 import { getCurrentUser } from "~/server/loader"
 
 export default async function Layout({
@@ -6,12 +5,7 @@ export default async function Layout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const user = await getCurrentUser()
+  await getCurrentUser()
 
-  return (
-    <main>
-      <PostHogIdentifyUser user={user} />
-      {children}
-    </main>
-  )
+  return children
 }

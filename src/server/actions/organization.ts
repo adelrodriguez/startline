@@ -1,7 +1,8 @@
 "use server"
 
 import { z } from "zod"
-import { authActionClient, withRateLimitByUser } from "~/lib/safe-action"
+import { authActionClient } from "~/lib/action-client"
+// import { withRateLimitByUser } from "~/lib/action-client"
 import { InviteMemberSchema } from "~/lib/validation/forms"
 import { createActivityLog } from "~/server/data/activity-log"
 import {
@@ -12,7 +13,7 @@ import {
 
 export const inviteMember = authActionClient
   .metadata({ actionName: "organization/inviteMember" })
-  .use(withRateLimitByUser)
+  // .use(withRateLimitByUser)
   .schema(InviteMemberSchema)
   // TODO(adelrodriguez): Replace this with the current organization (from a cookie)
   .bindArgsSchemas([z.coerce.bigint()])
