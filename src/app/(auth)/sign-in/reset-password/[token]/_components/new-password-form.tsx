@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
-
 import {
   Form,
   FormControl,
@@ -22,12 +21,12 @@ export default function NewPasswordForm({ token }: { token: string }) {
     zodResolver(NewPasswordSchema),
     {
       formProps: { defaultValues: { password: "", confirmPassword: "" } },
-    },
+    }
   )
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmitWithAction} className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmitWithAction}>
         <FormField
           control={form.control}
           name="password"
@@ -35,7 +34,7 @@ export default function NewPasswordForm({ token }: { token: string }) {
             <FormItem>
               <FormLabel>New Password</FormLabel>
               <FormControl>
-                <Input {...field} type="password" autoComplete="new-password" />
+                <Input {...field} autoComplete="new-password" type="password" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -48,7 +47,7 @@ export default function NewPasswordForm({ token }: { token: string }) {
             <FormItem>
               <FormLabel>Confirm Password</FormLabel>
               <FormControl>
-                <Input {...field} type="password" autoComplete="new-password" />
+                <Input {...field} autoComplete="new-password" type="password" />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -1,12 +1,14 @@
 import "server-only"
 
-import { TimeSpan, createDate } from "oslo"
+import { createDate, TimeSpan } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
-
 import OrganizationInvitationEmail from "~/components/emails/organization-invitation"
 import { sendEmail } from "~/lib/emails"
-import { NotFoundError, OrganizationInvitationError } from "~/lib/error"
-import { OrganizationError } from "~/lib/error"
+import {
+  NotFoundError,
+  OrganizationError,
+  OrganizationInvitationError,
+} from "~/lib/error"
 import type { UserId } from "~/server/data/user"
 import db, {
   account,
@@ -34,7 +36,7 @@ export async function createOrganization(
   values: NewOrganization = {
     name: "Personal Workspace",
   },
-  options?: { ownerId?: UserId },
+  options?: { ownerId?: UserId }
 ): Promise<Organization> {
   const [newOrganization] = await db
     .insert(organization)
@@ -51,7 +53,7 @@ export async function createOrganization(
 }
 
 export async function findOrganizationById(
-  organizationId: OrganizationId,
+  organizationId: OrganizationId
 ): Promise<Organization | null> {
   const existingOrganization = await db.query.organization.findFirst({
     where: (model, { eq }) => eq(model.id, organizationId),
@@ -68,7 +70,7 @@ export async function findAccountsByUserId(userId: UserId): Promise<Account[]> {
 
 export async function findOrganizationAccount(
   organizationId: OrganizationId,
-  userId: UserId,
+  userId: UserId
 ): Promise<Account | null> {
   const existingAccount = await db.query.account.findFirst({
     where: (model, { eq, and }) =>
@@ -81,7 +83,7 @@ export async function findOrganizationAccount(
 export async function createAccount(
   userId: UserId,
   organizationId: OrganizationId,
-  role: Account["role"],
+  role: Account["role"]
 ): Promise<Account> {
   const [existingAccount] = await db
     .insert(account)
@@ -95,7 +97,7 @@ export async function createAccount(
 
 export async function deleteAccount(
   organizationId: OrganizationId,
-  userId: UserId,
+  userId: UserId
 ): Promise<void> {
   const membership = await findOrganizationAccount(organizationId, userId)
 
@@ -112,14 +114,14 @@ export async function deleteAccount(
     .where(
       filters.and(
         filters.eq(account.userId, userId),
-        filters.eq(account.organizationId, organizationId),
-      ),
+        filters.eq(account.organizationId, organizationId)
+      )
     )
 }
 
 export async function assertUserIsOrganizationMember(
   organizationId: OrganizationId,
-  userId: UserId,
+  userId: UserId
 ): Promise<void> {
   const existingAccount = await findOrganizationAccount(organizationId, userId)
 
@@ -134,7 +136,7 @@ export async function createOrganizationInvitation(
   payload: {
     email: string
     role: OrganizationInvitation["role"]
-  },
+  }
 ): Promise<OrganizationInvitation> {
   // Check if the user is already a member of the organization
   const existingAccount = await db.query.account.findFirst({
@@ -147,8 +149,8 @@ export async function createOrganizationInvitation(
             .select({ id: user.id })
             .from(user)
             .where(eq(user.email, payload.email))
-            .limit(1),
-        ),
+            .limit(1)
+        )
       ),
   })
 
@@ -162,7 +164,7 @@ export async function createOrganizationInvitation(
       and(
         eq(inv.organizationId, organizationId),
         eq(inv.email, payload.email),
-        gt(inv.expiresAt, new Date()),
+        gt(inv.expiresAt, new Date())
       ),
   })
 
@@ -193,7 +195,7 @@ export async function createOrganizationInvitation(
 }
 
 async function sendOrganizationInvitationEmail(
-  invitation: OrganizationInvitation,
+  invitation: OrganizationInvitation
 ): Promise<void> {
   const organizationId = invitation.organizationId as OrganizationId
   const organization = await findOrganizationById(organizationId)
@@ -208,12 +210,12 @@ async function sendOrganizationInvitationEmail(
     OrganizationInvitationEmail({
       organizationName: organization.name,
       invitationToken: invitation.token,
-    }),
+    })
   )
 }
 
 export async function findOrganizationInvitationByToken(
-  token: string,
+  token: string
 ): Promise<OrganizationInvitation | null> {
   const existingInvitation = await db.query.organizationInvitation.findFirst({
     where: (inv, { eq, and, gt }) =>
@@ -225,7 +227,7 @@ export async function findOrganizationInvitationByToken(
 
 export async function acceptOrganizationInvitation(
   token: string,
-  userId: UserId,
+  userId: UserId
 ): Promise<OrganizationInvitation> {
   const invitation = await findOrganizationInvitationByToken(token)
 
@@ -249,7 +251,7 @@ export async function acceptOrganizationInvitation(
 }
 
 export async function deleteOrganizationInvitation(
-  id: OrganizationInvitation["id"],
+  id: OrganizationInvitation["id"]
 ): Promise<void> {
   await db
     .delete(organizationInvitation)

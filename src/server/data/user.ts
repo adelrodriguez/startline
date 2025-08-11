@@ -1,7 +1,6 @@
 import "server-only"
 
 import { addDays, addHours, addMinutes } from "date-fns"
-
 import EmailVerificationCodeEmail from "~/components/emails/email-verification-code"
 import PasswordResetTokenEmail from "~/components/emails/password-reset-token"
 import SignInCodeEmail from "~/components/emails/sign-in-code"
@@ -58,7 +57,7 @@ export async function findUserByEmail(email: string): Promise<User | null> {
 }
 
 export async function findUserByGoogleId(
-  googleId: string,
+  googleId: string
 ): Promise<User | null> {
   const existingUser = await db.query.user.findFirst({
     where: (model, { eq }) => eq(model.googleId, googleId),
@@ -68,7 +67,7 @@ export async function findUserByGoogleId(
 }
 
 export async function findUserByGitHubId(
-  githubId: string,
+  githubId: string
 ): Promise<User | null> {
   const existingUser = await db.query.user.findFirst({
     where: (model, { eq }) => eq(model.githubId, githubId),
@@ -97,7 +96,7 @@ export async function createUser(values: NewUser): Promise<User> {
 }
 
 export async function createUserFromGoogle(
-  values: Pick<NewUser, "email" | "googleId">,
+  values: Pick<NewUser, "email" | "googleId">
 ): Promise<User> {
   const [newUser] = await db
     .insert(user)
@@ -114,7 +113,7 @@ export async function createUserFromGoogle(
 }
 
 export async function createUserFromGitHub(
-  values: Pick<NewUser, "email" | "githubId">,
+  values: Pick<NewUser, "email" | "githubId">
 ): Promise<User> {
   const [newUser] = await db
     .insert(user)
@@ -131,7 +130,7 @@ export async function createUserFromGitHub(
 }
 
 export async function findOrCreateUser(
-  values: Pick<NewUser, "email">,
+  values: Pick<NewUser, "email">
 ): Promise<User> {
   const [newUser] = await db
     .insert(user)
@@ -151,13 +150,13 @@ export async function markUserAsEmailVerified(userId: UserId): Promise<void> {
     .where(
       filters.and(
         filters.eq(user.id, userId),
-        filters.isNull(user.emailVerifiedAt),
-      ),
+        filters.isNull(user.emailVerifiedAt)
+      )
     )
 }
 
 export function assertUserIsAdmin(
-  user: User,
+  user: User
 ): asserts user is User & { role: "admin" } {
   if (user.role !== "admin") {
     throw new UnauthorizedError("User is not an admin")
@@ -165,7 +164,7 @@ export function assertUserIsAdmin(
 }
 
 export function assertUserIsUser(
-  user: User,
+  user: User
 ): asserts user is User & { role: "user" } {
   if (user.role !== "user") {
     throw new UnauthorizedError("User is not a user")
@@ -173,7 +172,7 @@ export function assertUserIsUser(
 }
 
 export async function findProfileByUserId(
-  userId: UserId,
+  userId: UserId
 ): Promise<Profile | null> {
   const existingProfile = await db.query.profile.findFirst({
     where: filters.eq(profile.userId, userId),
@@ -184,7 +183,7 @@ export async function findProfileByUserId(
 
 export async function createProfile(
   userId: UserId,
-  values: StrictOmit<NewProfile, "userId"> = {},
+  values: StrictOmit<NewProfile, "userId"> = {}
 ): Promise<Profile> {
   const [newProfile] = await db
     .insert(profile)
@@ -199,7 +198,7 @@ export async function createProfile(
 
 export async function upsertProfile(
   userId: UserId,
-  values: StrictOmit<NewProfile, "userId"> = {},
+  values: StrictOmit<NewProfile, "userId"> = {}
 ): Promise<Profile> {
   const existingProfile = await findProfileByUserId(userId)
 
@@ -224,7 +223,7 @@ export async function upsertProfile(
 }
 
 export async function findValidEmailVerificationCodeByUserId(
-  userId: UserId,
+  userId: UserId
 ): Promise<EmailVerificationCode | null> {
   const code = await db.query.emailVerificationCode.findFirst({
     where: (model, { eq, and, gte }) =>
@@ -236,7 +235,7 @@ export async function findValidEmailVerificationCodeByUserId(
 
 export async function sendEmailVerificationCode(
   userId: UserId,
-  email: string,
+  email: string
 ): Promise<void> {
   // Delete old codes
   await deleteEmailVerificationCodes(userId)
@@ -255,13 +254,13 @@ export async function sendEmailVerificationCode(
   await sendEmail(
     email,
     "Verify your email",
-    EmailVerificationCodeEmail({ code }),
+    EmailVerificationCodeEmail({ code })
   )
 }
 
 export async function verifyEmailVerificationCode(
   userId: UserId,
-  code: string,
+  code: string
 ): Promise<boolean> {
   const emailVerificationCode =
     await findValidEmailVerificationCodeByUserId(userId)
@@ -279,7 +278,7 @@ export async function verifyEmailVerificationCode(
 }
 
 export async function deleteEmailVerificationCodes(
-  userId: UserId,
+  userId: UserId
 ): Promise<number | null> {
   const result = await db
     .delete(emailVerificationCode)
@@ -299,7 +298,7 @@ export async function deleteExpiredEmailVerificationCodes(): Promise<
 }
 
 export async function findValidPasswordResetToken(
-  input: string,
+  input: string
 ): Promise<PasswordResetToken | null> {
   const hashedInput = sha.sha256.hash(input)
 
@@ -313,7 +312,7 @@ export async function findValidPasswordResetToken(
 
 export async function sendPasswordResetToken(
   userId: UserId,
-  email: string,
+  email: string
 ): Promise<void> {
   await deletePasswordResetTokens(userId)
 
@@ -328,12 +327,12 @@ export async function sendPasswordResetToken(
   await sendEmail(
     email,
     "Reset your password",
-    PasswordResetTokenEmail({ token }),
+    PasswordResetTokenEmail({ token })
   )
 }
 
 export async function markPasswordResetTokenAsUsed(
-  userId: UserId,
+  userId: UserId
 ): Promise<void> {
   await deletePasswordResetTokens(userId)
 
@@ -361,7 +360,7 @@ export async function deleteExpiredPasswordResetTokens(): Promise<
 
 export async function createPassword(
   userId: UserId,
-  input: string,
+  input: string
 ): Promise<Password> {
   const hash = await argon2.hash(input)
 
@@ -389,7 +388,7 @@ export async function findPassword(userId: UserId): Promise<Password | null> {
 
 export async function verifyPassword(
   userId: UserId,
-  input: string,
+  input: string
 ): Promise<boolean> {
   const existingPassword = await findPassword(userId)
 
@@ -417,7 +416,7 @@ export async function sendSignInCode(email: string): Promise<void> {
 
 export async function verifySignInCode(
   email: string,
-  code: string,
+  code: string
 ): Promise<boolean> {
   const signInCode = await db.query.signInCode.findFirst({
     where: (model, { eq, and, gte }) =>
@@ -454,7 +453,7 @@ export async function deleteExpiredSignInCodes(): Promise<number | null> {
 export async function createSession(
   token: string,
   userId: UserId,
-  values: Omit<NewSession, "id" | "userId" | "expiresAt">,
+  values: Omit<NewSession, "id" | "userId" | "expiresAt">
 ): Promise<Session> {
   const [newSession] = await db
     .insert(session)
@@ -472,7 +471,7 @@ export async function createSession(
 }
 
 export async function findSessionById(
-  sessionId: SessionId,
+  sessionId: SessionId
 ): Promise<(Session & { user: User }) | null> {
   const existingSession = await db.query.session.findFirst({
     where: filters.eq(session.id, sessionId),
@@ -494,7 +493,7 @@ export async function deleteUserSessions(userId: UserId): Promise<void> {
 
 export async function updateSession(
   sessionId: SessionId,
-  values: Partial<Omit<NewSession, "id" | "userId">>,
+  values: Partial<Omit<NewSession, "id" | "userId">>
 ): Promise<void> {
   await db.update(session).set(values).where(filters.eq(session.id, sessionId))
 }

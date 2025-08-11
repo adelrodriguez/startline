@@ -9,7 +9,7 @@ export async function GET(): Promise<NextResponse> {
   if (!env.AUTH_OAUTH) {
     return NextResponse.json(
       { error: "OAuth authentication is disabled" },
-      { status: StatusCodes.FORBIDDEN },
+      { status: StatusCodes.FORBIDDEN }
     )
   }
 

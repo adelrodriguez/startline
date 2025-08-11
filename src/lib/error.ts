@@ -52,12 +52,12 @@ export class QueryError extends CustomError {
 export class SendEmailError extends CustomError {
   constructor(
     { email, name, message }: { email: string; name: string; message: string },
-    cause?: unknown,
+    cause?: unknown
   ) {
     super(
       "SendEmailError",
       `Error sending email to ${email}. ${name}: ${message}`,
-      cause,
+      cause
     )
   }
 }

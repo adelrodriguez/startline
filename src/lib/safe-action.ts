@@ -1,12 +1,11 @@
 import * as Sentry from "@sentry/nextjs"
+import { redirect } from "next/navigation"
 import type { Logger } from "next-axiom"
 import {
-  DEFAULT_SERVER_ERROR_MESSAGE,
   createMiddleware,
   createSafeActionClient,
+  DEFAULT_SERVER_ERROR_MESSAGE,
 } from "next-safe-action"
-import { redirect } from "next/navigation"
-
 import { validateRequest } from "~/lib/auth/session"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
 import { AuthError, OrganizationError, RateLimitError } from "~/lib/error"
@@ -67,7 +66,7 @@ export const withRateLimitByIp = createMiddleware().define(
     await rateLimitByIp()
 
     return next({ ctx })
-  },
+  }
 )
 
 export const withRateLimitByUser = createMiddleware<{

@@ -4,11 +4,10 @@ import { StatusCodes } from "http-status-codes"
 import ky from "ky"
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
-import { DatabaseError } from "~/lib/error"
-
 import { google } from "~/lib/auth/oauth"
 import { setSession } from "~/lib/auth/session"
 import { AUTHORIZED_URL, DEFAULT_ORGANIZATION_NAME } from "~/lib/consts"
+import { DatabaseError } from "~/lib/error"
 import { withLogger } from "~/lib/logger"
 import { GoogleUserSchema } from "~/lib/validation/external"
 import { createActivityLog } from "~/server/data/activity-log"
@@ -29,9 +28,7 @@ export const GET = withLogger(async (request) => {
   const codeVerifier = cookieStore.get("google_code_verifier")?.value ?? null
 
   if (
-    !code ||
-    !state ||
-    !storedState ||
+    !(code && state && storedState) ||
     state !== storedState ||
     !codeVerifier
   ) {
@@ -109,7 +106,7 @@ export const GET = withLogger(async (request) => {
 
     const organization = await createOrganization(
       { name: DEFAULT_ORGANIZATION_NAME },
-      { ownerId: user.id },
+      { ownerId: user.id }
     )
 
     await createActivityLog("created_organization", {
@@ -155,7 +152,7 @@ export const GET = withLogger(async (request) => {
 
     request.log.error(
       "Encountered an unknown error while handling a Google OAuth callback",
-      e as Error,
+      e as Error
     )
 
     return new NextResponse(null, {

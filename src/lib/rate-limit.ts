@@ -44,7 +44,7 @@ export async function rateLimitByIp(options?: RateLimitOptions) {
 
 export async function rateLimitByUser(
   email: string,
-  options?: RateLimitOptions,
+  options?: RateLimitOptions
 ) {
   const ipAddress = await getIpAddress()
 

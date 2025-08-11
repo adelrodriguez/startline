@@ -10,7 +10,7 @@ import {
 import { faker } from "@faker-js/faker"
 import { hash } from "@node-rs/argon2"
 import { z } from "zod"
-import db, { user, profile, organization, account, password } from "~/server/db"
+import db, { account, organization, password, profile, user } from "~/server/db"
 
 const s = spinner()
 
@@ -53,7 +53,7 @@ await db.transaction(async (tx) => {
       Array.from({ length: userCount }).map(() => ({
         email: faker.internet.email(),
         role: faker.helpers.arrayElement(["admin", "user"]),
-      })),
+      }))
     )
     .returning()
 
@@ -70,7 +70,7 @@ await db.transaction(async (tx) => {
       preferredLocale: faker.helpers.arrayElement(["en", "es"]),
       avatarUrl: faker.image.avatar(),
       phoneNumber: faker.phone.number(),
-    })),
+    }))
   )
 
   log.success("Created profiles")
@@ -81,7 +81,7 @@ await db.transaction(async (tx) => {
     users.map((user): typeof password.$inferInsert => ({
       userId: user.id,
       hash: hashedPassword,
-    })),
+    }))
   )
 
   log.success("Created passwords")
@@ -96,7 +96,7 @@ await db.transaction(async (tx) => {
     ])
     .returning()
 
-  if (!org1 || !org2 || !org3) {
+  if (!(org1 && org2 && org3)) {
     throw new Error("Failed to create organizations")
   }
 
@@ -108,7 +108,7 @@ await db.transaction(async (tx) => {
       userId: user.id,
       organizationId: faker.helpers.arrayElement([org1.id, org2.id, org3.id]),
       role: faker.helpers.arrayElement(["owner", "member", "admin"]),
-    })),
+    }))
   )
 
   s.message("Created accounts")

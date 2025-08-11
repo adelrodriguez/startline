@@ -3,7 +3,6 @@
 import { usePathname, useSearchParams } from "next/navigation"
 import { usePostHog } from "posthog-js/react"
 import { useEffect, useRef } from "react"
-
 import type { User } from "~/server/data/user"
 
 export function PostHogIdentifyUser({ user }: { user: User }) {
@@ -27,7 +26,7 @@ export function PostHogTrackPageview() {
   const prevPathRef = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!posthog || !pathname) return
+    if (!(posthog && pathname)) return
 
     const url = new URL(pathname, window.location.origin)
     url.search = searchParams.toString()

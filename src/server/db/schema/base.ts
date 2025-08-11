@@ -59,7 +59,7 @@ export const profile = createTable(
   }),
   (table) => ({
     primaryKey: primaryKey({ columns: [table.userId] }),
-  }),
+  })
 )
 
 export const password = createTable("password", (t) => ({
@@ -91,7 +91,7 @@ export const emailVerificationCode = createTable(
       .unique()
       .$type<Brand<bigint, "UserId">>(),
     hash: t.text().notNull(),
-  }),
+  })
 )
 
 export const passwordResetToken = createTable("password_reset_token", (t) => ({
@@ -188,7 +188,7 @@ export const account = createTable(
   }),
   (table) => ({
     primaryKey: primaryKey({ columns: [table.userId, table.organizationId] }),
-  }),
+  })
 )
 
 export const organizationInvitation = createTable(
@@ -231,7 +231,7 @@ export const organizationInvitation = createTable(
     role: accountRoleEnum().notNull().default("member"),
     token: t.text().notNull().unique(),
     expiresAt: t.timestamp({ mode: "date" }).notNull(),
-  }),
+  })
 )
 
 export const webhookEvent = createTable("webhook_event", (t) => ({

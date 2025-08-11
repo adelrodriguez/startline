@@ -10,7 +10,6 @@ import {
 } from "~/components/ui/card"
 import { TypographySmall } from "~/components/ui/typography"
 import { getCurrentUser, getFirstOrganization } from "~/server/loader"
-
 import InviteMemberForm from "./_components/invite-member-form"
 import SignOutButton from "./_components/sign-out-button"
 
@@ -32,8 +31,8 @@ export default async function Page() {
             <div className="flex items-center gap-4">
               <Avatar>
                 <AvatarImage
-                  src={user.profile?.avatarUrl || undefined}
                   alt="Avatar"
+                  src={user.profile?.avatarUrl || undefined}
                 />
                 <AvatarFallback>
                   {user.profile?.name?.[0] || "U"}

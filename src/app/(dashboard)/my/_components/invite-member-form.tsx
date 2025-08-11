@@ -3,7 +3,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import { useEffect } from "react"
 import { toast } from "sonner"
-
 import {
   Form,
   FormControl,
@@ -20,7 +19,9 @@ import type { OrganizationId } from "~/server/data/organization"
 
 export default function InviteMemberForm({
   organizationId,
-}: { organizationId: OrganizationId }) {
+}: {
+  organizationId: OrganizationId
+}) {
   const { form, handleSubmitWithAction, resetFormAndAction } =
     useHookFormAction(
       inviteMember.bind(null, organizationId),
@@ -35,7 +36,7 @@ export default function InviteMemberForm({
             toast.success("Invitation sent!")
           },
         },
-      },
+      }
     )
 
   useEffect(() => {

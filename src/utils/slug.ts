@@ -8,7 +8,7 @@ export function generateSlug(
     lower?: boolean
     remove?: RegExp
     append?: string
-  },
+  }
 ) {
   if (text.length === 0) return ""
 

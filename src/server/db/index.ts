@@ -12,8 +12,8 @@ import {
 } from "drizzle-orm"
 import client from "./client"
 
-export * from "./schema"
 export * as helpers from "./helpers"
+export * from "./schema"
 
 export const filters = {
   lte,

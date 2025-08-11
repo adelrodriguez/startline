@@ -1,12 +1,22 @@
 {
   "server-component": {
     "prefix": "/server-component",
-    "body": ["export default async function Component() {", "  return null", "}"],
+    "body": [
+      "export default async function Component() {",
+      "  return null",
+      "}"
+    ],
     "description": "Server component"
   },
   "client-component": {
     "prefix": "/client-component",
-    "body": ["\"use client\"", "", "export default function Component() {", "  return null", "}"],
+    "body": [
+      "\"use client\"",
+      "",
+      "export default function Component() {",
+      "  return null",
+      "}"
+    ],
     "description": "Client component"
   },
   "server-only": {

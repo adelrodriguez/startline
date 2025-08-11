@@ -4,15 +4,15 @@ import { validateRequest } from "~/lib/auth/session"
 import { UNAUTHORIZED_URL } from "~/lib/consts"
 import { OrganizationError, OrganizationInvitationError } from "~/lib/error"
 import {
-  type Organization,
   findAccountsByUserId,
   findOrganizationById,
   findOrganizationInvitationByToken,
+  type Organization,
 } from "~/server/data/organization"
 import {
+  findProfileByUserId,
   type Profile,
   type User,
-  findProfileByUserId,
 } from "~/server/data/user"
 
 export const getCurrentUser = cache(
@@ -26,7 +26,7 @@ export const getCurrentUser = cache(
     const profile = await findProfileByUserId(user.id)
 
     return { ...user, profile }
-  },
+  }
 )
 
 export const getFirstOrganization = cache(async (): Promise<Organization> => {
@@ -63,5 +63,5 @@ export const getOrganizationFromInvitation = cache(
     }
 
     return organization
-  },
+  }
 )

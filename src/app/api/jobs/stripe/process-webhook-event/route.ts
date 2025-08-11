@@ -4,14 +4,14 @@ import env from "~/lib/env.server"
 import { StripeError } from "~/lib/error"
 import { parseJobRequest } from "~/lib/jobs"
 import {
-  type WebhookEventId,
   markWebhookEventAsProcessed,
+  type WebhookEventId,
 } from "~/server/data/webhook-event"
 
 async function handler(request: NextRequest) {
   const { stripeEvent, webhookEventId } = await parseJobRequest(
     "stripe/process-webhook-event",
-    request,
+    request
   )
 
   console.log("Received webhook event", webhookEventId, stripeEvent)

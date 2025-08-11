@@ -1,5 +1,4 @@
 import React from "react"
-
 import { cn } from "~/utils/ui"
 
 const TypographyH1 = React.forwardRef<
@@ -7,11 +6,11 @@ const TypographyH1 = React.forwardRef<
   React.ComponentPropsWithoutRef<"h1">
 >(({ className, ...props }, ref) => (
   <h1
-    ref={ref}
     className={cn(
       "scroll-m-20 font-extrabold text-4xl tracking-tight lg:text-5xl",
-      className,
+      className
     )}
+    ref={ref}
     {...props}
   />
 ))
@@ -22,11 +21,11 @@ const TypographyH2 = React.forwardRef<
   React.ComponentPropsWithoutRef<"h2">
 >(({ className, ...props }, ref) => (
   <h2
-    ref={ref}
     className={cn(
       "scroll-m-20 border-b pb-2 font-semibold text-3xl tracking-tight first:mt-0",
-      className,
+      className
     )}
+    ref={ref}
     {...props}
   />
 ))
@@ -37,11 +36,11 @@ const TypographyH3 = React.forwardRef<
   React.ComponentPropsWithoutRef<"h3">
 >(({ className, ...props }, ref) => (
   <h3
-    ref={ref}
     className={cn(
       "scroll-m-20 font-semibold text-2xl tracking-tight",
-      className,
+      className
     )}
+    ref={ref}
     {...props}
   />
 ))
@@ -52,11 +51,11 @@ const TypographyH4 = React.forwardRef<
   React.ComponentPropsWithoutRef<"h4">
 >(({ className, ...props }, ref) => (
   <h4
-    ref={ref}
     className={cn(
       "scroll-m-20 font-semibold text-xl tracking-tight",
-      className,
+      className
     )}
+    ref={ref}
     {...props}
   />
 ))
@@ -67,8 +66,8 @@ const TypographyP = React.forwardRef<
   React.ComponentPropsWithoutRef<"p">
 >(({ className, ...props }, ref) => (
   <p
-    ref={ref}
     className={cn("leading-7 [&:not(:first-child)]:mt-6", className)}
+    ref={ref}
     {...props}
   />
 ))
@@ -79,8 +78,8 @@ const TypographyBlockquote = React.forwardRef<
   React.ComponentPropsWithoutRef<"blockquote">
 >(({ className, ...props }, ref) => (
   <blockquote
-    ref={ref}
     className={cn("mt-6 border-l-2 pl-6 italic", className)}
+    ref={ref}
     {...props}
   />
 ))
@@ -91,8 +90,8 @@ const TypographyList = React.forwardRef<
   React.ComponentPropsWithoutRef<"ul">
 >(({ className, ...props }, ref) => (
   <ul
-    ref={ref}
     className={cn("my-6 ml-6 list-disc [&>li]:mt-2", className)}
+    ref={ref}
     {...props}
   />
 ))
@@ -103,11 +102,11 @@ const TypographyInlineCode = React.forwardRef<
   React.ComponentPropsWithoutRef<"code">
 >(({ className, ...props }, ref) => (
   <code
-    ref={ref}
     className={cn(
       "relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono font-semibold text-sm",
-      className,
+      className
     )}
+    ref={ref}
     {...props}
   />
 ))
@@ -118,8 +117,8 @@ const TypographyLead = React.forwardRef<
   React.ComponentPropsWithoutRef<"p">
 >(({ className, ...props }, ref) => (
   <p
-    ref={ref}
     className={cn("text-muted-foreground text-xl", className)}
+    ref={ref}
     {...props}
   />
 ))
@@ -130,8 +129,8 @@ const TypographyLarge = React.forwardRef<
   React.ComponentPropsWithoutRef<"div">
 >(({ className, ...props }, ref) => (
   <div
-    ref={ref}
     className={cn("font-semibold text-lg", className)}
+    ref={ref}
     {...props}
   />
 ))
@@ -142,8 +141,8 @@ const TypographySmall = React.forwardRef<
   React.ComponentPropsWithoutRef<"small">
 >(({ className, ...props }, ref) => (
   <small
-    ref={ref}
     className={cn("font-medium text-sm leading-none", className)}
+    ref={ref}
     {...props}
   />
 ))
@@ -154,8 +153,8 @@ const TypographyMuted = React.forwardRef<
   React.ComponentPropsWithoutRef<"p">
 >(({ className, ...props }, ref) => (
   <p
-    ref={ref}
     className={cn("text-muted-foreground text-sm", className)}
+    ref={ref}
     {...props}
   />
 ))

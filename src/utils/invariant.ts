@@ -2,15 +2,15 @@ import { DatabaseError } from "~/lib/error"
 
 export function invariant(
   condition: boolean,
-  message: string,
+  message: string
 ): asserts condition
 export function invariant(
   condition: boolean,
-  throwable: Error,
+  throwable: Error
 ): asserts condition
 export function invariant(
   condition: boolean,
-  throwable: Error | string,
+  throwable: Error | string
 ): asserts condition {
   if (condition) return
 
@@ -19,7 +19,7 @@ export function invariant(
 
 export function invariantReturning<T>(
   record: T | null | undefined,
-  message = "Failed to create record",
+  message = "Failed to create record"
 ): asserts record is T {
   invariant(!!record, new DatabaseError(message))
 }

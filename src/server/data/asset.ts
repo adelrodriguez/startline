@@ -18,7 +18,7 @@ export async function findAssetById(id: AssetId): Promise<Asset | null> {
 }
 
 export async function findAssetByPublicId(
-  publicId: AssetPublicId,
+  publicId: AssetPublicId
 ): Promise<Asset | null> {
   const existingAsset = await db.query.asset.findFirst({
     where: (model, { eq }) => eq(model.publicId, publicId),
@@ -29,7 +29,7 @@ export async function findAssetByPublicId(
 
 export async function createAsset(
   userId: UserId,
-  values: NewAsset,
+  values: NewAsset
 ): Promise<Asset> {
   const [newAsset] = await db
     .insert(asset)
@@ -43,7 +43,7 @@ export async function createAsset(
 
 export async function markAssetAsUploaded(
   assetId: AssetId,
-  userId: UserId,
+  userId: UserId
 ): Promise<Asset> {
   const [uploadedAsset] = await db
     .update(asset)
@@ -52,8 +52,8 @@ export async function markAssetAsUploaded(
       filters.and(
         filters.eq(asset.id, assetId),
         filters.eq(asset.status, "pending"),
-        filters.eq(asset.userId, userId),
-      ),
+        filters.eq(asset.userId, userId)
+      )
     )
     .returning()
 

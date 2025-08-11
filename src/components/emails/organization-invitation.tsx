@@ -38,8 +38,8 @@ export default function OrganizationInvitationEmail({
               </Text>
               <Section className="my-4 text-center">
                 <Link
-                  href={buildUrl(`${ACCEPT_INVITATION_URL}/${invitationToken}`)}
                   className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-600"
+                  href={buildUrl(`${ACCEPT_INVITATION_URL}/${invitationToken}`)}
                 >
                   Accept Invitation
                 </Link>

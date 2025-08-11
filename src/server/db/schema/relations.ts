@@ -1,5 +1,4 @@
 import { relations } from "drizzle-orm"
-
 import {
   account,
   activityLog,
@@ -54,7 +53,7 @@ export const organizationInvitationRelations = relations(
       fields: [organizationInvitation.inviterId],
       references: [user.id],
     }),
-  }),
+  })
 )
 
 export const accountRelations = relations(account, ({ one }) => ({

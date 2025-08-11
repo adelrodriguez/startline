@@ -6,7 +6,7 @@ import type { AssetMimeType } from "~/server/data/asset"
 
 export default function useS3Upload(
   action = uploadFile,
-  mimeTypes: AssetMimeType[] = [],
+  mimeTypes: AssetMimeType[] = []
 ) {
   const upload = useCallback(
     async (file: File) => {
@@ -43,7 +43,7 @@ export default function useS3Upload(
 
       return confirmResult.data.url
     },
-    [action, mimeTypes],
+    [action, mimeTypes]
   )
 
   return { upload }

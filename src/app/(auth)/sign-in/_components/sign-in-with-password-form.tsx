@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import Link from "next/link"
-
 import { Button } from "~/components/ui/button"
 import {
   Form,
@@ -22,12 +21,12 @@ export default function SignInForm() {
   const { form, handleSubmitWithAction } = useHookFormAction(
     signInWithPassword,
     zodResolver(SignInWithPasswordSchema),
-    { formProps: { defaultValues: { email: "", password: "" } } },
+    { formProps: { defaultValues: { email: "", password: "" } } }
   )
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmitWithAction} className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmitWithAction}>
         <FormField
           control={form.control}
           name="email"
@@ -35,7 +34,7 @@ export default function SignInForm() {
             <FormItem>
               <FormLabel>Email address</FormLabel>
               <FormControl>
-                <Input {...field} type="email" autoComplete="email" />
+                <Input {...field} autoComplete="email" type="email" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -48,10 +47,10 @@ export default function SignInForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input {...field} type="password" autoComplete="password" />
+                <Input {...field} autoComplete="password" type="password" />
               </FormControl>
-              <Button variant="link" asChild className="p-0">
-                <Link href="/sign-in/reset-password" className="h-auto">
+              <Button asChild className="p-0" variant="link">
+                <Link className="h-auto" href="/sign-in/reset-password">
                   Forgot password?
                 </Link>
               </Button>

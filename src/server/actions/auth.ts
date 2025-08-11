@@ -1,8 +1,8 @@
 "use server"
 
-import { returnValidationErrors } from "next-safe-action"
 import { cookies } from "next/headers"
 import { RedirectType, redirect } from "next/navigation"
+import { returnValidationErrors } from "next-safe-action"
 import { z } from "zod"
 import {
   invalidateSession,
@@ -75,7 +75,7 @@ export const signUp = actionClient
 
     const newOrganization = await createOrganization(
       { name: DEFAULT_ORGANIZATION_NAME },
-      { ownerId: newUser.id },
+      { ownerId: newUser.id }
     )
 
     await createActivityLog("created_organization", {
@@ -185,7 +185,11 @@ export const checkSignInCode = actionClient
 
     let user = await findUserByEmail(email)
 
-    if (!user) {
+    if (user) {
+      await markUserAsEmailVerified(user.id)
+
+      await createActivityLog("signed_in_with_code", { userId: user.id })
+    } else {
       user = await createUser({ email })
 
       await createProfile(user.id)
@@ -194,14 +198,10 @@ export const checkSignInCode = actionClient
 
       await createOrganization(
         { name: DEFAULT_ORGANIZATION_NAME },
-        { ownerId: user.id },
+        { ownerId: user.id }
       )
 
       await markUserAsEmailVerified(user.id)
-    } else {
-      await markUserAsEmailVerified(user.id)
-
-      await createActivityLog("signed_in_with_code", { userId: user.id })
     }
 
     await setSession(user.id)
@@ -270,7 +270,7 @@ export const resetPassword = actionClient
       await setSession(passwordResetToken.userId)
 
       redirect(AUTHORIZED_URL, RedirectType.replace)
-    },
+    }
   )
 
 export const signOut = authActionClient

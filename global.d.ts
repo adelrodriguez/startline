@@ -1,5 +1,5 @@
-import type en from "./translations/en.json"
-import type es from "./translations/es.json"
+import type en from "./translations/en.json" with { type: "json" }
+import type es from "./translations/es.json" with { type: "json" }
 
 type Messages = typeof en & typeof es
 

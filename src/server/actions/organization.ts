@@ -5,9 +5,9 @@ import { authActionClient, withRateLimitByUser } from "~/lib/safe-action"
 import { InviteMemberSchema } from "~/lib/validation/forms"
 import { createActivityLog } from "~/server/data/activity-log"
 import {
-  type OrganizationId,
   assertUserIsOrganizationMember,
   createOrganizationInvitation,
+  type OrganizationId,
 } from "~/server/data/organization"
 
 export const inviteMember = authActionClient
@@ -26,18 +26,18 @@ export const inviteMember = authActionClient
     }) => {
       await assertUserIsOrganizationMember(
         organizationId as OrganizationId,
-        ctx.user.id,
+        ctx.user.id
       )
 
       await createOrganizationInvitation(
         organizationId as OrganizationId,
         ctx.user.id,
-        { email, role: "member" },
+        { email, role: "member" }
       )
 
       await createActivityLog("invited_member_to_organization", {
         userId: ctx.user.id,
         organizationId: organizationId as OrganizationId,
       })
-    },
+    }
   )

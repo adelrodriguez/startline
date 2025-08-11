@@ -2,11 +2,11 @@
   "GET": {
     "prefix": "/GET",
     "body": [
-      "import { NextResponse, type NextRequest } from \"next/server\"", 
-      "", 
-      "export async function GET(req: NextRequest): Promise<NextResponse> {", 
-      "  return NextResponse.json({})", 
-      "}", 
+      "import { NextResponse, type NextRequest } from \"next/server\"",
+      "",
+      "export async function GET(req: NextRequest): Promise<NextResponse> {",
+      "  return NextResponse.json({})",
+      "}",
       ""
     ],
     "description": "GET route"
@@ -14,11 +14,11 @@
   "POST": {
     "prefix": "/POST",
     "body": [
-      "import { NextResponse, type NextRequest } from \"next/server\"", 
-      "", 
-      "export async function POST(req: NextRequest): Promise<NextResponse> {", 
-      "  return NextResponse.json({})", 
-      "}", 
+      "import { NextResponse, type NextRequest } from \"next/server\"",
+      "",
+      "export async function POST(req: NextRequest): Promise<NextResponse> {",
+      "  return NextResponse.json({})",
+      "}",
       ""
     ],
     "description": "POST route"
@@ -26,11 +26,11 @@
   "PUT": {
     "prefix": "/PUT",
     "body": [
-      "import { NextResponse, type NextRequest } from \"next/server\"", 
-      "", 
-      "export async function PUT(req: NextRequest): Promise<NextResponse> {", 
-      "  return NextResponse.json({})", 
-      "}", 
+      "import { NextResponse, type NextRequest } from \"next/server\"",
+      "",
+      "export async function PUT(req: NextRequest): Promise<NextResponse> {",
+      "  return NextResponse.json({})",
+      "}",
       ""
     ],
     "description": "PUT route"
@@ -38,11 +38,11 @@
   "PATCH": {
     "prefix": "/PATCH",
     "body": [
-      "import { NextResponse, type NextRequest } from \"next/server\"", 
-      "", 
-      "export async function PATCH(req: NextRequest): Promise<NextResponse> {", 
-      "  return NextResponse.json({})", 
-      "}", 
+      "import { NextResponse, type NextRequest } from \"next/server\"",
+      "",
+      "export async function PATCH(req: NextRequest): Promise<NextResponse> {",
+      "  return NextResponse.json({})",
+      "}",
       ""
     ],
     "description": "PATCH route"
@@ -50,11 +50,11 @@
   "DELETE": {
     "prefix": "/DELETE",
     "body": [
-      "import { NextResponse, type NextRequest } from \"next/server\"", 
-      "", 
-      "export async function DELETE(req: NextRequest): Promise<NextResponse> {", 
-      "  return NextResponse.json({})", 
-      "}", 
+      "import { NextResponse, type NextRequest } from \"next/server\"",
+      "",
+      "export async function DELETE(req: NextRequest): Promise<NextResponse> {",
+      "  return NextResponse.json({})",
+      "}",
       ""
     ],
     "description": "DELETE route"
@@ -62,11 +62,11 @@
   "HEAD": {
     "prefix": "/HEAD",
     "body": [
-      "import { NextResponse, type NextRequest } from \"next/server\"", 
-      "", 
-      "export async function HEAD(req: NextRequest): Promise<NextResponse> {", 
-      "  return NextResponse.json({})", 
-      "}", 
+      "import { NextResponse, type NextRequest } from \"next/server\"",
+      "",
+      "export async function HEAD(req: NextRequest): Promise<NextResponse> {",
+      "  return NextResponse.json({})",
+      "}",
       ""
     ],
     "description": "HEAD route"
@@ -74,13 +74,13 @@
   "OPTIONS": {
     "prefix": "/OPTIONS",
     "body": [
-      "import { NextResponse, type NextRequest } from \"next/server\"", 
-      "", 
-      "export async function OPTIONS(req: NextRequest): Promise<NextResponse> {", 
-      "  return NextResponse.json({})", 
-      "}", 
+      "import { NextResponse, type NextRequest } from \"next/server\"",
+      "",
+      "export async function OPTIONS(req: NextRequest): Promise<NextResponse> {",
+      "  return NextResponse.json({})",
+      "}",
       ""
     ],
     "description": "OPTIONS route"
-  },
+  }
 }

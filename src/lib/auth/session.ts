@@ -8,14 +8,14 @@ import { cache } from "react"
 import { SESSION_COOKIE_NAME, SESSION_LENGTH_IN_DAYS } from "~/lib/consts"
 import { isProduction } from "~/lib/vars"
 import {
-  type Session,
-  type SessionId,
-  type User,
-  type UserId,
   createSession,
   deleteSession,
   deleteUserSessions,
   findSessionById,
+  type Session,
+  type SessionId,
+  type User,
+  type UserId,
   updateSession,
 } from "~/server/data/user"
 import { sha } from "~/utils/hash"
@@ -32,7 +32,7 @@ function generateSessionToken(): string {
 }
 
 async function validateSessionToken(
-  token: string,
+  token: string
 ): Promise<{ session: Session; user: User } | { session: null; user: null }> {
   const sessionId = sha.sha256.hash(token) as SessionId
 
@@ -127,7 +127,7 @@ export const validateRequest = cache(
     const result = await validateSessionToken(sessionId)
 
     return result
-  },
+  }
 )
 
 type AuthenticatedNextRequest<T extends NextRequest> = T & {
@@ -136,22 +136,22 @@ type AuthenticatedNextRequest<T extends NextRequest> = T & {
 }
 type ProtectedRouteHandler<T extends NextRequest = NextRequest> = (
   request: AuthenticatedNextRequest<T>,
-  { params }: { params?: Promise<Record<string, string>> },
+  { params }: { params?: Promise<Record<string, string>> }
 ) => Promise<Response> | Promise<NextResponse> | NextResponse | Response
 
 export function protectedRoute<T extends NextRequest = NextRequest>(
-  handler: ProtectedRouteHandler<T>,
+  handler: ProtectedRouteHandler<T>
 ) {
   return async (
     request: T,
-    args: { params?: Promise<Record<string, string>> },
+    args: { params?: Promise<Record<string, string>> }
   ) => {
     const { user, session } = await validateRequest()
 
     if (!session) {
       return NextResponse.json(
         { message: "Unauthorized" },
-        { status: StatusCodes.UNAUTHORIZED },
+        { status: StatusCodes.UNAUTHORIZED }
       )
     }
 

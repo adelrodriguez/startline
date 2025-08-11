@@ -1,5 +1,5 @@
-import { intro, outro, spinner } from "@clack/prompts"
 import { $ } from "bun"
+import { intro, outro, spinner } from "@clack/prompts"
 
 intro("Setting up email development server")
 

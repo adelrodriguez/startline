@@ -9,7 +9,7 @@ export type ActivityType = ActivityLog["type"]
 
 export async function createActivityLog(
   type: ActivityType,
-  values?: Pick<NewActivityLog, "userId" | "organizationId">,
+  values?: Pick<NewActivityLog, "userId" | "organizationId">
 ) {
   await db.insert(activityLog).values({
     type,

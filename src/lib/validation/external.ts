@@ -9,7 +9,7 @@ export const GoogleUserSchema = z.object({
   picture: z.string().url().optional(),
   locale: z.preprocess(
     (v) => (LOCALES.includes(v as Locale) ? v : undefined),
-    z.enum(LOCALES).optional(),
+    z.enum(LOCALES).optional()
   ),
 })
 export type GoogleUser = z.infer<typeof GoogleUserSchema>

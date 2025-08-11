@@ -4,7 +4,6 @@ import type { NextConfig } from "next"
 import { withAxiom } from "next-axiom"
 import createNextIntlPlugin from "next-intl/plugin"
 import { withPlausibleProxy } from "next-plausible"
-
 import envClient from "~/lib/env.client"
 import envServer from "~/lib/env.server"
 

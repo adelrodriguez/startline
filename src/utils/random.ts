@@ -1,5 +1,5 @@
 import { getRandomValues } from "node:crypto"
-import { type RandomReader, generateRandomString } from "@oslojs/crypto/random"
+import { generateRandomString, type RandomReader } from "@oslojs/crypto/random"
 
 const lowercaseAlphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
 const uppercaseAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

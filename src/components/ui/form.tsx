@@ -1,8 +1,7 @@
 "use client"
 
-import { type Label as LabelPrimitive, Slot as SlotPrimitive } from "radix-ui"
-
 import { Loader2Icon } from "lucide-react"
+import { type Label as LabelPrimitive, Slot as SlotPrimitive } from "radix-ui"
 import * as React from "react"
 import {
   Controller,
@@ -13,7 +12,6 @@ import {
   useFormContext,
   useFormState,
 } from "react-hook-form"
-
 import { Button } from "~/components/ui/button"
 import { Label } from "~/components/ui/label"
 import { cn } from "~/utils/ui"
@@ -28,7 +26,7 @@ type FormFieldContextValue<
 }
 
 const FormFieldContext = React.createContext<FormFieldContextValue>(
-  {} as FormFieldContextValue,
+  {} as FormFieldContextValue
 )
 
 const FormField = <
@@ -72,7 +70,7 @@ type FormItemContextValue = {
 }
 
 const FormItemContext = React.createContext<FormItemContextValue>(
-  {} as FormItemContextValue,
+  {} as FormItemContextValue
 )
 
 const FormItem = React.forwardRef<
@@ -83,7 +81,7 @@ const FormItem = React.forwardRef<
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div ref={ref} className={cn("space-y-2", className)} {...props} />
+      <div className={cn("space-y-2", className)} ref={ref} {...props} />
     </FormItemContext.Provider>
   )
 })
@@ -97,9 +95,9 @@ const FormLabel = React.forwardRef<
 
   return (
     <Label
-      ref={ref}
       className={cn(error && "text-destructive", className)}
       htmlFor={formItemId}
+      ref={ref}
       {...props}
     />
   )
@@ -114,14 +112,12 @@ const FormControl = React.forwardRef<
 
   return (
     <SlotPrimitive.Slot
-      ref={ref}
-      id={formItemId}
       aria-describedby={
-        !error
-          ? `${formDescriptionId}`
-          : `${formDescriptionId} ${formMessageId}`
+        error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`
       }
       aria-invalid={!!error}
+      id={formItemId}
+      ref={ref}
       {...props}
     />
   )
@@ -136,9 +132,9 @@ const FormDescription = React.forwardRef<
 
   return (
     <p
-      ref={ref}
-      id={formDescriptionId}
       className={cn("text-muted-foreground text-sm", className)}
+      id={formDescriptionId}
+      ref={ref}
       {...props}
     />
   )
@@ -158,9 +154,9 @@ const FormMessage = React.forwardRef<
 
   return (
     <p
-      ref={ref}
-      id={formMessageId}
       className={cn("font-medium text-destructive text-sm", className)}
+      id={formMessageId}
+      ref={ref}
       {...props}
     >
       {body}
@@ -179,10 +175,10 @@ const FormSubmit = React.forwardRef<
 
   return (
     <Button
+      aria-disabled={isSubmitting}
+      disabled={isSubmitting}
       ref={ref}
       type="submit"
-      disabled={isSubmitting}
-      aria-disabled={isSubmitting}
       {...props}
     >
       {isSubmitting ? (

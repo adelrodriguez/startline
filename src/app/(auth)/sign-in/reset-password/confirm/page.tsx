@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-
 import { Button } from "~/components/ui/button"
 import {
   Card,
@@ -13,7 +12,9 @@ import { RESET_PASSWORD_URL } from "~/lib/consts"
 
 export default async function Page({
   searchParams,
-}: { searchParams: Promise<{ to: string }> }) {
+}: {
+  searchParams: Promise<{ to: string }>
+}) {
   const { to } = await searchParams
 
   if (!to) {

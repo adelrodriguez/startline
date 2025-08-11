@@ -23,7 +23,7 @@ export const POST = withLogger(async (req) => {
   const event = stripe.webhooks.constructEvent(
     body,
     signature,
-    env.STRIPE_WEBHOOK_SECRET,
+    env.STRIPE_WEBHOOK_SECRET
   )
 
   const processedWebhookEvent = await findWebhookEventByExternalId(event.id)
@@ -39,7 +39,7 @@ export const POST = withLogger(async (req) => {
         processedAt: processedWebhookEvent.processedAt,
         reason: "Webhook event already processed",
       },
-      { status: StatusCodes.OK },
+      { status: StatusCodes.OK }
     )
   }
 
@@ -57,6 +57,6 @@ export const POST = withLogger(async (req) => {
 
   return NextResponse.json(
     { success: true, receivedAt: new Date() },
-    { status: StatusCodes.OK },
+    { status: StatusCodes.OK }
   )
 })

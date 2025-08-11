@@ -5,7 +5,6 @@ import { NuqsAdapter } from "nuqs/adapters/next/app"
 import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
 import { Suspense } from "react"
-
 import { PostHogTrackPageview } from "~/components/analytics/posthog"
 import { Toaster } from "~/components/ui/sonner"
 import { TooltipProvider } from "~/components/ui/tooltip"
@@ -32,8 +31,8 @@ export default function Providers({
       <ThemeProvider
         attribute="class"
         defaultTheme="system"
-        enableSystem
         disableTransitionOnChange
+        enableSystem
       >
         <TooltipProvider>
           <NuqsAdapter>{children}</NuqsAdapter>

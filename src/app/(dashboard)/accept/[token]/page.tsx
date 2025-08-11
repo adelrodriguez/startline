@@ -12,7 +12,9 @@ import { getOrganizationFromInvitation } from "~/server/loader"
 
 export default async function Page({
   params,
-}: { params: Promise<{ token: string }> }) {
+}: {
+  params: Promise<{ token: string }>
+}) {
   const { token } = await params
   const organization = await getOrganizationFromInvitation(token)
 
@@ -35,7 +37,7 @@ export default async function Page({
 
         <CardFooter className="flex justify-between">
           <form>
-            <Button variant="outline" type="submit">
+            <Button type="submit" variant="outline">
               <XCircle className="mr-2 h-4 w-4" />
               Decline
             </Button>

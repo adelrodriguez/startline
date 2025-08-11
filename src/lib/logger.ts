@@ -2,8 +2,8 @@ import "server-only"
 
 import { geolocation, ipAddress, waitUntil } from "@vercel/functions"
 import { StatusCodes } from "http-status-codes"
-import { LogLevel, Logger } from "next-axiom"
 import type { NextFetchEvent, NextRequest, NextResponse } from "next/server"
+import { Logger, LogLevel } from "next-axiom"
 import type { ActionMetadata } from "~/lib/validation/actions"
 import { getGeolocation, getIpAddress } from "~/utils/headers"
 
@@ -48,7 +48,7 @@ export function createActionLogger(metadata: ActionMetadata) {
         success ? LogLevel.info : LogLevel.error,
         `Action "${metadata.actionName}" ${success ? "succeeded" : "failed"} in ${report.durationMs}ms`,
         report,
-        {},
+        {}
       )
 
       logger.config.req = report
@@ -97,7 +97,7 @@ export function createRequestLogger(request: NextRequest) {
         logLevel,
         `[${request.method}] ${report.path} ${statusCode} ${report.durationMs}ms`,
         report,
-        {},
+        {}
       )
 
       logger.config.req = report
@@ -113,13 +113,13 @@ type NextRequestWithLogger = NextRequest & {
 }
 type HandlerWithLogger = (
   request: NextRequestWithLogger,
-  args: { params?: Promise<Record<string, string>> },
+  args: { params?: Promise<Record<string, string>> }
 ) => Promise<Response> | Promise<NextResponse> | NextResponse | Response
 
 export function withLogger(handler: HandlerWithLogger) {
   return async (
     request: NextRequest,
-    args: { params?: Promise<Record<string, string>> },
+    args: { params?: Promise<Record<string, string>> }
   ) => {
     const logger = createRequestLogger(request)
 
@@ -132,7 +132,7 @@ export function withLogger(handler: HandlerWithLogger) {
       // Flush the logger (with child loggers)
       logger.flush(
         response.status >= 400 ? LogLevel.error : LogLevel.info,
-        response.status,
+        response.status
       )
 
       return response

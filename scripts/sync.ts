@@ -2,11 +2,11 @@
 // recommended to use the GitHub action included instead, but this script is
 // useful to update the repo in case the action fails.
 
-import { cancel, isCancel, select, spinner } from "@clack/prompts"
 // Note that this does not respect the .templatesyncignore file, so it will try
 // to merge all the changes made to the template. Use with caution if you have
 // several files ignored.
 import { $ } from "bun"
+import { cancel, isCancel, select, spinner } from "@clack/prompts"
 
 const s = spinner()
 
@@ -14,7 +14,9 @@ s.start("Checking for template remote...")
 
 const remotes = await $`git remote`.text().then((text) => text.split("\n"))
 
-if (!remotes.includes("template")) {
+if (remotes.includes("template")) {
+  s.stop("Template remote found")
+} else {
   s.stop("No template remote found")
 
   const confirmation = await select({
@@ -27,7 +29,7 @@ if (!remotes.includes("template")) {
 
   if (!confirmation || isCancel(confirmation)) {
     cancel(
-      "Please add the template remote by running the command: `git remote add template git@github.com:adelrodriguez/startline-web.git`",
+      "Please add the template remote by running the command: `git remote add template git@github.com:adelrodriguez/startline-web.git`"
     )
 
     process.exit(0)
@@ -38,8 +40,6 @@ if (!remotes.includes("template")) {
   await $`git remote add template git@github.com:adelrodriguez/startline-web.git`
 
   s.stop("Template remote added")
-} else {
-  s.stop("Template remote found")
 }
 
 s.start("Fetching template remote...")

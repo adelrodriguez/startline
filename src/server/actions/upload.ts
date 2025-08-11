@@ -51,7 +51,7 @@ export const uploadFile = authActionClient
         presignedUrl: url,
         publicId: pendingAsset.publicId,
       }
-    },
+    }
   )
 
 export const confirmUpload = authActionClient

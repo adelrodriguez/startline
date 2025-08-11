@@ -9,7 +9,7 @@ export default function SignOutButton() {
   const { execute, isPending } = useAction(signOut)
 
   return (
-    <Button variant="secondary" onClick={() => execute()} disabled={isPending}>
+    <Button disabled={isPending} onClick={() => execute()} variant="secondary">
       {isPending ? (
         <>
           <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />

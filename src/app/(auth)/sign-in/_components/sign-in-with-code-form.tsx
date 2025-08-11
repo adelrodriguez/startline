@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
-
 import {
   Form,
   FormControl,
@@ -21,12 +20,12 @@ export default function SignInWithCodeForm() {
     zodResolver(SignInWithCodeSchema),
     {
       formProps: { defaultValues: { email: "" } },
-    },
+    }
   )
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmitWithAction} className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmitWithAction}>
         <FormField
           control={form.control}
           name="email"

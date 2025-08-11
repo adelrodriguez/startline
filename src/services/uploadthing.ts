@@ -1,9 +1,8 @@
 import {
-  type FileRouter as UploadThingFileRouter,
   createUploadthing,
+  type FileRouter as UploadThingFileRouter,
 } from "uploadthing/next"
-import { UTApi, UploadThingError } from "uploadthing/server"
-
+import { UploadThingError, UTApi } from "uploadthing/server"
 import { validateRequest } from "~/lib/auth/session"
 import { rateLimitByUser } from "~/lib/rate-limit"
 import { createActivityLog } from "~/server/data/activity-log"

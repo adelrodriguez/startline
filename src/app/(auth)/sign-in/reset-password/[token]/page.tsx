@@ -9,7 +9,9 @@ import NewPasswordForm from "./_components/new-password-form"
 
 export default async function Page({
   params,
-}: { params: Promise<{ token: string }> }) {
+}: {
+  params: Promise<{ token: string }>
+}) {
   const { token } = await params
 
   return (

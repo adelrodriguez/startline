@@ -1,6 +1,6 @@
 import "server-only"
 
-import db, { filters, webhookEvent, helpers } from "~/server/db"
+import db, { filters, helpers, webhookEvent } from "~/server/db"
 import { invariantReturning } from "~/utils/invariant"
 import type { StrictOmit } from "~/utils/type"
 
@@ -19,7 +19,7 @@ export async function findWebhookEventByExternalId(externalId: string) {
 export async function createWebhookEvent(
   values: StrictOmit<NewWebhookEvent, "payload"> & {
     payload: unknown
-  },
+  }
 ): Promise<WebhookEvent> {
   const [newWebhookEvent] = await db
     .insert(webhookEvent)
@@ -39,7 +39,7 @@ export async function createWebhookEvent(
 }
 
 export async function markWebhookEventAsProcessed(
-  id: WebhookEventId,
+  id: WebhookEventId
 ): Promise<void> {
   await db
     .update(webhookEvent)

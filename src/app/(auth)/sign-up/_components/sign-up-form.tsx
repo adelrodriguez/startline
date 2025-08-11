@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import { toast } from "sonner"
-
 import {
   Form,
   FormControl,
@@ -35,12 +34,12 @@ export default function SignUpForm() {
           toast.error(error.serverError)
         },
       },
-    },
+    }
   )
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmitWithAction} className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmitWithAction}>
         <FormField
           control={form.control}
           name="name"
@@ -48,7 +47,7 @@ export default function SignUpForm() {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input {...field} type="text" autoComplete="name" />
+                <Input {...field} autoComplete="name" type="text" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -61,7 +60,7 @@ export default function SignUpForm() {
             <FormItem>
               <FormLabel>Email address</FormLabel>
               <FormControl>
-                <Input {...field} type="email" autoComplete="email" />
+                <Input {...field} autoComplete="email" type="email" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -74,7 +73,7 @@ export default function SignUpForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input {...field} type="password" autoComplete="new-password" />
+                <Input {...field} autoComplete="new-password" type="password" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -87,7 +86,7 @@ export default function SignUpForm() {
             <FormItem>
               <FormLabel>Confirm Password</FormLabel>
               <FormControl>
-                <Input {...field} type="password" autoComplete="new-password" />
+                <Input {...field} autoComplete="new-password" type="password" />
               </FormControl>
               <FormMessage />
             </FormItem>

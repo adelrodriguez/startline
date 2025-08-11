@@ -6,7 +6,6 @@ import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
 import { useAction } from "next-safe-action/hooks"
 import { type ComponentRef, useRef } from "react"
 import { toast } from "sonner"
-
 import { Button } from "~/components/ui/button"
 import {
   Form,
@@ -32,7 +31,7 @@ export default function CheckEmailVerificationCodeForm() {
   const formRef = useRef<ComponentRef<"form">>(null)
   const { form, handleSubmitWithAction } = useHookFormAction(
     checkEmailVerificationCode,
-    zodResolver(CheckEmailVerificationCodeSchema),
+    zodResolver(CheckEmailVerificationCodeSchema)
   )
 
   const { execute: resendCode } = useAction(resendEmailVerificationCode, {
@@ -50,8 +49,8 @@ export default function CheckEmailVerificationCodeForm() {
   return (
     <Form {...form}>
       <form
-        onSubmit={handleSubmitWithAction}
         className="space-y-4"
+        onSubmit={handleSubmitWithAction}
         ref={formRef}
       >
         <FormField
@@ -62,12 +61,12 @@ export default function CheckEmailVerificationCodeForm() {
               <FormControl>
                 <InputOTP
                   {...field}
-                  type="text"
                   maxLength={6}
-                  pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
                   onComplete={() => {
                     formRef?.current?.requestSubmit()
                   }}
+                  pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+                  type="text"
                 >
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />
@@ -82,7 +81,7 @@ export default function CheckEmailVerificationCodeForm() {
                   </InputOTPGroup>
                 </InputOTP>
               </FormControl>
-              <Button onClick={() => resendCode()} variant="link" type="button">
+              <Button onClick={() => resendCode()} type="button" variant="link">
                 Resend code
               </Button>
               <FormMessage />

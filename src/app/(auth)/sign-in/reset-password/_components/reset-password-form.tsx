@@ -1,7 +1,6 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
-
 import {
   Form,
   FormControl,
@@ -19,12 +18,12 @@ export default function ResetPasswordForm() {
   const { form, handleSubmitWithAction } = useHookFormAction(
     requestPasswordReset,
     zodResolver(RequestPasswordResetSchema),
-    { formProps: { defaultValues: { email: "" } } },
+    { formProps: { defaultValues: { email: "" } } }
   )
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmitWithAction} className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmitWithAction}>
         <FormField
           control={form.control}
           name="email"
@@ -32,7 +31,7 @@ export default function ResetPasswordForm() {
             <FormItem>
               <FormLabel>Email address</FormLabel>
               <FormControl>
-                <Input {...field} type="email" autoComplete="email" />
+                <Input {...field} autoComplete="email" type="email" />
               </FormControl>
               <FormMessage />
             </FormItem>

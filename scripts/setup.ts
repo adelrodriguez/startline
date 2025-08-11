@@ -1,6 +1,6 @@
+import { $ } from "bun"
 import fs from "node:fs/promises"
 import { cancel, intro, isCancel, outro, select, spinner } from "@clack/prompts"
-import { $ } from "bun"
 
 const s = spinner()
 
@@ -30,18 +30,18 @@ if (envLocalExists) {
     process.exit(0)
   }
 
-  if (!confirmation) {
-    cancel(
-      "Please create a .env following the template of the .env.example file.",
-    )
-
-    process.exit(0)
-  } else {
+  if (confirmation) {
     s.start("Creating .env file...")
 
     await fs.copyFile(".env.example", ".env")
 
     s.stop("Created .env file")
+  } else {
+    cancel(
+      "Please create a .env following the template of the .env.example file."
+    )
+
+    process.exit(0)
   }
 }
 
@@ -63,13 +63,13 @@ if (isCancel(hasDocker)) {
   process.exit(0)
 }
 
-if (!hasDocker) {
-  cancel("Please install Docker before continuing.")
-  process.exit(0)
-} else {
+if (hasDocker) {
   s.start("Starting Docker containers...")
   await $`bun docker:up`
   s.stop("Docker containers started.")
+} else {
+  cancel("Please install Docker before continuing.")
+  process.exit(0)
 }
 
 outro("Finished setup. Happy coding!")

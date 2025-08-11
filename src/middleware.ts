@@ -9,7 +9,7 @@ import { middlewareLogger } from "~/lib/logger"
 
 export async function middleware(
   request: NextRequest,
-  event: NextFetchEvent,
+  event: NextFetchEvent
 ): Promise<NextResponse> {
   middlewareLogger(request, event)
 

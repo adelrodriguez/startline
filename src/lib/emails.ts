@@ -10,7 +10,7 @@ export async function sendEmail(
   email: string,
   subject: string,
   body: ReactElement,
-  sendAt?: Date | string,
+  sendAt?: Date | string
 ) {
   if (env.MOCK_RESEND) {
     const content = await render(body, { plainText: true })
@@ -40,7 +40,7 @@ export async function sendEmail(
         message: error.message,
         email,
       },
-      error,
+      error
     )
   }
 }

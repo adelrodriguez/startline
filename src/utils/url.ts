@@ -11,7 +11,7 @@ export function buildUrl<T extends string>(
     query?: Record<string, string | number>
     decoded?: boolean
     protocol?: "http" | "https"
-  },
+  }
 ): string {
   const url = new URL(pathname, buildBaseUrl(options?.protocol))
 

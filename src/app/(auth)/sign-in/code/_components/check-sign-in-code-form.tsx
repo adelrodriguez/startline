@@ -6,7 +6,6 @@ import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
 import { useAction } from "next-safe-action/hooks"
 import { type ComponentRef, useRef } from "react"
 import { toast } from "sonner"
-
 import { Button } from "~/components/ui/button"
 import {
   Form,
@@ -29,7 +28,7 @@ export default function CheckSignInCodeForm({ email }: { email: string }) {
   const formRef = useRef<ComponentRef<"form">>(null)
   const { form, handleSubmitWithAction } = useHookFormAction(
     checkSignInCode,
-    zodResolver(CheckSignInWithCodeSchema),
+    zodResolver(CheckSignInWithCodeSchema)
   )
   const { execute: resendCode } = useAction(resendSignInCode, {
     onExecute() {
@@ -46,8 +45,8 @@ export default function CheckSignInCodeForm({ email }: { email: string }) {
   return (
     <Form {...form}>
       <form
-        onSubmit={handleSubmitWithAction}
         className="space-y-4"
+        onSubmit={handleSubmitWithAction}
         ref={formRef}
       >
         <FormField
@@ -58,12 +57,12 @@ export default function CheckSignInCodeForm({ email }: { email: string }) {
               <FormControl>
                 <InputOTP
                   {...field}
-                  type="text"
                   maxLength={6}
-                  pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
                   onComplete={() => {
                     formRef?.current?.requestSubmit()
                   }}
+                  pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+                  type="text"
                 >
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />
@@ -80,8 +79,8 @@ export default function CheckSignInCodeForm({ email }: { email: string }) {
               </FormControl>
               <Button
                 onClick={() => resendCode({ email })}
-                variant="link"
                 type="button"
+                variant="link"
               >
                 Resend code
               </Button>

@@ -36,7 +36,7 @@ export async function enqueueJob<T extends JobType>(
     | "retries"
     | "timeout"
     | "notBefore"
-  >,
+  >
 ) {
   const request = buildJobRequest(type, payload)
 
@@ -62,7 +62,7 @@ export async function enqueueJob<T extends JobType>(
 
 export function buildJobRequest<T extends JobType>(
   type: T,
-  payload: JobPayload<T>,
+  payload: JobPayload<T>
 ): PublishRequest<JobPayload<T>> {
   return {
     url: buildUrl(`/api/jobs/${type}`, {
@@ -74,7 +74,7 @@ export function buildJobRequest<T extends JobType>(
 
 export async function parseJobRequest<T extends JobType>(
   type: T,
-  request: Request | NextRequest,
+  request: Request | NextRequest
 ): Promise<JobPayload<T>> {
   const payload = await request.json()
 

@@ -11,7 +11,7 @@ export function getPostHog() {
 
 export function withPostHog<T>(callback: (posthog: PostHog) => T): T
 export async function withPostHog<T>(
-  callback: (posthog: PostHog) => Promise<T>,
+  callback: (posthog: PostHog) => Promise<T>
 ): Promise<T> {
   const posthog = getPostHog()
 

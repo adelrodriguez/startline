@@ -54,7 +54,7 @@ export default createEnv({
       .refine(
         (v) =>
           isProduction ? v.startsWith("sk_live") : v.startsWith("sk_test"),
-        `Must start with ${isProduction ? "sk_live" : "sk_test"} in ${environment}`,
+        `Must start with ${isProduction ? "sk_live" : "sk_test"} in ${environment}`
       ),
     STRIPE_WEBHOOK_SECRET: z.string(),
 
@@ -68,11 +68,11 @@ export default createEnv({
     // Authentication methods
     AUTH_PASSWORD: z.preprocess(
       (v) => v === "true",
-      z.boolean().default(false),
+      z.boolean().default(false)
     ),
     AUTH_SIGN_IN_CODES: z.preprocess(
       (v) => v === "true",
-      z.boolean().default(false),
+      z.boolean().default(false)
     ),
     AUTH_OAUTH: z.preprocess((v) => v === "true", z.boolean().default(false)),
   },

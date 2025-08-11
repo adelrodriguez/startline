@@ -28,7 +28,7 @@ s.stop("Existing schedules fetched")
 for (const endpoint of endpoints) {
   if (
     existingSchedules.find(
-      (schedule) => schedule.destination === endpoint.destination,
+      (schedule) => schedule.destination === endpoint.destination
     )
   ) {
     log.warn(`Schedule already exists: ${endpoint.destination}`)
