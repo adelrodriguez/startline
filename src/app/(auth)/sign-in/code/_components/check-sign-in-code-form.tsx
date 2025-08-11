@@ -21,8 +21,8 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "~/components/ui/input-otp"
-import { CheckSignInWithCodeSchema } from "~/lib/validation/forms"
 import { checkSignInCode, resendSignInCode } from "~/server/actions/auth"
+import { CheckSignInWithCodeSchema } from "~/shared/validation/forms"
 
 export default function CheckSignInCodeForm({ email }: { email: string }) {
   const formRef = useRef<ComponentRef<"form">>(null)

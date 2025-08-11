@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { DatabaseError } from "~/lib/error"
+import { DatabaseError } from "~/shared/error"
 import { invariant, invariantReturning } from "../invariant"
 
 describe("invariant", () => {

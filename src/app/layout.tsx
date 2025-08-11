@@ -1,10 +1,9 @@
 import type { Metadata } from "next"
-import Providers from "~/components/providers"
-import { APP_NAME, type Locale } from "~/lib/consts"
-import { fonts } from "~/utils/fonts"
-import { cn } from "~/utils/ui"
+import Providers from "~/shared/components/providers"
+import { APP_NAME, type Locale } from "~/shared/consts"
+import { cn, fonts } from "~/shared/utils/ui"
 
-import "~/styles/tailwind.css"
+import "~/shared/assets/styles/tailwind.css"
 
 export const metadata: Metadata = {
   title: APP_NAME,

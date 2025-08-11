@@ -3,9 +3,9 @@ import {
   type NextRequest,
   NextResponse,
 } from "next/server"
-import { nextIntlMiddleware } from "~/i18n/routing"
-import { LOCALES, SESSION_COOKIE_NAME } from "~/lib/consts"
-import { logger } from "~/lib/logger"
+import { LOCALES, SESSION_COOKIE_NAME } from "~/shared/consts"
+import { nextIntlMiddleware } from "~/shared/i18n/routing"
+import { logger } from "~/shared/logger"
 
 export async function middleware(
   request: NextRequest,

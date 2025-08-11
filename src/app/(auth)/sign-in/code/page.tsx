@@ -1,7 +1,7 @@
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { VERIFICATION_EMAIL_COOKIE_NAME } from "~/lib/consts"
+import { VERIFICATION_EMAIL_COOKIE_NAME } from "~/shared/consts"
 import CheckSignInCodeForm from "./_components/check-sign-in-code-form"
 
 export default async function Page() {

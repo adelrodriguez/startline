@@ -13,8 +13,8 @@ import {
   FormSubmit,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import { SignUpSchema } from "~/lib/validation/forms"
 import { signUp } from "~/server/actions/auth"
+import { SignUpSchema } from "~/shared/validation/forms"
 
 export default function SignUpForm() {
   const { form, handleSubmitWithAction } = useHookFormAction(

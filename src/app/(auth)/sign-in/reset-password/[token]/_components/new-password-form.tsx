@@ -12,8 +12,8 @@ import {
   FormSubmit,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import { NewPasswordSchema } from "~/lib/validation/forms"
 import { resetPassword } from "~/server/actions/auth"
+import { NewPasswordSchema } from "~/shared/validation/forms"
 
 export default function NewPasswordForm({ token }: { token: string }) {
   const { form, handleSubmitWithAction } = useHookFormAction(

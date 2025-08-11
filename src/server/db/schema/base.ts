@@ -1,6 +1,6 @@
 import { pgEnum, primaryKey } from "drizzle-orm/pg-core"
-import { DEFAULT_LOCALE, LOCALES } from "~/lib/consts"
 import { createPublicId, createTable } from "~/server/db/schema/helpers"
+import { DEFAULT_LOCALE, LOCALES } from "~/shared/consts"
 import type { Brand } from "~/utils/type"
 
 export const userRoleEnum = pgEnum("user_role", ["admin", "user"])

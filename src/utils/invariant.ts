@@ -1,4 +1,4 @@
-import { DatabaseError } from "~/lib/error"
+import { DatabaseError } from "~/shared/error"
 
 export function invariant(
   condition: boolean,

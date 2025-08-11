@@ -2,13 +2,7 @@ import "server-only"
 
 import { createDate, TimeSpan } from "oslo"
 import { alphabet, generateRandomString } from "oslo/crypto"
-import OrganizationInvitationEmail from "~/components/emails/organization-invitation"
 import { sendEmail } from "~/lib/emails"
-import {
-  NotFoundError,
-  OrganizationError,
-  OrganizationInvitationError,
-} from "~/lib/error"
 import type { UserId } from "~/server/data/user"
 import db, {
   account,
@@ -17,6 +11,12 @@ import db, {
   organizationInvitation,
   user,
 } from "~/server/db"
+import OrganizationInvitationEmail from "~/shared/components/emails/organization-invitation"
+import {
+  NotFoundError,
+  OrganizationError,
+  OrganizationInvitationError,
+} from "~/shared/error"
 import { invariantReturning } from "~/utils/invariant"
 
 export type Organization = typeof organization.$inferSelect

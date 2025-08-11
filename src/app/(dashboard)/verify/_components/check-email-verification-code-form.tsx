@@ -21,11 +21,11 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "~/components/ui/input-otp"
-import { CheckEmailVerificationCodeSchema } from "~/lib/validation/forms"
 import {
   checkEmailVerificationCode,
   resendEmailVerificationCode,
 } from "~/server/actions/auth"
+import { CheckEmailVerificationCodeSchema } from "~/shared/validation/forms"
 
 export default function CheckEmailVerificationCodeForm() {
   const formRef = useRef<ComponentRef<"form">>(null)

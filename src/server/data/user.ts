@@ -1,12 +1,7 @@
 import "server-only"
 
 import { addDays, addHours, addMinutes } from "date-fns"
-import EmailVerificationCodeEmail from "~/components/emails/email-verification-code"
-import PasswordResetTokenEmail from "~/components/emails/password-reset-token"
-import SignInCodeEmail from "~/components/emails/sign-in-code"
-import { SESSION_LENGTH_IN_DAYS } from "~/lib/consts"
 import { sendEmail } from "~/lib/emails"
-import { UnauthorizedError } from "~/lib/error"
 import db, {
   emailVerificationCode,
   filters,
@@ -17,6 +12,11 @@ import db, {
   signInCode,
   user,
 } from "~/server/db"
+import EmailVerificationCodeEmail from "~/shared/components/emails/email-verification-code"
+import PasswordResetTokenEmail from "~/shared/components/emails/password-reset-token"
+import SignInCodeEmail from "~/shared/components/emails/sign-in-code"
+import { SESSION_LENGTH_IN_DAYS } from "~/shared/consts"
+import { UnauthorizedError } from "~/shared/error"
 import { argon2, sha } from "~/utils/hash"
 import { invariantReturning } from "~/utils/invariant"
 import {

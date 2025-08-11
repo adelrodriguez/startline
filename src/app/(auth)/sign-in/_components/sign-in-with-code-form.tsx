@@ -11,8 +11,8 @@ import {
   FormSubmit,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import { SignInWithCodeSchema } from "~/lib/validation/forms"
 import { signInWithCode } from "~/server/actions/auth"
+import { SignInWithCodeSchema } from "~/shared/validation/forms"
 
 export default function SignInWithCodeForm() {
   const { form, handleSubmitWithAction } = useHookFormAction(

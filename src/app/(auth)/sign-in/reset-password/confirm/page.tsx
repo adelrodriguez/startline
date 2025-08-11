@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card"
-import { RESET_PASSWORD_URL } from "~/lib/consts"
+import { RESET_PASSWORD_URL } from "~/shared/consts"
 
 export default async function Page({
   searchParams,

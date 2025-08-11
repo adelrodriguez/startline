@@ -1,8 +1,5 @@
 import { redirect } from "next/navigation"
 import { cache } from "react"
-import { validateRequest } from "~/lib/auth/session"
-import { UNAUTHORIZED_URL } from "~/lib/consts"
-import { OrganizationError, OrganizationInvitationError } from "~/lib/error"
 import {
   findAccountsByUserId,
   findOrganizationById,
@@ -14,6 +11,9 @@ import {
   type Profile,
   type User,
 } from "~/server/data/user"
+import { validateRequest } from "~/shared/auth/server"
+import { UNAUTHORIZED_URL } from "~/shared/consts"
+import { OrganizationError, OrganizationInvitationError } from "~/shared/error"
 
 export const getCurrentUser = cache(
   async (): Promise<User & { profile: Profile | null }> => {

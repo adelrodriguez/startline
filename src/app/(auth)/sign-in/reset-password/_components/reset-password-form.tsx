@@ -11,8 +11,8 @@ import {
   FormSubmit,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import { RequestPasswordResetSchema } from "~/lib/validation/forms"
 import { requestPasswordReset } from "~/server/actions/auth"
+import { RequestPasswordResetSchema } from "~/shared/validation/forms"
 
 export default function ResetPasswordForm() {
   const { form, handleSubmitWithAction } = useHookFormAction(

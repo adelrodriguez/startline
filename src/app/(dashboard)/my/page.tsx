@@ -1,4 +1,3 @@
-import { AdminOnly } from "~/components/auth/roles"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import {
   Card,
@@ -10,6 +9,7 @@ import {
 } from "~/components/ui/card"
 import { TypographySmall } from "~/components/ui/typography"
 import { getCurrentUser, getFirstOrganization } from "~/server/loader"
+import { AdminOnly } from "~/shared/components/auth/roles"
 import InviteMemberForm from "./_components/invite-member-form"
 import SignOutButton from "./_components/sign-out-button"
 

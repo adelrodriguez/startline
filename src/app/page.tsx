@@ -1,7 +1,5 @@
 import { RabbitIcon } from "lucide-react"
 import Link from "next/link"
-import { SignedIn, SignedOut } from "~/components/auth/state"
-import { ModeToggle } from "~/components/theme"
 import { Button } from "~/components/ui/button"
 import {
   Tooltip,
@@ -9,6 +7,8 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip"
 import { TypographyH1, TypographyLead } from "~/components/ui/typography"
+import { SignedIn, SignedOut } from "~/shared/components/auth/state"
+import { ModeToggle } from "~/shared/components/theme"
 
 export default function Page() {
   return (

@@ -13,9 +13,9 @@ import {
   FormSubmit,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import { InviteMemberSchema } from "~/lib/validation/forms"
 import { inviteMember } from "~/server/actions/organization"
 import type { OrganizationId } from "~/server/data/organization"
+import { InviteMemberSchema } from "~/shared/validation/forms"
 
 export default function InviteMemberForm({
   organizationId,

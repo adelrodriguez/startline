@@ -1,5 +1,5 @@
-import { AUTHORIZED_URL } from "~/lib/consts"
-import env from "~/lib/env.client"
+import { AUTHORIZED_URL } from "~/shared/consts"
+import env from "~/shared/env.client"
 
 export function buildBaseUrl(protocol: "http" | "https" = "https") {
   return `${protocol}://${env.NEXT_PUBLIC_DOMAIN}`

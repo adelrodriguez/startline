@@ -14,8 +14,8 @@ import {
   FormSubmit,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import { SignInWithPasswordSchema } from "~/lib/validation/forms"
 import { signInWithPassword } from "~/server/actions/auth"
+import { SignInWithPasswordSchema } from "~/shared/validation/forms"
 
 export default function SignInForm() {
   const { form, handleSubmitWithAction } = useHookFormAction(
