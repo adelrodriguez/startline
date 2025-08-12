@@ -1,4 +1,4 @@
-import { vercel } from "@t3-oss/env-core/presets"
+import { vercel } from "@t3-oss/env-core/presets-zod"
 import { createEnv } from "@t3-oss/env-nextjs"
 import { z } from "zod"
 
@@ -12,19 +12,8 @@ export default createEnv({
       .default("development"),
 
     // Resend
-    MOCK_RESEND: z.preprocess((v) => v === "true", z.boolean().default(false)),
+    MOCK_RESEND: z.stringbool().default(false),
     RESEND_API_KEY: z.string(),
-
-    // Authentication methods
-    AUTH_PASSWORD: z.preprocess(
-      (v) => v === "true",
-      z.boolean().default(false)
-    ),
-    AUTH_SIGN_IN_CODES: z.preprocess(
-      (v) => v === "true",
-      z.boolean().default(false)
-    ),
-    AUTH_OAUTH: z.preprocess((v) => v === "true", z.boolean().default(false)),
   },
 
   client: {
@@ -42,6 +31,5 @@ export default createEnv({
   skipValidation:
     process.env.SKIP_ENV_VALIDATION === "true" || process.env.CI === "true",
 
-  emptyStringAsUndefined: process.env.NODE_ENV === "production",
   extends: [vercel()],
 })
