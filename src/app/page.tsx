@@ -38,6 +38,10 @@ export default function Page() {
             </Button>
           </Unauthenticated>
 
+          <Button asChild variant="link">
+            <Link href="/demo">Demo</Link>
+          </Button>
+
           <ModeToggle />
         </nav>
       </header>
@@ -45,7 +49,7 @@ export default function Page() {
         <section className="w-full pt-12 md:pt-24 lg:pt-32">
           <div className="container space-y-10 xl:space-y-16">
             <div className="flex flex-col items-center gap-4 text-center">
-              <TypographyH1>Startline Web</TypographyH1>
+              <TypographyH1>Startline</TypographyH1>
 
               <TypographyLead className="max-w-2xl">
                 A feature-rich template to kickstart your next project. Packed

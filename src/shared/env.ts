@@ -4,20 +4,7 @@ import { z } from "zod"
 
 export default createEnv({
   server: {
-    DATABASE_URL: z.string(),
-
-    EMAIL_FROM: z.string().email(),
-
-    // GitHub
-    GITHUB_CLIENT_ID: z.string(),
-    GITHUB_CLIENT_SECRET: z.string(),
-
-    // Google
-    GOOGLE_CLIENT_ID: z.string(),
-    GOOGLE_CLIENT_SECRET: z.string(),
-
-    // Mocks
-    MOCK_RESEND: z.preprocess((v) => v === "true", z.boolean().default(false)),
+    EMAIL_FROM: z.email(),
 
     // Node
     NODE_ENV: z
@@ -25,6 +12,7 @@ export default createEnv({
       .default("development"),
 
     // Resend
+    MOCK_RESEND: z.preprocess((v) => v === "true", z.boolean().default(false)),
     RESEND_API_KEY: z.string(),
 
     // Authentication methods
@@ -38,13 +26,15 @@ export default createEnv({
     ),
     AUTH_OAUTH: z.preprocess((v) => v === "true", z.boolean().default(false)),
   },
-  
+
   client: {
+    NEXT_PUBLIC_CONVEX_URL: z.string(),
     NEXT_PUBLIC_DOMAIN: z.string(),
   },
 
   experimental__runtimeEnv: {
     NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN,
+    NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
   },
 
   skipValidation:
