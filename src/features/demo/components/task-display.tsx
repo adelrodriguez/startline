@@ -1,9 +1,9 @@
 "use client"
 
 import { type Preloaded, useMutation, usePreloadedQuery } from "convex/react"
-import { api } from "~/convex/api"
 import { Button } from "~/shared/components/ui/button"
 import { TypographyH4, TypographyP } from "~/shared/components/ui/typography"
+import { api } from "~~/convex/_generated/api"
 
 export default function TaskDisplay({
   query,

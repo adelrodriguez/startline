@@ -1,6 +1,10 @@
 import { RabbitIcon } from "lucide-react"
 import Link from "next/link"
-import { Authenticated, Unauthenticated } from "~/shared/components/auth/state"
+import {
+  Authenticated,
+  AuthLoading,
+  Unauthenticated,
+} from "~/shared/components/auth"
 import { ModeToggle } from "~/shared/components/theme"
 import { Button } from "~/shared/components/ui/button"
 import {
@@ -64,6 +68,10 @@ export default function Page() {
                   </Link>
                 </Button>
               </div>
+
+              <AuthLoading>
+                <p>Loading...</p>
+              </AuthLoading>
             </div>
           </div>
         </section>

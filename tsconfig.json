@@ -22,8 +22,8 @@
       }
     ],
     "paths": {
-      "~/*": ["./src/*"],
-      "~/convex/*": ["./convex/_generated/*"]
+      "~~/*": ["./*"],
+      "~/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

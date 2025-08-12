@@ -30,11 +30,13 @@ export default createEnv({
   client: {
     NEXT_PUBLIC_CONVEX_URL: z.string(),
     NEXT_PUBLIC_DOMAIN: z.string(),
+    NEXT_PUBLIC_SITE_URL: z.string(),
   },
 
   experimental__runtimeEnv: {
     NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN,
     NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   },
 
   skipValidation:
