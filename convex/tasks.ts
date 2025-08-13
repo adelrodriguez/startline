@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
+import { vv } from "./helpers"
 
 export const list = query({
   args: {},
@@ -20,5 +21,14 @@ export const create = mutation({
       createdAt: Date.now(),
       updatedAt: Date.now(),
     })
+  },
+})
+
+export const remove = mutation({
+  args: {
+    id: vv.id("tasks"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id)
   },
 })

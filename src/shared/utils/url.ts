@@ -1,35 +1,60 @@
-import { AUTHORIZED_URL } from "~/shared/consts"
-import env from "~/shared/env"
+import { isProduction } from "./environment"
 
-export function buildBaseUrl(protocol: "http" | "https" = "https") {
-  return `${protocol}://${env.NEXT_PUBLIC_DOMAIN}`
-}
+const LEADING_SLASHES = /^\/+/
+const MULTIPLE_SLASHES = /\/+/g
 
-export function buildUrl<T extends string>(
-  pathname: T,
-  options?: {
-    query?: Record<string, string | number>
-    decoded?: boolean
-    protocol?: "http" | "https"
-  }
-): string {
-  const url = new URL(pathname, buildBaseUrl(options?.protocol))
+/**
+ * Adds or overrides the protocol for a URL.
+ *
+ * Explicitly provided protocols will override existing ones.
+ * Useful for security enforcement and environment normalization.
+ */
+export function addProtocol(url: string, protocol?: "http" | "https") {
+  if (url.includes("://")) {
+    const [existingProtocol, ...rest] = url.split("://")
+    const urlWithoutProtocol = rest.join("://")
 
-  if (options?.query) {
-    for (const [key, value] of Object.entries(options.query)) {
-      url.searchParams.set(key, value.toString())
+    if (!existingProtocol) {
+      return url
     }
+
+    if (!protocol) {
+      return `${existingProtocol.toLowerCase()}://${urlWithoutProtocol}`
+    }
+
+    return `${protocol}://${urlWithoutProtocol}`
   }
 
-  const stringUrl = url.toString()
-
-  if (options?.decoded) {
-    return decodeURIComponent(stringUrl)
-  }
-
-  return stringUrl
+  const defaultProtocol = isProduction ? "https" : "http"
+  return `${protocol ?? defaultProtocol}://${url}`
 }
 
-export function buildAuthPathname<T extends string>(pathname: T) {
-  return `${AUTHORIZED_URL}/${pathname}` as const
+export function createUrlBuilder(baseUrl: string, protocol?: "http" | "https") {
+  const baseUrlObject = new URL(addProtocol(baseUrl, protocol))
+
+  return function buildUrl<T extends string>(
+    pathname: T,
+    options?: {
+      query?: Record<string, string | number | boolean | undefined>
+    }
+  ): string {
+    const cleanedPathname = pathname.replace(LEADING_SLASHES, "")
+    const fullPath =
+      baseUrlObject.pathname === "/"
+        ? `/${cleanedPathname}`
+        : `${baseUrlObject.pathname}/${cleanedPathname}`
+
+    const normalizedPath = fullPath.replace(MULTIPLE_SLASHES, "/")
+    const url = new URL(normalizedPath, baseUrlObject.origin)
+
+    if (options?.query) {
+      for (const [key, value] of Object.entries(options.query)) {
+        if (value !== undefined) {
+          url.searchParams.set(key, value.toString())
+        }
+      }
+    }
+
+    return url.toString()
+  }
 }

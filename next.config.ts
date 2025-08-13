@@ -8,7 +8,9 @@ const withBundleAnalyzer = bundleAnalyzer({
 })
 // const withNextIntl = createNextIntlPlugin("./src/shared/i18n/request")
 
-let nextConfig: NextConfig = {}
+let nextConfig: NextConfig = {
+  serverExternalPackages: ["pino", "pino-pretty"],
+}
 
 nextConfig = withBundleAnalyzer(nextConfig)
 // nextConfig = withNextIntl(nextConfig)

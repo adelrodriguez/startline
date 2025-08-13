@@ -1,17 +1,9 @@
 import { convexAdapter } from "@convex-dev/better-auth"
 import { convex } from "@convex-dev/better-auth/plugins"
 import { betterAuth } from "better-auth"
-import env from "~/shared/env"
 import type { GenericCtx } from "~~/convex/_generated/server"
 import { betterAuthComponent } from "~~/convex/auth"
-
-// TODO: Actually implement this
-export async function validateRequest() {
-  return (await Promise.resolve({
-    user: null,
-    session: null,
-  })) as { user: User | null; session: Session | null }
-}
+import env from "~~/src/shared/env"
 
 export function createAuth(ctx: GenericCtx) {
   return betterAuth({
@@ -29,3 +21,7 @@ export function createAuth(ctx: GenericCtx) {
     ],
   })
 }
+
+export type Auth = ReturnType<typeof createAuth>
+
+export { APIError as AuthError } from "better-auth/api"

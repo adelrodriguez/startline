@@ -1,10 +1,6 @@
-import { RabbitIcon } from "lucide-react"
+import { FastForwardIcon } from "lucide-react"
 import Link from "next/link"
-import {
-  Authenticated,
-  AuthLoading,
-  Unauthenticated,
-} from "~/shared/components/auth"
+import { Authenticated, Unauthenticated } from "~/shared/components/auth"
 import { ModeToggle } from "~/shared/components/theme"
 import { Button } from "~/shared/components/ui/button"
 import {
@@ -23,8 +19,8 @@ export default function Page() {
           href="#"
           prefetch={false}
         >
-          <RabbitIcon className="size-6" />
-          <span className="sr-only">Startline Web</span>
+          <FastForwardIcon className="size-6" />
+          <span className="sr-only">Startline</span>
         </Link>
         <nav className="ml-auto flex gap-1 sm:gap-2">
           <Authenticated>
@@ -68,10 +64,6 @@ export default function Page() {
                   </Link>
                 </Button>
               </div>
-
-              <AuthLoading>
-                <p>Loading...</p>
-              </AuthLoading>
             </div>
           </div>
         </section>
