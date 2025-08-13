@@ -1,75 +1,84 @@
-import { $ } from "bun"
 import fs from "node:fs/promises"
-import { cancel, intro, isCancel, outro, select, spinner } from "@clack/prompts"
+import { cancel, intro, isCancel, note, outro, select, spinner, text } from "@clack/prompts"
 
 const s = spinner()
 
-intro("Setting up the `startline` template")
+intro("Setting up your Next.js + Convex project")
 
-s.start("Checking for a .env file...")
+s.start("Checking for environment configuration...")
 
-const envLocalExists = await fs.exists(".env")
+const envExists = await fs.exists(".env")
 
-if (envLocalExists) {
+if (envExists) {
   s.stop("Found .env file.")
 } else {
   s.stop("No .env file found")
 
   const confirmation = await select({
-    message:
-      "Do you want to create a .env file? This will copy the .env.example file to .env.",
+    message: "Create environment file from template?",
     options: [
-      { label: "Yes", value: true },
-      { label: "No", value: false },
+      { label: "Yes, copy .env.example to .env", value: true },
+      { label: "No, I'll create it manually", value: false },
     ],
   })
 
   if (isCancel(confirmation)) {
-    cancel("Cancelled setup.")
-
+    cancel("Setup cancelled.")
     process.exit(0)
   }
 
   if (confirmation) {
     s.start("Creating .env file...")
-
     await fs.copyFile(".env.example", ".env")
-
     s.stop("Created .env file")
-  } else {
-    cancel(
-      "Please create a .env following the template of the .env.example file."
+    
+    note(
+      "Please update the following in your .env file:\n" +
+      "• NEXT_PUBLIC_CONVEX_URL (from your Convex dashboard)\n" +
+      "• NEXT_PUBLIC_CONVEX_SITE_URL (from your Convex dashboard)\n" +
+      "• EMAIL_FROM (your sending email address)\n" +
+      "• RESEND_API_KEY (if using Resend for emails)\n" +
+      "• OAuth credentials (if using GitHub/Google auth)",
+      "Environment Variables"
     )
-
-    process.exit(0)
+  } else {
+    note(
+      "Make sure to create a .env file with the required variables.\n" +
+      "Use .env.example as a reference.",
+      "Manual Setup"
+    )
   }
 }
 
-// TODO(adelrodriguez): Run script that prompts user to create the necessary
-// accounts and fill environment variables.
-
-const hasDocker = await select({
-  message:
-    "Do you have Docker installed? We use Docker for running the database and the Redis server for local development.",
+const convexSetup = await select({
+  message: "Have you set up your Convex project?",
   options: [
-    { label: "Yes", value: true },
-    { label: "No", value: false },
+    { label: "Yes, I have a Convex project ready", value: true },
+    { label: "No, I need to set up Convex", value: false },
   ],
 })
 
-if (isCancel(hasDocker)) {
-  cancel("Cancelled setup.")
-
+if (isCancel(convexSetup)) {
+  cancel("Setup cancelled.")
   process.exit(0)
 }
 
-if (hasDocker) {
-  s.start("Starting Docker containers...")
-  await $`bun docker:up`
-  s.stop("Docker containers started.")
+if (convexSetup) {
+  note(
+    "Great! Make sure your Convex URLs are in your .env file:\n" +
+    "• NEXT_PUBLIC_CONVEX_URL\n" +
+    "• NEXT_PUBLIC_CONVEX_SITE_URL",
+    "Convex Configuration"
+  )
 } else {
-  cancel("Please install Docker before continuing.")
-  process.exit(0)
+  note(
+    "To set up Convex:\n" +
+    "1. Visit https://convex.dev and create an account\n" +
+    "2. Create a new project\n" +
+    "3. Run 'bunx convex dev' to initialize\n" +
+    "4. Copy the URLs to your .env file",
+    "Convex Setup Required"
+  )
 }
 
-outro("Finished setup. Happy coding!")
+outro("Setup complete! Run 'bun dev' to start developing.")

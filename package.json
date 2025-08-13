@@ -13,7 +13,6 @@
     "clean": "bun scripts/clean.ts",
     "dev": "next dev --turbopack",
     "dev:convex": "convex dev",
-    "dev:email": "bun template:email && email dev --dir src/components/emails --port 3001",
     "format": "adamantite format",
     "lint": "adamantite lint",
     "start": "next start",

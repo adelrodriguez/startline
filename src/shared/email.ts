@@ -5,7 +5,6 @@ import chalk from "chalk"
 import type { ReactElement } from "react"
 import { Resend } from "resend"
 import env from "~/shared/env"
-import { SendEmailError } from "~/shared/error"
 import { logger } from "~/shared/logger"
 
 const resend = new Resend(env.RESEND_API_KEY)
@@ -38,14 +37,9 @@ export async function sendEmail(
   })
 
   if (error) {
-    throw new SendEmailError(
-      {
-        name: error.name,
-        message: error.message,
-        email,
-      },
-      error
-    )
+    throw new Error(`Failed to send email to ${email}: ${error.message}`, {
+      cause: error,
+    })
   }
 }
 

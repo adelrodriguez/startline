@@ -11,7 +11,6 @@
 import type * as auth from "../auth.js";
 import type * as helpers from "../helpers.js";
 import type * as http from "../http.js";
-import type * as tasks from "../tasks.js";
 
 import type {
   ApiFromModules,
@@ -31,7 +30,6 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   helpers: typeof helpers;
   http: typeof http;
-  tasks: typeof tasks;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

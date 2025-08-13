@@ -4,10 +4,21 @@ import * as z from "~/shared/utils/schema"
 
 export default createEnv({
   server: {
-    // Resend
+    // Email Configuration
     EMAIL_FROM: z.email(),
-    MOCK_RESEND: z.stringbool().default(false),
     RESEND_API_KEY: z.string(),
+    MOCK_RESEND: z.stringbool().default(false),
+
+    // OAuth Configuration
+    GITHUB_CLIENT_ID: z.string().optional(),
+    GITHUB_CLIENT_SECRET: z.string().optional(),
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
+
+    // Authentication Configuration
+    AUTH_PASSWORD: z.stringbool().default(true),
+    AUTH_SIGN_IN_CODES: z.stringbool().default(true),
+    AUTH_OAUTH: z.stringbool().default(true),
   },
 
   client: {
@@ -24,12 +35,24 @@ export default createEnv({
 
   clientPrefix: "NEXT_PUBLIC_",
 
-  // We require all environment variables to be set so we can support both
-  // Next.js and Convex's runtimes
   runtimeEnvStrict: {
+    // Email
     EMAIL_FROM: process.env.EMAIL_FROM,
-    MOCK_RESEND: process.env.MOCK_RESEND,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
+    MOCK_RESEND: process.env.MOCK_RESEND,
+
+    // OAuth
+    GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+    GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+
+    // Authentication
+    AUTH_PASSWORD: process.env.AUTH_PASSWORD,
+    AUTH_SIGN_IN_CODES: process.env.AUTH_SIGN_IN_CODES,
+    AUTH_OAUTH: process.env.AUTH_OAUTH,
+
+    // Client
     NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
     NEXT_PUBLIC_CONVEX_SITE_URL: process.env.NEXT_PUBLIC_CONVEX_SITE_URL,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
